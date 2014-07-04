@@ -1,0 +1,254 @@
+<div class="breadcrumbs">
+    <!-- breadcrumbs goes here -->
+    <ul class="breadcrumb">
+        <li>
+            <i class="ace-icon fa fa-home home-icon"></i>
+            <a href="#">首页</a>
+        </li>
+    </ul>
+</div>
+
+<div class="page-content" ng-controller="depotAuditAuditedController">
+<!-- setting box goes here if needed -->
+
+<div class="page-header">
+    <h1>
+        已审核单据管理
+        <small>
+            <i class="ace-icon fa fa-angle-double-right"></i>
+            订单列表
+        </small>
+    </h1>
+</div>
+
+<div class="row">
+<div class="col-xs-12">
+<!-- PAGE CONTENT BEGINS -->
+
+<!--Criteria Query Form BEGINS
+===========================================-->
+<form class="form-horizontal" name="form" novalidate ng-submit="submit()">
+    <fieldset>
+        <div class="col-sm-10 col-sm-offset-1">
+
+
+            <div class="form-group">
+                <!--公司-->
+                <label class="col-sm-1 control-label no-padding-right"> 公司 </label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <inc-select inc="invoice.inc"></inc-select>
+                    </div>
+                </div>
+
+                <!--客户-->
+                <label class="col-sm-1 control-label no-padding-right"> 客户 </label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <client-select client="invoice.client" client-id="searchTerm.clientId"></client-select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <!--单据类型-->
+                <label class="col-sm-1 control-label no-padding-right"> 单据类型</label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <select class="form-control" ng-model="searchTerm.invoiceTypeId">
+                            <option value="1">销售</option>
+                            <option value="3">自用</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!--单号-->
+                <label class="col-sm-1 control-label no-padding-right"> 单号 </label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <input class="form-control" type="text" ng-model="searchTerm.num">
+                    </div>
+                </div>
+            </div>
+
+            <!--单据日期-->
+            <div class="form-group">
+                <label class="col-sm-1 control-label no-padding-right"> 单据日期 </label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-5 pull-left">
+                        <input type="text" class="form-control" datepicker-popup="yyyy/MM/dd"
+                               show-button-bar="false" is-open="startDateOpened" datepicker-options=" {showWeeks: false, startingDay: 1 }"
+                               ng-required="true" ng-click="startDateOpened = true"
+                               ng-model="searchTerm.startDateOfReceived"/>
+                                <span class="input-group-addon">
+                                <i class="fa fa-calendar bigger-110"></i>
+                                </span>
+                    </div>
+                    <div class="input-group col-xs-2 pull-left center">
+                        <span class="bigger-160">~</span>
+                    </div>
+                    <div class="input-group col-xs-5">
+                        <input type="text" class="form-control" datepicker-popup="yyyy/MM/dd"
+                               show-button-bar="false" is-open="endDateOpened" datepicker-options=" {showWeeks: false, startingDay: 1 }"
+                               ng-required="true" ng-click="endDateOpened = true"
+                               ng-model="searchTerm.endDateOfReceived"/>
+                                <span class="input-group-addon">
+                                <i class="fa fa-calendar bigger-110"></i>
+                                </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-danger" ng-if="error">
+                <button type="button" class="close" data-dismiss="alert">
+                    <i class="ace-icon fa fa-times"></i>
+                </button>
+                <strong>
+                    <i class="ace-icon fa fa-check"></i>
+                    查询出错，请联系管理员!
+                </strong>
+                <br>
+            </div>
+
+            <!--搜索-->
+            <div class="form-group">
+                <div class="col-sm-5 col-lg-offset-1">
+                    <button class="btn btn-info" type="submit" ng-click="action = 'SUBMIT'">
+                        <i class="ace-icon fa fa-check bigger-110"></i>
+                        搜索
+                    </button>
+
+                    &nbsp; &nbsp; &nbsp;
+                    <button class="btn" type="submit" ng-click="action = 'RESET'">
+                        <i class="ace-icon fa fa-undo bigger-110"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<!--Criteria Query Form ENDS
+===========================================-->
+
+<!--Datatable BEGINS
+===========================================-->
+<div class="col-sm-12">
+    <div class="table-header">
+        已审核单据列表
+    </div>
+    <div>
+        <div class="dataTables_wrapper form-inline">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div id="sample-table-2_length" class="dataTables_length"><label>每页
+                        <select size="1" name="sample-table-2_length">
+                            <option value="20" selected="selected">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select> 记录</label></div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="dataTables_filter"><label>搜索: <input type="text"></label>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-striped table-bordered table-hover dataTable">
+                <thead>
+                <tr role="row">
+                    <th>单据类型</th>
+                    <th>单号</th>
+                    <th>公司</th>
+                    <th>客户</th>
+                    <th>
+                        <i class="ace-icon fa fa-clock-o bigger-110 hidden-480"></i>
+                        单据日期
+                    </th>
+                    <th>车号</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr ng-repeat="invoice in data.content" ng-dblclick="view(invoice.invoiceId)">
+                    <td>
+                        <span class="label label-sm label-success arrowed arrowed-righ" ng-if="invoice.invoiceType.type ==0" ng-bind="invoice.invoiceType.name"></span>
+                        <span class="label label-sm label-info arrowed arrowed-in" ng-if="invoice.invoiceType.type ==1" ng-bind="invoice.invoiceType.name"></span>
+                    </td>
+                    <td ng-bind="invoice.num"></td>
+                    <td ng-bind="invoice.inc.incName">/td>
+                    <td ng-bind="invoice.client.clientName">/td>
+                    <td ng-bind="invoice.receivedDate | date:'yyyy-MM-dd HH:mm:ss'">/td>
+                    <td ng-bind="invoice.carNum">/td>
+                    <td>
+                        <div class="hidden-sm hidden-xs action-buttons">
+                            <a class="green" title="查看" ui-sref="home.customer_service.order.view({invoiceId:invoice.invoiceId})">
+                                <i class="ace-icon fa fa-pencil bigger-130"></i>
+                            </a>
+
+                        </div>
+
+                        <div class="hidden-md hidden-lg">
+                            <div class="inline position-relative">
+                                <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown"
+                                        data-position="auto">
+                                    <i class="ace-icon fa fa-caret-down icon-only bigger-120"></i>
+                                </button>
+
+                                <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                                    <li>
+                                        <a ui-sref="home.customer_service.order.view({invoiceId:invoice.invoiceId})"
+                                           class="tooltip-success" title="查看">
+																			<span class="green">
+																				<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>
+																			</span>
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="center" ng-if="loading">
+                    <td colspan="7">
+                        <i class="fa fa-spinner fa-spin bigger-210"></i>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="dataTables_info" id="sample-table-2_info">总共 <span ng-bind="data.page.totalElements"></span> 条记录</div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="dataTables_paginate paging_bootstrap">
+                        <pagination ng-model="currentPage" ng-change="onPageChanged()"
+                                    total-items="data.page.totalElements" items-per-page="data.page.size"
+                                    boundary-links="true"
+                                    class="pagination pull-right" previous-text="&lsaquo;" next-text="&rsaquo;"
+                                    first-text="&laquo;" last-text="&raquo;"></pagination>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!--Datatable ENDS
+===========================================-->
+
+<!-- PAGE CONTENT ENDS -->
+</div>
+<!-- /.col -->
+</div>
+<!-- /.row -->
+
+</div>
+<!-- /.page-content -->

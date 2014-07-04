@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<configuration status="off">-->
+<configuration status="debug">
+<properties>
+        <property name="LOG_PATH">H:/</property>
+        <property name="APP_NAME">newlp</property>
+    </properties>
+    <appenders>
+
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%date{HH:mm:ss.SSS} %level [%file:%line] - %msg%n" />
+        </Console>
+
+        <RollingFile name="RollingFile" fileName="${LOG_PATH}/${APP_NAME}.log"
+                         filePattern="${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd-HH}.log.zip">
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
+        </RollingFile>
+    </appenders>
+    <loggers>
+
+        <logger name="com.lesso.newlp" level="debug"/>
+
+        <!-- 3rdparty Loggers -->
+        <!--<logger name="org.springframework.core" level="debug"/>-->
+        <!--<logger name="org.springframework.beans" level="debug"/>-->
+        <!--<logger name="org.springframework.context" level="debug"/>-->
+        <!--<logger name="org.springframework.web" level="debug"/>-->
+        <!--<logger name="org.springframework.security" level="debug"/>-->
+        <!--<logger name="org.springframework.test" level="debug"/>-->
+        <logger name="org.springframework.data" level="debug"/>
+        <logger name="org.springframework.jdbc" level="debug"/>
+
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="trace"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="debug"/>
+        <logger name="org.hibernate.SQL" level="debug"/>
+        <logger name="org.hibernate.engine.QueryParameters" level="debug"/>
+        <logger name="org.hibernate.engine.query.HQLQueryPlan" level="debug"/>
+        <logger name="org.hibernate.engine.jdbc.spi" level="debug"/>
+        <logger name="org.hibernate.tool.hbm2ddl" level="debug"/>
+        <!-- Root Logger -->
+        <root level="debug">
+            <appender-ref ref="Console" />
+            <appender-ref ref="RollingFile" />
+        </root>
+    </loggers>
+</configuration>

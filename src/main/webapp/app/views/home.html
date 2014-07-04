@@ -1,0 +1,150 @@
+<div class="no-skin">
+    <div id="navbar" class="navbar navbar-default" ng-controller="headerCtrl">
+        <!-- navbar goes here -->
+        <div id="navbar-container" class="navbar-container">
+
+            <!-- toggle buttons are here or inside brand container -->
+
+            <div class="navbar-header pull-left">
+                <!-- brand text here -->
+                <a href="#" class="navbar-brand">
+                    <small>
+                        <i class="ace-icon fa fa-leaf"></i>
+                        礼品系统
+                    </small>
+                </a>
+            </div>
+            <!-- /.navbar-header -->
+
+
+            <div class="navbar-buttons navbar-header pull-right ">
+                <ul class="nav ace-nav">
+                    <!-- user buttons such as messages, notifications and user menu -->
+                    <li class="light-blue">
+                        <a data-toggle="dropdown" href="javascript:;" class="dropdown-toggle">
+                            <img class="nav-user-photo" src="./avatars/avatar.png" alt="Jason's Photo">
+								<span class="user-info">
+									<small>你好,</small>
+									{{currentUser.username}}
+								</span>
+                            <i class="ace-icon fa fa-caret-down"></i>
+                        </a>
+
+                        <ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                            <li>
+                                <a href="javascript:;">
+                                    <i class="ace-icon fa fa-cog"></i>
+                                    设置 (待完成)
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="javascript:;">
+                                    <i class="ace-icon fa fa-user"></i>
+                                    个人资料 (待完成)
+                                </a>
+                            </li>
+
+                            <li class="divider"></li>
+
+                            <li>
+                                <a ui-sref="logout">
+                                    <i class="ace-icon fa fa-power-off"></i>
+                                    登出
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-buttons -->
+
+
+            <nav class="navbar-menu pull-left">
+                <!-- optional menu & form inside navbar -->
+            </nav>
+            <!-- /.navbar-menu -->
+
+        </div>
+        <!-- /.navbar-container -->
+    </div>
+    <!-- /.navbar -->
+
+    <div class="main-container" id="main-container" ng-controller="mainCtrl">
+        <div class="sidebar responsive" id="sidebar"  ng-init="collapseSidebar=false" ng-class="{'menu-min':collapseSidebar}">
+            <!-- sidebar goes here -->
+            <div class="sidebar-shortcuts" id="sidebar-shortcuts">
+
+                <div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
+                    <button class="btn btn-success"><i class="ace-icon fa fa-signal"></i></button>
+                    <button class="btn btn-info"><i class="ace-icon fa fa-pencil"></i></button>
+                    <button class="btn btn-warning"><i class="ace-icon fa fa-users"></i></button>
+                    <button class="btn btn-danger"><i class="ace-icon fa fa-cogs"></i></button>
+                </div>
+
+                <div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
+                    <span class="btn btn-success"></span>
+                    <span class="btn btn-info"></span>
+                    <span class="btn btn-warning"></span>
+                    <span class="btn btn-danger"></span>
+                </div>
+            </div>
+
+            <ul class="nav nav-list">
+
+                <!--panels
+                =====================================-->
+                <li  ng-repeat="panel in panels" ng-init="panel.isOpen= true">
+                    <!--ng-class="{active:$state.includes(panel.state)}"-->
+                    <a class="dropdown-toggle" href="javascript:;" ng-click="panel.isOpen = !panel.isOpen;">
+                        <i class="{{panel.iconClass}}"></i>
+                        <span class="menu-text">
+                          {{panel.name}}{{'active'| includedByState}}
+                        </span>
+                        <b class="arrow fa fa-angle-down"></b>
+                        <!-- arrow down icon if there's a submenu -->
+                    </a>
+
+                    <b class="arrow"></b>
+                    <!-- optional arrow for minimized menu & hover submenu -->
+                    <ul class="submenu" ng-class="{'show':panel.isOpen}">
+                        <li ng-repeat="pane in panel.panes" ui-sref-active="active">
+                            <a  ui-sref="{{pane.state}}">
+                                <i class="menu-icon fa fa-caret-right"></i>
+                                <span class="menu-text">{{pane.name}}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div id="sidebar-collapse" class="sidebar-toggle sidebar-collapse" ng-click="collapseSidebar=!collapseSidebar">
+                <i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left"
+                   data-icon2="ace-icon fa fa-angle-double-right"></i>
+            </div>
+        </div>
+
+        <div class="main-content" ui-view="">
+        </div>
+        <!-- /.main-content -->
+
+        <!-- footer area -->
+        <div class="footer">
+            <div class="footer-inner">
+                <!-- #section:basics/footer -->
+                <div class="footer-content">
+						<span class="bigger-120">
+							<span class="blue bolder">联塑</span>
+							IT © 2013-2014
+						</span>
+                </div>
+
+                <!-- /section:basics/footer -->
+            </div>
+        </div>
+    </div>
+    <!-- /.main-container -->
+
+    <!-- list of script files -->
+
+</div>

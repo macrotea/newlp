@@ -1,0 +1,67 @@
+<div class="view-container" ng-controller="managementMessageListCtrl">
+    <h1 class="page-header">消息管理</h1>
+
+    <div class="col-lg-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel title</h3>
+            </div>
+            <div class="panel-body">
+                <ul class="chat-list">
+                    <li class="chat" ng-repeat="chat in chats">
+                        <div class="chat-actions">
+                            <a href="#"><span class="glyphicon glyphicon-comment"></span></a>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-status"></div>
+                            <div class="chat-createtime">{{chat.createtime | date:'HH:mm'}}</div>
+                            <div class="user-info">
+                                <a href="#">{{chat.user.nickname}}</a>
+                                <a href="#" class="avatar">
+                                    <img class="avatar-img" ng-src="{{chat.user.headimgurl}}">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="chat-content">
+                            {{chat.content}}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel title</h3>
+            </div>
+            <div class="panel-body">
+                <ul class="  message-list">
+                    <li class="message me" ng-repeat="message in messages">
+                        <!--<div class="message-actions">-->
+                            <!--<a href="#"><span class="glyphicon glyphicon-comment"></span></a>-->
+                        <!--</div>-->
+                        <div class="message-info">
+                            <div class="message-status"></div>
+                            <div class="message-createtime">{{message.createtime | date:'HH:mm'}}</div>
+                            <div class="user-info">
+                                <a href="#">{{message.user.nickname}}</a>
+                                <a href="#" class="avatar">
+                                    <img class="avatar-img" ng-src="{{message.user.headimgurl}}">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="message-content">
+                            <div class="cloud">
+                                <div class="cloud-text">
+                                    {{message.content}}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
