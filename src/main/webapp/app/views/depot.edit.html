@@ -36,12 +36,12 @@
             <span class="title">仓库</span>
         </li>
 
-        <li data-target="#step3" class="">
+        <li data-target="#step3"  ng-class="{complete:(invoice.auditStatus>=90),active:( invoice.auditStatus>=70 && invoice.auditStatus<=90)}">
             <span class="step">3</span>
             <span class="title">打单</span>
         </li>
 
-        <li data-target="#step4" class="">
+        <li data-target="#step4"  ng-class="{complete:(invoice.auditStatus>=90)}">
             <span class="step">4</span>
             <span class="title">完成</span>
         </li>
@@ -66,7 +66,7 @@
 
             <div class="col-sm-9">
                 <div class="input-group col-xs-10 col-sm-5">
-                    <client-select client="invoice.client"></client-select>
+                    <select class="form-control" title="选择客户" client-select ng-model="invoice.client" ng-options="client.clientName for client in [invoice.client] track by client.clientId"></select>
                 </div>
             </div>
         </div>
@@ -251,7 +251,7 @@
             <!--</button>-->
             <strong>
                 <i class="ace-icon fa fa-check"></i>
-                订单<span ng-if="invoice.auditStatus==60">提交</span><span ng-if="invoice.auditStatus==50">保存</span>成功!
+                订单<span ng-if="invoice.auditStatus==70">提交</span><span ng-if="invoice.auditStatus==50">保存</span>成功!
             </strong>
             <br>
         </div>
@@ -268,7 +268,7 @@
         <div class="clearfix form-actions">
             <div class="col-md-offset-3 col-md-9">
 
-                <button class="btn btn-info" type="submit" ng-click="invoice.auditStatus = 60">
+                <button class="btn btn-info" type="submit" ng-click="invoice.auditStatus = 70">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     提交
                 </button>

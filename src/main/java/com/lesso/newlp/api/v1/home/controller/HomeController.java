@@ -1,5 +1,6 @@
 package com.lesso.newlp.api.v1.home.controller;
 
+import com.lesso.newlp.auth.model.CurrentUser;
 import com.lesso.newlp.home.entity.PanelEntity;
 import com.lesso.newlp.home.repository.PanelRepository;
 import com.lesso.newlp.home.service.HomeService;
@@ -11,6 +12,7 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ import javax.annotation.Resource;
  */
 @Controller
 @RequestMapping("/api/v1/home")
+@SuppressWarnings("unchecked")
 public class HomeController {
 
     @Resource
@@ -41,8 +44,8 @@ public class HomeController {
 //    }
 
     @RequestMapping("/panels")
-    public HttpEntity<PagedResources<PanelEntity>> get(Model model, Pageable pageable, PagedResourcesAssembler assembler) {
-        Page<PanelEntity> panels = panelRepository.findAll(pageable);
+    public HttpEntity<PagedResources<PanelEntity>> get(Model model, Pageable pageable, PagedResourcesAssembler assembler,@CurrentUser User user) {
+        Page<PanelEntity> panels = panelService.findByMemberId(user.getUsername(),pageable);
         return new ResponseEntity<>(assembler.toResource(panels), HttpStatus.OK);
     }
 }

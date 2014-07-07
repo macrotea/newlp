@@ -1,31 +1,4 @@
-<div class="breadcrumbs">
-    <!-- breadcrumbs goes here -->
-    <ul class="breadcrumb">
-        <li>
-            <i class="ace-icon fa fa-home home-icon"></i>
-            <a href="#">首页</a>
-        </li>
-    </ul>
-</div>
-
-<div class="page-content" ng-controller="depotAuditUnauditedController">
-<!-- setting box goes here if needed -->
-
-<div class="page-header">
-    <h1>
-        未审核单据管理
-        <small>
-            <i class="ace-icon fa fa-angle-double-right"></i>
-            单据列表
-        </small>
-    </h1>
-</div>
-
-<div class="row">
-<div class="col-xs-12">
-<!-- PAGE CONTENT BEGINS -->
-
-<!--Criteria Query Form BEGINS
+<!--Invoice Criteria BEGINS
 ===========================================-->
 <form class="form-horizontal" name="form" novalidate ng-submit="submit()">
     <fieldset>
@@ -48,8 +21,7 @@
                 <div class="col-sm-5">
                     <div class="input-group col-xs-12">
                         <!--<client-select client="invoice.client" client-id="searchTerm.clientId"></client-select>-->
-                        <select class="form-control" title="选择客户" client-select client-id="searchTerm.clientId" ng-model="searchTerm.client" ng-options="client.clientName for client in [searchTerm.client] track by client.clientId">
-                        </select>
+                        <select class="form-control" title="选择客户" client-select client-id="searchTerm.clientId" ng-model="searchTerm.client" ng-options="client.clientName for client in [searchTerm.client] track by client.clientId"></select>
                     </div>
                 </div>
             </div>
@@ -136,22 +108,22 @@
         </div>
     </fieldset>
 </form>
-<!--Criteria Query Form ENDS
+<!--Invoice Criteria ENDS
 ===========================================-->
 
-<!--Datatable BEGINS
+<!--Invoice Datatable BEGINS
 ===========================================-->
 <div class="col-sm-12">
     <div class="table-header">
-        未审核单据列表
+        订单列表
     </div>
     <div>
         <div class="dataTables_wrapper form-inline">
             <div class="row">
                 <div class="col-xs-6">
-                    <!--<div id="sample-table-2_length" class="dataTables_length"><label>每页-->
-                        <!--<select  ng-model="pageSize" ng-options="pageSize.name for pageSize in pageSizes" ng-change="onPageSizeChange()">-->
-                        <!--</select> 记录</label></div>-->
+                    <div id="sample-table-2_length" class="dataTables_length"><label>每页
+                        <select  ng-model="pageSize" ng-options="pageSize.name for pageSize in pageSizes" ng-change="onPageSizeChange()">
+                        </select> 记录</label></div>
                 </div>
                 <div class="col-xs-6">
                     <div class="dataTables_filter"><label>过滤: <input type="text" ng-model="searchText"></label>
@@ -176,10 +148,12 @@
                 </thead>
 
                 <tbody>
-                <tr ng-repeat="invoice in data.content | filter:searchText track by invoice.invoiceId" ng-dblclick="edit(invoice.invoiceId,invoice.auditStatus)" ng-if="!loading">
-                <td>
-                        <span class="label label-sm label-success arrowed arrowed-righ" ng-if="invoice.invoiceType.type ==0" ng-bind="invoice.invoiceType.name"></span>
-                        <span class="label label-sm label-info arrowed arrowed-in" ng-if="invoice.invoiceType.type ==1" ng-bind="invoice.invoiceType.name"></span>
+                <tr ng-repeat="invoice in data.content | filter:searchText track by invoice.invoiceId " ng-dblclick="rowDblClick(invoice.invoiceId)"  ng-if="!loading">
+                    <td>
+                        <span class="label label-sm label-success arrowed arrowed-righ"
+                              ng-if="invoice.invoiceType.type ==0" ng-bind="invoice.invoiceType.name"></span>
+                        <span class="label label-sm label-info arrowed arrowed-in" ng-if="invoice.invoiceType.type ==1"
+                              ng-bind="invoice.invoiceType.name"></span>
                     </td>
                     <td ng-bind="invoice.num"></td>
                     <td ng-bind="invoice.inc.incName">/td>
@@ -188,16 +162,20 @@
                     <td ng-bind="invoice.carNum">/td>
                     <td>
                         <div class="hidden-sm hidden-xs action-buttons">
-                            <a class="green" title="修改"  href="javascript:;" ng-click="edit(invoice.invoiceId)">
+                            <a class="green" title="修改" href="javascript:;"  ng-click="edit(invoice.invoiceId)" ng-if="edit">
                                 <i class="ace-icon fa fa-pencil bigger-130"></i>
                             </a>
 
-                            <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)" ng-if="invoice.auditStatus==60">
+                            <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)" ng-if="sendBack">
                                 <i class="ace-icon fa fa-reply bigger-130"></i>
                             </a>
 
-                            <a class="red" href="javascript:;" title="删除" ng-click="remove(invoice.invoiceId)" ng-if="invoice.auditStatus==50">
+                            <a class="red" href="javascript:;" title="删除" ng-click="remove(invoice.invoiceId)" ng-if="remove">
                                 <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                            </a>
+
+                            <a class="blue" href="javascript:;" title="查看" ng-click="view(invoice.invoiceId)" ng-if="view">
+                                <i class="ace-icon fa fa-search-plus bigger-130"></i>
                             </a>
                         </div>
 
@@ -209,26 +187,34 @@
                                 </button>
 
                                 <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
-                                    <li>
-                                        <a class="tooltip-success" title="修改" href="javascript:;" ng-click="edit(invoice.invoiceId)">
+                                    <li ng-if="edit">
+                                        <a  class="tooltip-success" title="修改"  href="javascript:;"  ng-click="edit(invoice.invoiceId)">
 																			<span class="green">
 																				<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>
 																			</span>
                                         </a>
                                     </li>
 
-                                    <li ng-if="invoice.auditStatus==60">
-                                        <a class="tooltip-error" title="退回"  href="javascript:;" ng-click="sendBack(invoice.invoiceId)">
+                                    <li ng-if="sendBack">
+                                        <a class="tooltip-error" title="退回" href="javascript:;" ng-click="sendBack(invoice.invoiceId)">
 																			<span class="red">
 																				<i class="ace-icon fa fa-reply bigger-120"></i>
 																			</span>
                                         </a>
                                     </li>
 
-                                    <li ng-if="invoice.auditStatus==50">
-                                        <a class="tooltip-error" title="删除"  href="javascript:;" ng-click="remove(invoice.invoiceId)">
+                                    <li ng-if="remove">
+                                        <a class="tooltip-error" title="删除" href="javascript:;" ng-click="remove(invoice.invoiceId)">
 																			<span class="red">
 																				<i class="ace-icon fa fa-trash-o bigger-120"></i>
+																			</span>
+                                        </a>
+                                    </li>
+
+                                    <li ng-if="remove">
+                                        <a class="tooltip-error" title="查看" href="javascript:;" ng-click="view(invoice.invoiceId)">
+																			<span class="blue">
+																				<i class="ace-icon fa fa-search-plus bigger-120"></i>
 																			</span>
                                         </a>
                                     </li>
@@ -246,12 +232,14 @@
             </table>
             <div class="row">
                 <div class="col-xs-6">
-                    <div class="dataTables_info" id="sample-table-2_info">总共 <span ng-bind="data.page.totalElements"></span> 条记录</div>
+                    <div class="dataTables_info" id="sample-table-2_info">总共 <span
+                            ng-bind="data.page.totalElements"></span> 条记录
+                    </div>
                 </div>
                 <div class="col-xs-6">
                     <div class="dataTables_paginate paging_bootstrap">
-                        <pagination ng-model="currentPage" ng-change="onPageChanged()"
-                                    total-items="data.page.totalElements" items-per-page="data.page.size"
+                        <pagination ng-model="page.number" ng-change="onPageChanged()"
+                                    total-items="data.page.totalElements" items-per-page="page.size"
                                     boundary-links="true"
                                     class="pagination pull-right" previous-text="&lsaquo;" next-text="&rsaquo;"
                                     first-text="&laquo;" last-text="&raquo;"></pagination>
@@ -262,14 +250,5 @@
     </div>
 
 </div>
-<!--Datatable ENDS
+<!--Invoice Datatable ENDS
 ===========================================-->
-
-<!-- PAGE CONTENT ENDS -->
-</div>
-<!-- /.col -->
-</div>
-<!-- /.row -->
-
-</div>
-<!-- /.page-content -->

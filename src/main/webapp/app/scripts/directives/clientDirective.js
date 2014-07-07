@@ -5,19 +5,16 @@ angular.module('newlpApp')
     .directive({
         "clientSelect": function () {
             return {
-                templateUrl: 'templates/client.select.html',
+//                templateUrl: 'templates/client.select.html',
                 restrict: 'AE',
-//            transclude: true,
+                transclude: true,
                 scope: {
-                    client: '=client',
+                    client: '=ngModel',
                     clientId: '=?clientId'
                 },
                 controller: function ($scope, $modal) {
 
-                    $scope.open = function ($event) {
-
-                        $event.preventDefault();
-                        $event.stopPropagation();
+                    $scope.open = function () {
 
                         /*open modal*/
                         var modalInstance = $modal.open({
@@ -71,23 +68,25 @@ angular.module('newlpApp')
                         /*return selected result of modal*/
                         modalInstance.result.then(function (selected) {
                             $scope.client = selected[0];
-                            $scope.clientId = selected[0]? selected[0].clientId:undefined;
+                            $scope.clientId = selected[0]? selected[0].clientId:null;
                         }, function () {
                             console.info('Modal dismissed at: ' + new Date());
                         });
                     };
 
+                },
+                link: function (scope, element, attrs, ctrl) {
+                    element[0].onclick = function ($event) {
+                        $event.preventDefault();
+                        $event.stopPropagation();
+                        scope.open();
+                    }
                 }
-//                link: function (scope, element, attrs, ctrl) {
-//                    element[0].onclick = function ($event) {
-//                        $event.preventDefault();
-//                        $event.stopPropagation();
-//                        scope.open('lg');
-//                    }
-//                }
             };
         }
-    }).run(function ($templateCache) {
-        $templateCache.put('templates/client.select.html', '<select class="form-control" title="选择客户" ng-click="open($event)"><option value="{{client.clientId}}">{{client.clientName}}</option> </select>');
-    });
+    })
+//    .run(function ($templateCache) {
+//        $templateCache.put('templates/client.select.html', '<select class="form-control" title="选择客户" client-select client-id="searchTerm.clientId" ng-model="searchTerm.client" ng-options="client.clientName for client in [searchTerm.client] track by client.clientId"> </select>');
+//    })
+;
 

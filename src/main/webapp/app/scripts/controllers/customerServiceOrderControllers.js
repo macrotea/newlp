@@ -155,227 +155,61 @@ angular.module('newlpApp')
     })
 
     .controller('customerServiceOrderDraftsController', function ($scope, $state, $http, $location, $stateParams, Invoice, ngDialog) {
-
-        $scope.queryByAuditStatus = function () {
-            $scope.loading = true;
-            Invoice.queryByAuditStatus({
-                    page: $scope.currentPage - 1,
-                    sort: [
-                        'receivedDate,desc'
-                    ],
+        $scope.searchForm = {
+            options: {
+                criteria: {
                     auditStatus: 30
                 },
-                function (data) {
-                    $scope.loading = false;
-                    $scope.data = data;
-                });
-        };
-
-        //submit search
-        $scope.search = function () {
-            $scope.loading = true;
-            if(_.isDate($scope.searchTerm.endDateOfReceived)){
-                $scope.searchTerm.endDateOfReceived = moment($scope.searchTerm.endDateOfReceived).add('hours', 23).add('minutes', 59).add('seconds', 59).format();
-            }
-
-            Invoice.search({page: $scope.currentPage - 1}, $scope.searchTerm).$promise.then(function (data) {
-                $scope.loading = false;
-                $scope.data = data;
-            }, function (data) {
-                $scope.loading = false;
-                $scope.error = true;
-            });
-        };
-
-       //handle Criteria Query Form action
-        $scope.submit = function () {
-            $scope.currentPage = 1;
-            if($scope.action == 'RESET'){
-                $scope.reset();
-            }
-
-            if($scope.action == 'SUBMIT'){
-                $scope.onPageChanged = $scope.search;
-                $scope.onPageChanged();
+                actions: {
+                    edit: function (invoiceId) {
+                        $state.go('home.customer_service.order.edit', {invoiceId: invoiceId});
+                    },
+                    remove: function (invoiceId) {
+                        $scope.invoiceIdToRemove = invoiceId;
+                        ngDialog.open({
+                            template: 'views/customer_service.order.remove.html',
+                            className: 'ngdialog-theme-plain',
+                            controller: 'customerServiceOrderRemoveConfirmCtrl',
+                            scope: $scope
+                        });
+                    }
+                }
             }
         };
-
-        //reset
-        $scope.reset = function () {
-            $scope.onPageChanged = $scope.queryByAuditStatus;
-
-            //search criteria
-            $scope.searchTerm = {
-                num: null,
-                incId: null,
-                clientId: null,
-                carNum: null,
-                startDateOfReceived: null,
-                endDateOfReceived: null,
-                invoiceTypeId: null,
-                auditStatus: 30
-            };
-            $scope.onPageChanged();
-        };
-
-        $scope.edit = function (invoiceId) {
-            $state.go('home.customer_service.order.edit', {invoiceId: invoiceId});
-        };
-
-        $scope.remove = function (invoiceId) {
-            $scope.invoiceIdToRemove = invoiceId;
-            ngDialog.open({
-                template: 'views/customer_service.order.remove.html',
-                className: 'ngdialog-theme-plain',
-                controller: 'customerServiceOrderRemoveConfirmCtrl',
-                scope: $scope
-            });
-        };
-
-        $scope.reset();
     })
 
-    .controller('customerServiceOrderReceivesController', function ($scope, $state, $http, $location, $stateParams, Invoice) {
+    .controller('customerServiceOrderReceivesController', function ($scope, $state) {
 
-        $scope.queryByAuditStatus = function () {
-            $scope.loading = true;
-            Invoice.queryByAuditStatus({
-                    page: $scope.currentPage - 1,
-                    sort: [
-                        'receivedDate,desc'
-                    ],
+        $scope.searchForm = {
+            options: {
+                criteria: {
                     auditStatus: 20
                 },
-                function (data) {
-                    $scope.loading = false;
-                    $scope.data = data;
-                });
-        };
-
-        //submit search
-        $scope.search = function () {
-            $scope.loading = true;
-            if(_.isDate($scope.searchTerm.endDateOfReceived)){
-                $scope.searchTerm.endDateOfReceived = moment($scope.searchTerm.endDateOfReceived).add('hours', 23).add('minutes', 59).add('seconds', 59).format();
-            }
-
-            Invoice.search({page: $scope.currentPage - 1}, $scope.searchTerm).$promise.then(function (data) {
-                $scope.loading = false;
-                $scope.data = data;
-            }, function (data) {
-                $scope.loading = false;
-                $scope.error = true;
-            });
-        };
-
-        //handle Criteria Query Form action
-        $scope.submit = function () {
-            $scope.currentPage = 1;
-            if($scope.action == 'RESET'){
-                $scope.reset();
-            }
-
-            if($scope.action == 'SUBMIT'){
-                $scope.onPageChanged = $scope.search;
-                $scope.onPageChanged();
+                actions: {
+                    edit: function (invoiceId) {
+                        $state.go('home.customer_service.order.receive', {invoiceId: invoiceId});
+                    }
+                }
             }
         };
-
-        //reset
-        $scope.reset = function () {
-            $scope.onPageChanged = $scope.queryByAuditStatus;
-
-            //search criteria
-            $scope.searchTerm = {
-                num: null,
-                incId: null,
-                clientId: null,
-                carNum: null,
-                startDateOfReceived: null,
-                endDateOfReceived: null,
-                invoiceTypeId: null,
-                auditStatus: 20
-            };
-            $scope.onPageChanged();
-        };
-
-        $scope.receive = function (invoiceId) {
-            $state.go('home.customer_service.order.receive', {invoiceId: invoiceId});
-        };
-
-        $scope.reset();
 
     })
 
-    .controller('customerServiceOrderSubmittedController', function ($scope, $state, $http, $location, $stateParams, Invoice) {
+    .controller('customerServiceOrderSubmittedController', function ($scope, $state) {
 
-        $scope.queryByAuditStatus = function () {
-            $scope.loading = true;
-            Invoice.queryByAuditStatus({
-                    page: $scope.currentPage - 1,
-                    sort: [
-                        'receivedDate,desc'
-                    ],
+        $scope.searchForm = {
+            options: {
+                criteria: {
                     auditStatus: 40
                 },
-                function (data) {
-                    $scope.loading = false;
-                    $scope.data = data;
-                });
-        };
-
-        //submit search
-        $scope.search = function () {
-            $scope.loading = true;
-            if(_.isDate($scope.searchTerm.endDateOfReceived)){
-                $scope.searchTerm.endDateOfReceived = moment($scope.searchTerm.endDateOfReceived).add('hours', 23).add('minutes', 59).add('seconds', 59).format();
-            }
-
-            Invoice.search({page: $scope.currentPage - 1}, $scope.searchTerm).$promise.then(function (data) {
-                $scope.loading = false;
-                $scope.data = data;
-            }, function (data) {
-                $scope.loading = false;
-                $scope.error = true;
-            });
-        };
-
-        //handle Criteria Query Form action
-        $scope.submit = function () {
-            $scope.currentPage = 1;
-            if($scope.action == 'RESET'){
-                $scope.reset();
-            }
-
-            if($scope.action == 'SUBMIT'){
-                $scope.onPageChanged = $scope.search;
-                $scope.onPageChanged();
+                actions: {
+                    view: function (invoiceId) {
+                        $state.go('home.customer_service.order.view', {invoiceId: invoiceId});
+                    }
+                }
             }
         };
 
-        //reset
-        $scope.reset = function () {
-            $scope.onPageChanged = $scope.queryByAuditStatus;
-
-            //search criteria
-            $scope.searchTerm = {
-                num: null,
-                incId: null,
-                clientId: null,
-                carNum: null,
-                startDateOfReceived: null,
-                endDateOfReceived: null,
-                invoiceTypeId: null,
-                auditStatus: 40
-            };
-            $scope.onPageChanged();
-        };
-
-        $scope.view = function (invoiceId) {
-            $state.go('home.customer_service.order.view', {invoiceId: invoiceId});
-        };
-
-        $scope.reset();
     })
 
     .controller('customerServiceOrderRemoveConfirmCtrl', function ($scope, ngDialog, Invoice) {

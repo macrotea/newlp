@@ -94,7 +94,7 @@
 
                 <!--panels
                 =====================================-->
-                <li  ng-repeat="panel in panels" ng-init="panel.isOpen= true">
+                <li  ng-repeat="panel in panels | orderBy:'order'" ng-init="panel.isOpen= true">
                     <!--ng-class="{active:$state.includes(panel.state)}"-->
                     <a class="dropdown-toggle" href="javascript:;" ng-click="panel.isOpen = !panel.isOpen;">
                         <i class="{{panel.iconClass}}"></i>

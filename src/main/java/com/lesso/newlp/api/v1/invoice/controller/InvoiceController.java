@@ -35,7 +35,7 @@ import java.util.Objects;
 @RequestMapping("/api/v1/invoices")
 public class InvoiceController {
 
-//    private static Logger logger = LogManager.getLogger();
+    //    private static Logger logger = LogManager.getLogger();
     Logger logger = LoggerFactory.getLogger(InvoiceController.class);
 
 
@@ -72,7 +72,7 @@ public class InvoiceController {
 
     @RequestMapping(value = "/{invoiceId}", method = RequestMethod.GET)
     public ResponseEntity<InvoiceEntity> get(Model model, @PathVariable("invoiceId") Long invoiceId) throws Exception {
-        logger.debug("getting invoice:{}",invoiceId);
+        logger.debug("getting invoice:{}", invoiceId);
         InvoiceEntity invoice = invoiceService.findById(invoiceId);
         return new ResponseEntity<InvoiceEntity>(invoice, HttpStatus.OK);
     }
@@ -89,11 +89,22 @@ public class InvoiceController {
 
         InvoiceEntity invoiceEntity = invoiceRepository.findOne(invoiceId);
 
-        if(!Objects.isNull(invoice.getAuditStatus())){
+        if (!Objects.isNull(invoice.getAuditStatus())) {
             invoiceEntity.setAuditStatus(invoice.getAuditStatus());
         }
 
-        invoice= invoiceRepository.save(invoiceEntity);
+        if (!Objects.isNull(invoice.getInvoiceDetails())) {
+            final InvoiceEntity finalInvoice = invoice;
+            invoiceEntity.getInvoiceDetails().forEach(a -> {
+                finalInvoice.getInvoiceDetails().forEach(b -> {
+                    if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
+                        a.setDeliveryCount(b.getDeliveryCount());
+                    }
+                });
+            });
+        }
+
+        invoice = invoiceRepository.save(invoiceEntity);
 
         return new ResponseEntity<>(invoice, HttpStatus.OK);
     }
@@ -115,7 +126,7 @@ public class InvoiceController {
     @RequestMapping(value = "/search/auditStatus/{auditStatus}", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
     public ResponseEntity<PagedResources<InvoiceEntity>> searchByAudit(Model model, Pageable pageable, PagedResourcesAssembler assembler, @PathVariable("auditStatus") Integer auditStatus) {
-        Page<InvoiceEntity> invoiceEntities = invoiceService.queryByAuditStatus(auditStatus,pageable);
+        Page<InvoiceEntity> invoiceEntities = invoiceService.queryByAuditStatus(auditStatus, pageable);
 //        Page<InvoiceEntity> invoiceEntities = invoiceRepository.queryByAuditStatus(auditStatus, pageable);
         return new ResponseEntity<>(assembler.toResource(invoiceEntities), HttpStatus.OK);
     }

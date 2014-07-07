@@ -44,6 +44,8 @@ angular
                 abstract: true,
                 url: '/customer-service'
             })
+
+            //home > customer_service > order
             .state('home.customer_service.order', {
                 abstract: true,
                 url: '/order'
@@ -105,6 +107,71 @@ angular
                 }
             })
 
+            //home > customer_service > confirm
+            .state('home.customer_service.confirm', {
+                abstract: true,
+                url: '/confirm'
+            })
+            .state('home.customer_service.confirm.receives', {
+                url: '/receives',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/customer_service.confirm.receives.html'
+                    }
+                }
+            })
+            .state('home.customer_service.confirm.receive', {
+                url: '/{invoiceId:[0-9]{1,10}}/receive',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/customer_service.confirm.receive.html'
+                    }
+                }
+            })
+            .state('home.customer_service.confirm.adjust', {
+                url: '/{invoiceId:[0-9]{1,10}}/adjust',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/customer_service.confirm.adjust.html'
+                    }
+                }
+            })
+            .state('home.customer_service.confirm.view', {
+                url: '/{invoiceId:[0-9]{1,10}}',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/customer_service.confirm.view.html'
+                    }
+                }
+            })
+            .state('home.customer_service.confirm.edit', {
+                url: '/{invoiceId:[0-9]{1,10}}/edit',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/customer_service.confirm.edit.html'
+                    }
+                }
+            })
+            .state('home.customer_service.confirm.audit', {
+                abstract: true,
+                url: '/audit'
+            })
+            .state('home.customer_service.confirm.audit.unaudited', {
+                url: '/unaudited',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/customer_service.confirm.audit.unaudited.html'
+                    }
+                }
+            })
+            .state('home.customer_service.confirm.audit.audited', {
+                url: '/audited',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/customer_service.confirm.audit.audited.html'
+                    }
+                }
+            })
 
             // home > depot //
             .state('home.depot', {
@@ -139,11 +206,35 @@ angular
                     }
                 }
             })
+            .state('home.depot.receive', {
+                url: '/{invoiceId:[0-9]{1,10}}/receive',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/depot.receive.html'
+                    }
+                }
+            })
+            .state('home.depot.adjust', {
+                url: '/{invoiceId:[0-9]{1,10}}/adjust',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/depot.adjust.html'
+                    }
+                }
+            })
             .state('home.depot.add.restock', {
                 url: '/restock',
                 views: {
                     '@home': {
                         templateUrl: 'views/depot.add.restock.html'
+                    }
+                }
+            })
+            .state('home.depot.view', {
+                url: '/{invoiceId:[0-9]{1,10}}',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/depot.view.html'
                     }
                 }
             })

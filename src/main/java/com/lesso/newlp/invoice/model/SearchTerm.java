@@ -1,5 +1,6 @@
 package com.lesso.newlp.invoice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.util.Date;
 /**
  * Created by Sean on 6/27/2014.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SearchTerm implements Serializable{
 

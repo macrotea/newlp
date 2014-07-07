@@ -19,5 +19,4 @@ public interface IncRepository extends PagingAndSortingRepository<IncEntity,Long
 
     @Query("select inc from IncEntity  inc left join inc.members  incMem  where incMem.memberId = :memberId")
     Page<IncEntity> findByMemberId(@Param("memberId") String memberId,Pageable pageable);
-
 }

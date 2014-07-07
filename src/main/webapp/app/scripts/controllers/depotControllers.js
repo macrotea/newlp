@@ -32,10 +32,10 @@ angular.module('newlpApp')
 
             Material.findByNameOrNumLike({
                 page: $scope.currentPage - 1,
-                searchTerm:$scope.searchTerm
-            },{}, function (data) {
-                $scope.loading = false;
+                searchTerm: $scope.searchTerm
+            }, {}, function (data) {
                 $scope.data = data;
+                $scope.loading = false;
             })
         };
         $scope.onPageChanged = $scope.search;
@@ -81,6 +81,7 @@ angular.module('newlpApp')
             });
         };
     })
+
     .controller('depotAddRestockController', function ($scope, $state, Material, Invoice) {
 
         //init
@@ -111,10 +112,10 @@ angular.module('newlpApp')
 
             Material.findByNameOrNumLike({
                 page: $scope.currentPage - 1,
-                searchTerm:$scope.searchTerm
-            },{}, function (data) {
-                $scope.loading = false;
+                searchTerm: $scope.searchTerm
+            }, {}, function (data) {
                 $scope.data = data;
+                $scope.loading = false;
             })
         };
         $scope.onPageChanged = $scope.search;
@@ -160,12 +161,12 @@ angular.module('newlpApp')
             });
         };
     })
+
     .controller('depotEditController', function ($scope, $state, $stateParams, Material, Invoice) {
 
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
         });
-
 
         //单据明细
         $scope.data = undefined;
@@ -177,44 +178,44 @@ angular.module('newlpApp')
 
             Material.findByNameOrNumLike({
                 page: $scope.currentPage - 1,
-                searchTerm:$scope.searchTerm
-            },{}, function (data) {
-                $scope.loading = false;
+                searchTerm: $scope.searchTerm
+            }, {}, function (data) {
                 $scope.data = data;
+                $scope.loading = false;
             });
         };
         $scope.onPageChanged = $scope.search;
 
-        $scope.add = function (materialNum) {
-            if (selectedNums.indexOf(materialNum) < 0) {
-                $scope.materialSearchData._embedded.materials.forEach(function (material) {
-                    if (materialNum == material.materialNum) {
-                        selectedNums.push(materialNum);
-                        var invoiceDetail = {};
-                        invoiceDetail.orderCount = 1;
-                        invoiceDetail.remark = '明细备注';
-                        invoiceDetail.unit = material.unit;
-                        invoiceDetail.auxiliaryUnitOne = material.auxiliaryUnitOne;
-                        invoiceDetail.auxiliaryUnitTwo = material.auxiliaryUnitTwo;
-                        invoiceDetail.conversionRateOne = material.conversionRateOne;
-                        invoiceDetail.conversionRateTwo = material.conversionRateTwo;
-                        invoiceDetail.price = material.price;
-                        invoiceDetail.material = material;
-                        $scope.invoice.invoiceDetails.push(invoiceDetail);
-                    }
-                })
+
+        $scope.add = function (material) {
+
+            var notExist = true;
+            $scope.invoice.invoiceDetails.forEach(function (invoiceDetail) {
+                if (invoiceDetail.material.materialNum == material.materialNum) {
+                    notExist = false;
+                }
+            });
+
+            if (notExist) {
+                var invoiceDetail = {};
+                invoiceDetail.orderCount = 1;
+                invoiceDetail.remark = '明细备注';
+                invoiceDetail.unit = material.unit;
+                invoiceDetail.auxiliaryUnitOne = material.auxiliaryUnitOne;
+                invoiceDetail.auxiliaryUnitTwo = material.auxiliaryUnitTwo;
+                invoiceDetail.conversionRateOne = material.conversionRateOne;
+                invoiceDetail.conversionRateTwo = material.conversionRateTwo;
+                invoiceDetail.price = material.price;
+                invoiceDetail.material = material;
+                $scope.invoice.invoiceDetails.push(invoiceDetail);
             }
+
         };
 
         $scope.remove = function (materialNum) {
-            if (selectedNums.indexOf(materialNum) >= 0) {
-                selectedNums = selectedNums.filter(function (n) {
-                    return materialNum != n;
-                });
-                $scope.invoice.invoiceDetails = $scope.invoice.invoiceDetails.filter(function (material) {
-                    return materialNum != material.materialNum;
-                })
-            }
+            $scope.invoice.invoiceDetails = $scope.invoice.invoiceDetails.filter(function (invoiceDetail) {
+                return materialNum != invoiceDetail.material.materialNum;
+            })
         };
 
         $scope.submit = function () {
@@ -227,103 +228,94 @@ angular.module('newlpApp')
         };
     })
 
-    .controller('depotReceivesController', function ($scope, $state, $location, $stateParams, Invoice, ngDialog) {
+    .controller('depotReceiveController', function ($scope, $state, $stateParams, Material, Invoice) {
 
-        $scope.queryByAuditStatus = function () {
-            $scope.loading = true;
-            Invoice.queryByAuditStatus({
-                    page: $scope.currentPage - 1,
-                    sort: [
-                        'receivedDate,desc'
-                    ],
-                    auditStatus: 40
-                },
-                function (data) {
-                    $scope.loading = false;
-                    $scope.data = data;
+        Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
+            $scope.invoice = invoice;
+        });
+
+        $scope.submit = function () {
+            Invoice.patch({
+                invoiceId: $scope.invoice.invoiceId,
+                auditStatus: $scope.invoice.auditStatus
+            }).$promise.then(function (data) {
+                    console.log(data);
+                    $scope.success = true;
+                }, function (data) {
+                    $scope.error = true;
                 });
         };
-
-        //submit search
-        $scope.search = function () {
-            $scope.loading = true;
-            if (_.isDate($scope.searchTerm.endDateOfReceived)) {
-                $scope.searchTerm.endDateOfReceived = moment($scope.searchTerm.endDateOfReceived).add('hours', 23).add('minutes', 59).add('seconds', 59).format();
-            }
-
-            Invoice.search({page: $scope.currentPage - 1}, $scope.searchTerm).$promise.then(function (data) {
-                $scope.loading = false;
-                $scope.data = data;
-            }, function (data) {
-                $scope.loading = false;
-                $scope.error = true;
-            });
-        };
-
-        //handle Criteria Query Form action
-        $scope.submit = function () {
-            $scope.currentPage = 1;
-            if ($scope.action == 'RESET') {
-                $scope.reset();
-            }
-
-            if ($scope.action == 'SUBMIT') {
-                $scope.onPageChanged = $scope.search;
-                $scope.onPageChanged();
-            }
-        };
-
-        //reset
-        $scope.reset = function () {
-            $scope.onPageChanged = $scope.queryByAuditStatus;
-
-            //search criteria
-            $scope.searchTerm = {
-                num: null,
-                incId: null,
-                clientId: null,
-                carNum: null,
-                startDateOfReceived: null,
-                endDateOfReceived: null,
-                invoiceTypeId: null,
-                auditStatus: 40
-            };
-            $scope.onPageChanged();
-        };
-
-        $scope.edit = function (invoiceId) {
-            $state.go('home.depot.edit', {invoiceId: invoiceId});
-        };
-
-        $scope.sendBack = function (invoiceId) {
-            $scope.invoiceIdToRemove = invoiceId;
-            ngDialog.open({
-                template: 'views/depot.sendBack.html',
-                className: 'ngdialog-theme-plain',
-                controller: 'depotSendBackConfirmCtrl',
-                scope: $scope
-            });
-        };
-
-        $scope.reset();
-
     })
 
-    .controller('depotAuditUnauditedController', function ($scope, $state, $location, $stateParams, Invoice) {
+    .controller('depotAdjustController', function ($scope, $state, $stateParams, Material, Invoice) {
 
+        Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
+            $scope.invoice = invoice;
+        });
+
+        $scope.submit = function () {
+            Invoice.patch({
+                invoiceId: $scope.invoice.invoiceId,
+                invoiceDetails:$scope.invoice.invoiceDetails,
+                auditStatus: $scope.invoice.auditStatus
+            }).$promise.then(function (data) {
+                    console.log(data);
+                    $scope.success = true;
+                }, function (data) {
+                    $scope.error = true;
+                });
+        };
+    })
+
+    .controller('depotReceivesController', function ($scope, $state, $location, $stateParams, Invoice, ngDialog) {
+        $scope.searchForm = {
+            options: {
+                criteria: {
+                    auditStatus: 40
+                },
+                actions:{
+                    edit:function (invoiceId) {
+                            $state.go('home.depot.receive', {invoiceId: invoiceId})
+                    },
+                    sendBack:function (invoiceId) {
+                        $scope.invoiceIdToRemove = invoiceId;
+                        ngDialog.open({
+                            template: 'views/depot.sendBack.html',
+                            className: 'ngdialog-theme-plain',
+                            controller: 'depotSendBackConfirmCtrl',
+                            scope: $scope
+                        });
+                    }
+                }
+            }
+        };
+    })
+
+    .controller('depotAuditUnauditedController', function ($scope, $state, $location, $stateParams, Invoice, ngDialog) {
+
+        $scope.currentPage = 1;
         $scope.queryByAuditStatus = function () {
             $scope.loading = true;
             Invoice.queryByAuditStatus({
                     page: $scope.currentPage - 1,
-                    sort: [
-                        'receivedDate,desc'
-                    ],
                     auditStatus: 50
                 },
                 function (data) {
-                    $scope.loading = false;
-                    $scope.data = data;
+                    Invoice.queryByAuditStatus({
+                            page: $scope.currentPage - 1,
+                            auditStatus: 60
+                        },
+                        function (dataTmp) {
+
+                            data.content = data.content.concat(dataTmp.content);
+                            data.page.totalElements = data.page.totalElements + dataTmp.page.totalElements;
+                            data.page.totalPages = data.page.totalPages > dataTmp.page.totalPages ? data.page.totalPages : dataTmp.page.totalPages;
+                            $scope.data = data;
+
+                            $scope.loading = false;
+                        });
                 });
+
         };
 
         //submit search
@@ -333,9 +325,21 @@ angular.module('newlpApp')
                 $scope.searchTerm.endDateOfReceived = moment($scope.searchTerm.endDateOfReceived).add('hours', 23).add('minutes', 59).add('seconds', 59).format();
             }
 
+            $scope.searchTerm.auditStatus = 50;
             Invoice.search({page: $scope.currentPage - 1}, $scope.searchTerm).$promise.then(function (data) {
-                $scope.loading = false;
-                $scope.data = data;
+
+                $scope.searchTerm.auditStatus = 60;
+                Invoice.search({page: $scope.currentPage - 1}, $scope.searchTerm,
+                    function (dataTmp) {
+
+                        data.content = data.content.concat(dataTmp.content);
+                        data.page.totalElements = data.page.totalElements + dataTmp.page.totalElements;
+                        data.page.totalPages = data.page.totalPages > dataTmp.page.totalPages ? data.page.totalPages : dataTmp.page.totalPages;
+                        $scope.data = data;
+                        $scope.loading = false;
+
+                    });
+
             }, function (data) {
                 $scope.loading = false;
                 $scope.error = true;
@@ -373,8 +377,10 @@ angular.module('newlpApp')
             $scope.onPageChanged();
         };
 
-        $scope.edit = function (invoiceId) {
-            $state.go('home.depot.edit', {invoiceId: invoiceId});
+        $scope.edit = function (invoiceId,auditStatus) {
+            auditStatus == 50 ? $state.go('home.depot.edit', {invoiceId: invoiceId}) :
+                auditStatus == 60 ? $state.go('home.depot.adjust', {invoiceId: invoiceId}) :
+                    undefined;
         };
 
         $scope.sendBack = function (invoiceId) {
@@ -387,110 +393,35 @@ angular.module('newlpApp')
             });
         };
 
-        $scope.reset();
-
-
-    })
-
-    .controller('depotAuditAuditedController', function ($scope, $state, $location, $stateParams, Invoice) {
-
-        $scope.queryByAuditStatus = function () {
-            $scope.loading = true;
-            Invoice.queryByAuditStatus({
-                    page: $scope.currentPage - 1,
-                    sort: [
-                        'receivedDate,desc'
-                    ],
-                    auditStatus: 70
-                },
-                function (data) {
-                    $scope.loading = false;
-                    $scope.data = data;
-                });
-        };
-
-        //submit search
-        $scope.search = function () {
-            $scope.loading = true;
-            if (_.isDate($scope.searchTerm.endDateOfReceived)) {
-                $scope.searchTerm.endDateOfReceived = moment($scope.searchTerm.endDateOfReceived).add('hours', 23).add('minutes', 59).add('seconds', 59).format();
-            }
-
-            Invoice.search({page: $scope.currentPage - 1}, $scope.searchTerm).$promise.then(function (data) {
-                $scope.loading = false;
-                $scope.data = data;
-            }, function (data) {
-                $scope.loading = false;
-                $scope.error = true;
+        $scope.remove = function (invoiceId) {
+            $scope.invoiceIdToRemove = invoiceId;
+            ngDialog.open({
+                template: 'views/customer_service.order.remove.html',
+                className: 'ngdialog-theme-plain',
+                controller: 'customerServiceOrderRemoveConfirmCtrl',
+                scope: $scope
             });
         };
 
-        //handle Criteria Query Form action
-        $scope.submit = function () {
-            $scope.currentPage = 1;
-            if ($scope.action == 'RESET') {
-                $scope.reset();
-            }
-
-            if ($scope.action == 'SUBMIT') {
-                $scope.onPageChanged = $scope.search;
-                $scope.onPageChanged();
-            }
-        };
-
-        //reset
-        $scope.reset = function () {
-            $scope.onPageChanged = $scope.queryByAuditStatus;
-
-            //search criteria
-            $scope.searchTerm = {
-                num: null,
-                incId: null,
-                clientId: null,
-                carNum: null,
-                startDateOfReceived: null,
-                endDateOfReceived: null,
-                invoiceTypeId: null,
-                auditStatus: 70
-            };
-            $scope.onPageChanged();
-        };
-
-        $scope.view = function (invoiceId) {
-            $state.go('home.depot.view', {invoiceId: invoiceId});
-        };
-
         $scope.reset();
 
 
     })
 
-    .controller('depotSubmittedController', function ($scope, $state, $location, $stateParams, Invoice) {
-        var requestParams = $location.search();
-        $scope.loading = true;
-
-        //handle page selection
-        $scope.onPageChanged = function () {
-            $scope.loading = true;
-            Invoice.queryByAuditStatus({
-                    page: $scope.currentPage - 1,
-                    auditStatus: 40
+    .controller('depotAuditAuditedController', function ($scope, $state) {
+        $scope.searchForm = {
+            options: {
+                criteria: {
+                    auditStatus: 70
                 },
-                function (data) {
-                    $scope.loading = false;
-                    $scope.data = data;
+                actions:{
+                    view:function (invoiceId) {
+                        $state.go('home.depot.view', {invoiceId: invoiceId});
+                    }
+                }
+            }
 
-                })
         };
-
-        //load first page
-        $scope.currentPage = 1;
-        $scope.onPageChanged();
-
-        $scope.edit = function (invoiceId) {
-            $state.go('home.depot.edit', {invoiceId: invoiceId});
-        };
-
     })
 
     .controller('depotSendBackConfirmCtrl', function ($scope, ngDialog, Invoice) {

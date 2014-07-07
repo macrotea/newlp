@@ -1,0 +1,42 @@
+<div class="breadcrumbs">
+    <!-- breadcrumbs goes here -->
+    <ul class="breadcrumb">
+        <li>
+            <i class="ace-icon fa fa-home home-icon"></i>
+            <a href="#">首页</a>
+        </li>
+    </ul>
+</div>
+
+<div class="page-content" ng-controller="customerServiceConfirmAuditUnauditedController">
+    <!-- setting box goes here if needed -->
+
+    <div class="page-header">
+        <h1>
+            未审核单据管理
+            <small>
+                <i class="ace-icon fa fa-angle-double-right"></i>
+                订单列表
+            </small>
+        </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+
+
+            <!--Invoice Search Form BEGINS
+            ===========================================-->
+            <invoice-search-form options="searchForm.options"></invoice-search-form>
+            <!--Invoice Search Form ENDS
+            ===========================================-->
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+</div>
+<!-- /.page-content -->

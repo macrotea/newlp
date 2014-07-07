@@ -13,9 +13,16 @@ angular.module('newlpApp')
                     incId: '=?incId'
                 },
                 controller: function ($scope, $modal, Inc, currentUser) {
-                    Inc.findByMemberId({memberId: currentUser.getUsername()}, {}, function (data) {
-                        $scope.inc = data._embedded.incs[0];
-                    });
+                    var incs = sessionStorage.getItem('incs');
+                    if(undefined == incs){
+                        Inc.findByMemberId({memberId: currentUser.getUsername()}, {}, function (data) {
+                            incs= data._embedded.incs;
+                            $scope.inc = incs[0];
+                            sessionStorage.setItem('incs',JSON.stringify(incs));
+                        });
+                    }else{
+                        $scope.inc = JSON.parse(incs)[0];
+                    }
                 }
             };
         }
