@@ -23,7 +23,7 @@ public class PaneEntity implements Serializable {
     @Column(name = "order_")
     Integer order;
 
-    @JsonBackReference
+    @JsonBackReference("panel-pane")
     @ManyToOne()
     PanelEntity panel;
 

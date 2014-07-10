@@ -1,5 +1,6 @@
 package com.lesso.newlp.material.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
 
 import javax.persistence.*;
@@ -25,9 +26,11 @@ public class MaterialEntity extends AbstractTimestampEntity implements Serializa
     @Column(columnDefinition ="bit NULL DEFAULT ((1))")
     Boolean active=true;                     //默认为1，0为删除
 
+    @JsonBackReference("materialType-material")
     @ManyToOne
     MaterialTypeEntity materialType;
 
+    @JsonBackReference("materialAttribute-material")
     @ManyToOne
     MaterialAttributeEntity materialAttribute;
 

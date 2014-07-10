@@ -1,6 +1,6 @@
 package com.lesso.newlp.invoice.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
 import com.lesso.newlp.pm.entity.IncEntity;
 import org.hibernate.annotations.LazyCollection;
@@ -21,13 +21,13 @@ public class InvoiceTypeIncRelEntity extends AbstractTimestampEntity implements 
     @EmbeddedId
     private InvoiceTypeIncRelPk invoiceTypeIncRelPk;
 
-    @JsonManagedReference
+    @JsonBackReference("invoiceType-invoiceTypeIncRel")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "invoiceType_invoiceTypeId", insertable = false, updatable = false)
     @LazyCollection(LazyCollectionOption.FALSE)
     InvoiceTypeEntity invoiceType;
 
-    @JsonManagedReference
+    @JsonBackReference("inc-invoiceTypeIncRel")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "inc_incId", insertable = false, updatable = false)
     @LazyCollection(LazyCollectionOption.FALSE)

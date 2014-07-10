@@ -20,6 +20,7 @@ import javax.annotation.Resource;
  */
 @Controller
 @RequestMapping("/api/v1/material")
+@SuppressWarnings("unchecked")
 public class MaterialController {
 
     @Resource

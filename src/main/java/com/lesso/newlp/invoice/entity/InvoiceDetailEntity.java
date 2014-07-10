@@ -1,6 +1,7 @@
 package com.lesso.newlp.invoice.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
 import com.lesso.newlp.material.entity.MaterialEntity;
 
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 /**
  * Created by Sean on 6/17/2014.
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID")
 @Entity
 @Table(name = "INV_INVOICE_DETAIL", schema = "DBO",catalog = "NEWLP")
 public class InvoiceDetailEntity extends AbstractTimestampEntity implements Serializable {
@@ -36,7 +38,6 @@ public class InvoiceDetailEntity extends AbstractTimestampEntity implements Seri
     BigDecimal price;                             //单价
     /*==========================================*/
 
-    @JsonBackReference
     @ManyToOne
     InvoiceEntity invoice;
 

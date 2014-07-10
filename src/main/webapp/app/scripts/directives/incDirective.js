@@ -12,7 +12,7 @@ angular.module('newlpApp')
                     inc: '=inc',
                     incId: '=?incId'
                 },
-                controller: function ($scope, $modal, Inc, currentUser) {
+                controller: function ($scope, Inc, currentUser) {
                     var incs = sessionStorage.getItem('incs');
                     if(undefined == incs){
                         Inc.findByMemberId({memberId: currentUser.getUsername()}, {}, function (data) {
@@ -26,6 +26,5 @@ angular.module('newlpApp')
                 }
             };
         }
-    }).run(function ($templateCache) {
-        $templateCache.put('templates/inc.select.html', '<select class="form-control" title=""><option value="{{inc.incId}}">{{inc.incName}}</option> </select>');
-    });
+    })
+;

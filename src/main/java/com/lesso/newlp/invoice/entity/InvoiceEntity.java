@@ -1,6 +1,7 @@
 package com.lesso.newlp.invoice.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
 import com.lesso.newlp.pm.entity.ClientEntity;
 import com.lesso.newlp.pm.entity.IncEntity;
@@ -15,6 +16,7 @@ import java.util.Set;
 /**
  * Created by Sean on 6/17/2014.
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID")
 @Entity
 @Table(name = "INV_INVOICE", schema = "DBO",catalog = "NEWLP")
 public class InvoiceEntity extends AbstractTimestampEntity implements Serializable {
@@ -56,7 +58,6 @@ public class InvoiceEntity extends AbstractTimestampEntity implements Serializab
     @ManyToOne
     InvoiceTypeEntity invoiceType;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<InvoiceDetailEntity> invoiceDetails;

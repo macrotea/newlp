@@ -22,7 +22,7 @@ public class CompanyMaterialEntity extends AbstractTimestampEntity implements Se
     @Column(columnDefinition ="bit NULL DEFAULT ((1))")
     Boolean active=true;                     //默认为1，0为删除
 
-    @JsonBackReference
+    @JsonBackReference("inc-companyMaterial")
     @ManyToOne
     IncEntity inc;                          //公司
 

@@ -1,6 +1,7 @@
 package com.lesso.newlp.pm.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -15,6 +16,7 @@ import java.util.Set;
  * Date: 11/14/13
  * Time: 10:44 PM
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property="@UUID")
 @Entity
 @Table(name = "PM_GROUP", schema = "DBO",catalog = "NEWLP")
 public class GroupEntity extends AbstractTimestampEntity implements Serializable {
@@ -25,7 +27,8 @@ public class GroupEntity extends AbstractTimestampEntity implements Serializable
     @Column
     String name;
 
-    @JsonManagedReference
+//    @JsonManagedReference("group-member")
+//    @JsonBackReference("group-member")
     @ManyToMany()
     @JoinTable(name = "PM_GROUP_MEMBER_REL",
             joinColumns = {@JoinColumn(name = "group_groupId")},

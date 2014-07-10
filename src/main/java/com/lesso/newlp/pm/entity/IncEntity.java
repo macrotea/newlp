@@ -1,6 +1,8 @@
 package com.lesso.newlp.pm.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.lesso.newlp.invoice.entity.InvoiceTypeEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -13,6 +15,7 @@ import java.util.Set;
 /**
  * Created by Sean on 6/23/2014.
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property="@UUID")
 @Entity
 @Table(name = "PM_INC",  schema = "DBO",catalog = "NEWLP")
 public class IncEntity implements Serializable {
@@ -24,17 +27,23 @@ public class IncEntity implements Serializable {
     @Column(insertable = false,updatable = false)
     String incShortName;
 
-    @JsonBackReference
+//    @JsonManagedReference("inc-invoiceType")
+//    @JsonBackReference("inc-invoiceType")
+    @JsonIgnore
     @ManyToMany(mappedBy = "incs")
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<InvoiceTypeEntity> invoiceTypes = new HashSet<>();
 
-    @JsonBackReference
+//    @JsonManagedReference("inc-client")
+//    @JsonBackReference("inc-client")
+@JsonIgnore
     @ManyToMany(mappedBy = "incs")
 //    @LazyCollection(LazyCollectionOption.FALSE)
     Set<ClientEntity> clients = new HashSet<>();
 
-    @JsonBackReference
+//    @JsonManagedReference("inc-member")
+//    @JsonBackReference("inc-member")
+@JsonIgnore
     @ManyToMany()
     @JoinTable(name = "PM_INC_MEMBER_REL",
             joinColumns = {@JoinColumn(name = "inc_incId")},

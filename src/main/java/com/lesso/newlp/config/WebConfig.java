@@ -1,8 +1,10 @@
 package com.lesso.newlp.config;
 
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.lesso.newlp.invoice.entity.InvoiceDetailEntity;
 import com.lesso.newlp.invoice.entity.InvoiceEntity;
 import com.lesso.newlp.invoice.entity.InvoiceTypeEntity;
@@ -40,7 +42,6 @@ import org.springframework.web.servlet.view.velocity.VelocityConfig;
 import org.springframework.web.servlet.view.velocity.VelocityConfigurer;
 import org.springframework.web.servlet.view.velocity.VelocityViewResolver;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +81,6 @@ public class WebConfig extends RepositoryRestMvcConfiguration {
         final Map<String, MediaType> mediaTypes = new HashMap<String, MediaType>();
         mediaTypes.put("html", MediaType.TEXT_HTML);
         mediaTypes.put("json", MediaType.APPLICATION_JSON);
-        mediaTypes.put("json", new MediaType("application","json", Charset.forName("UTF-8")));
         mediaTypes.put("xml", MediaType.APPLICATION_XML);
         configurer.
                 defaultContentType(MediaType.APPLICATION_JSON).
@@ -92,8 +92,8 @@ public class WebConfig extends RepositoryRestMvcConfiguration {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(objectMapper());
         converters.add(converter);
-        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
-        converters.add(fastJsonHttpMessageConverter);
+//        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
+//        converters.add(fastJsonHttpMessageConverter);
 
 //        ObjectMapper mapper = new ObjectMapper();
 //        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -102,8 +102,11 @@ public class WebConfig extends RepositoryRestMvcConfiguration {
 
     @Override
     protected void configureHttpMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
-        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
-        messageConverters.add(fastJsonHttpMessageConverter);
+//        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
+//        messageConverters.add(fastJsonHttpMessageConverter);
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(objectMapper());
+        messageConverters.add(converter);
     }
 
 
@@ -135,8 +138,22 @@ public class WebConfig extends RepositoryRestMvcConfiguration {
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JodaModule());
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return new ObjectMapper();
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
+        objectMapper.configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS,false);
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS,false);
+        objectMapper.configure(SerializationFeature.USE_EQUALITY_FOR_OBJECT_ID,true);
+        objectMapper.configure(SerializationFeature.EAGER_SERIALIZER_FETCH,true);
+//        objectMapper.enable(MapperFeature.USE_STATIC_TYPING);
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+//        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        StdDateFormat dateFormat = new StdDateFormat();
+//        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        objectMapper.setDateFormat(dateFormat);
+        objectMapper.getDeserializationConfig().with(dateFormat);
+        objectMapper.getSerializationConfig().with(dateFormat);
+        return objectMapper;
     }
 
     @Bean

@@ -1,5 +1,6 @@
 package com.lesso.newlp.pm.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
 import org.hibernate.annotations.LazyCollection;
@@ -20,13 +21,13 @@ public class ClientMemberRelEntity extends AbstractTimestampEntity implements Se
     @EmbeddedId
     private ClientMemberRelPk clientMemberRelPk;
 
-    @JsonManagedReference
+    @JsonBackReference("client-clientMemberRel")
     @ManyToOne()
     @JoinColumn(name = "client_clientId", insertable = false, updatable = false)
     @LazyCollection(LazyCollectionOption.FALSE)
     ClientEntity client;
 
-    @JsonManagedReference
+    @JsonBackReference("member-clientMemberRel")
     @ManyToOne()
     @JoinColumn(name = "member_memberId", insertable = false, updatable = false)
     @LazyCollection(LazyCollectionOption.FALSE)

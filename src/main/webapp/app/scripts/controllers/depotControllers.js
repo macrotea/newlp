@@ -276,17 +276,9 @@ angular.module('newlpApp')
                 actions:{
                     edit:function (invoiceId) {
                             $state.go('home.depot.receive', {invoiceId: invoiceId})
-                    },
-                    sendBack:function (invoiceId) {
-                        $scope.invoiceIdToRemove = invoiceId;
-                        ngDialog.open({
-                            template: 'views/depot.sendBack.html',
-                            className: 'ngdialog-theme-plain',
-                            controller: 'depotSendBackConfirmCtrl',
-                            scope: $scope
-                        });
                     }
-                }
+                },
+                sendBackController:'depotSendBackConfirmCtrl'
             }
         };
     })
@@ -386,7 +378,7 @@ angular.module('newlpApp')
         $scope.sendBack = function (invoiceId) {
             $scope.invoiceIdToRemove = invoiceId;
             ngDialog.open({
-                template: 'views/depot.sendBack.html',
+                template: 'views/invoice.sendBack.html',
                 className: 'ngdialog-theme-plain',
                 controller: 'depotSendBackConfirmCtrl',
                 scope: $scope
@@ -396,7 +388,7 @@ angular.module('newlpApp')
         $scope.remove = function (invoiceId) {
             $scope.invoiceIdToRemove = invoiceId;
             ngDialog.open({
-                template: 'views/customer_service.order.remove.html',
+                template: 'views/invoice.remove.html',
                 className: 'ngdialog-theme-plain',
                 controller: 'customerServiceOrderRemoveConfirmCtrl',
                 scope: $scope

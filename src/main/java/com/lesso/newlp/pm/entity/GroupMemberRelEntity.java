@@ -1,6 +1,7 @@
 package com.lesso.newlp.pm.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -20,13 +21,13 @@ public class GroupMemberRelEntity extends AbstractTimestampEntity implements Ser
     @EmbeddedId
     private GroupMemberRelPk groupMemberRelPk;
 
-    @JsonManagedReference
+//    @JsonBackReference("member-groupMemberRel")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "member_memberId", insertable = false, updatable = false)
     @LazyCollection(LazyCollectionOption.FALSE)
     MemberEntity member;
 
-    @JsonManagedReference
+//    @JsonBackReference("group-groupMemberRel")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "group_groupId", insertable = false, updatable = false)
     @LazyCollection(LazyCollectionOption.FALSE)

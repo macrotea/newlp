@@ -1,6 +1,7 @@
 package com.lesso.newlp.home.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -36,6 +37,7 @@ public class PanelEntity implements Serializable {
         this.panelId = panelId;
     }
 
+    @JsonManagedReference("panel-pane")
     @OneToMany(mappedBy = "panel")
     @LazyCollection(LazyCollectionOption.FALSE)
     @OrderBy("order ASC")

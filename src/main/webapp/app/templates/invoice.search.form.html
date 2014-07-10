@@ -56,7 +56,7 @@
 
                 <div class="col-sm-5">
                     <div class="input-group col-xs-5 pull-left">
-                        <input type="text" class="form-control" datepicker-popup="yyyy/MM/dd"
+                        <input type="text" class="form-control" datepicker-popup="yyyy-MM-dd"
                                show-button-bar="false" is-open="startDateOpened" datepicker-options=" {showWeeks: false, startingDay: 1 }"
                                ng-required="true" ng-click="startDateOpened = true"
                                ng-model="searchTerm.startDateOfReceived"/>
@@ -68,7 +68,7 @@
                         <span class="bigger-160">~</span>
                     </div>
                     <div class="input-group col-xs-5">
-                        <input type="text" class="form-control" datepicker-popup="yyyy/MM/dd"
+                        <input type="text" class="form-control" datepicker-popup="yyyy-MM-dd"
                                show-button-bar="false" is-open="endDateOpened" datepicker-options=" {showWeeks: false, startingDay: 1 }"
                                ng-required="true" ng-click="endDateOpened = true"
                                ng-model="searchTerm.endDateOfReceived"/>
@@ -113,11 +113,9 @@
 
 <!--Invoice Datatable BEGINS
 ===========================================-->
-<div class="col-sm-12">
     <div class="table-header">
         订单列表
     </div>
-    <div>
         <div class="dataTables_wrapper form-inline">
             <div class="row">
                 <div class="col-xs-6">
@@ -166,11 +164,11 @@
                                 <i class="ace-icon fa fa-pencil bigger-130"></i>
                             </a>
 
-                            <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)" ng-if="sendBack">
+                            <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)" ng-if="enableSendBack">
                                 <i class="ace-icon fa fa-reply bigger-130"></i>
                             </a>
 
-                            <a class="red" href="javascript:;" title="删除" ng-click="remove(invoice.invoiceId)" ng-if="remove">
+                            <a class="red" href="javascript:;" title="删除" ng-click="remove(invoice.invoiceId)" ng-if="enableRemove">
                                 <i class="ace-icon fa fa-trash-o bigger-130"></i>
                             </a>
 
@@ -247,8 +245,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
-</div>
 <!--Invoice Datatable ENDS
 ===========================================-->

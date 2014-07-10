@@ -11,18 +11,38 @@ angular.module('newlpApp')
                 scope: {
                     options: '=options'
                 },
-                controller: function ($scope, $state,  Invoice) {
+                controller: function ($scope, $state,  Invoice,ngDialog) {
 
                     /*init actions*/
                     $scope.edit = $scope.options.actions.edit;
-                    $scope.sendBack = $scope.options.actions.sendBack;
-                    $scope.remove = $scope.options.actions.remove;
                     $scope.view = $scope.options.actions.view;
                     $scope.rowDblClick =
                         $scope.options.actions.rowDblClick?$scope.options.actions.rowDblClick:
                         $scope.options.actions.edit?$scope.options.actions.edit:
                         $scope.options.actions.view?$scope.options.actions.view:undefined
                     ;
+
+                    $scope.enableRemove = $scope.options.removeController;
+                    $scope.remove = function (invoiceId) {
+                        $scope.invoiceIdToRemove = invoiceId;
+                        ngDialog.open({
+                            template: 'views/invoice.remove.html',
+                            className: 'ngdialog-theme-plain',
+                            controller: $scope.options.removeController,
+                            scope: $scope
+                        });
+                    };
+
+                    $scope.enableSendBack = $scope.options.sendBackController;
+                    $scope.sendBack = function (invoiceId) {
+                        $scope.invoiceIdToRemove = invoiceId;
+                        ngDialog.open({
+                            template: 'views/invoice.sendBack.html',
+                            className: 'ngdialog-theme-plain',
+                            controller: $scope.options.sendBackController,
+                            scope: $scope
+                        });
+                    };
 
                     /*init params*/
                     $scope.pageSizes=[

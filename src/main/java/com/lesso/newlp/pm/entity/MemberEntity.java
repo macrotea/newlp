@@ -1,6 +1,9 @@
 package com.lesso.newlp.pm.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -15,6 +18,7 @@ import java.util.Set;
  * Date: 11/14/13
  * Time: 5:16 PM
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property="@UUID")
 @Entity
 @Table(name = "PM_MEMBER", schema = "DBO",catalog = "NEWLP")
 public class MemberEntity extends AbstractTimestampEntity implements Serializable {
@@ -30,17 +34,20 @@ public class MemberEntity extends AbstractTimestampEntity implements Serializabl
     @Column(nullable = false)
     Boolean enabled;
 
-    @JsonManagedReference
+//    @JsonManagedReference("group-member")
+//    @JsonBackReference("group-member")
     @ManyToMany(mappedBy="members")
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<GroupEntity> groups = new HashSet<GroupEntity>();
 
-    @JsonManagedReference
+//    @JsonManagedReference("inc-member")
+//    @JsonBackReference("inc-member")
     @ManyToMany(mappedBy="members")
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<IncEntity> incs = new HashSet<IncEntity>();
 
-    @JsonManagedReference
+//    @JsonManagedReference("member-client")
+//    @JsonBackReference("member-client")
     @ManyToMany(mappedBy="members")
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<ClientEntity> clients = new HashSet<ClientEntity>();

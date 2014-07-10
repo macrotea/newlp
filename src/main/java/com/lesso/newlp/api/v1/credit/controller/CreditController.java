@@ -2,6 +2,7 @@ package com.lesso.newlp.api.v1.credit.controller;
 
 import com.lesso.newlp.credit.entity.CreditEntity;
 import com.lesso.newlp.credit.model.SearchTerm;
+import com.lesso.newlp.credit.repository.CreditRepository;
 import com.lesso.newlp.credit.service.CreditService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 /**
  * Created by Sean on 6/19/2014.
@@ -33,6 +35,16 @@ public class CreditController {
 
     @Resource
     CreditService creditService;
+
+    @Resource
+    CreditRepository creditRepository;
+
+    @RequestMapping(method = RequestMethod.GET)
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<PagedResources<CreditEntity>> get(Model model, Pageable pageable, PagedResourcesAssembler assembler) {
+        Page<CreditEntity> creditEntities = creditRepository.queryAll( pageable);
+        return new ResponseEntity<>(assembler.toResource(creditEntities), HttpStatus.OK);
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<CreditEntity> add(@RequestBody CreditEntity credit, BindingResult result) {
@@ -50,6 +62,48 @@ public class CreditController {
     @RequestMapping(value = "/{creditId}", method = RequestMethod.PUT)
     public ResponseEntity<CreditEntity> update(@RequestBody CreditEntity credit, @PathVariable("creditId") Long creditId) throws InvocationTargetException, IllegalAccessException {
         credit = creditService.update(credit);
+        return new ResponseEntity<>(credit, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{creditId}", method = RequestMethod.PATCH)
+    public ResponseEntity<CreditEntity> patch(@RequestBody CreditEntity credit, @PathVariable("creditId") Long creditId) throws InvocationTargetException, IllegalAccessException {
+
+        CreditEntity creditEntity = creditRepository.findOne(creditId);
+
+        if (!Objects.isNull(credit.getClient())) {
+            creditEntity.setClient(credit.getClient());
+        }
+
+        if (!Objects.isNull(credit.getValidDate())) {
+            creditEntity.setValidDate(credit.getValidDate());
+        }
+
+        if (!Objects.isNull(credit.getExpiryDate())) {
+            creditEntity.setExpiryDate(credit.getExpiryDate());
+        }
+
+        if (!Objects.isNull(credit.getType())) {
+            creditEntity.setType(credit.getType());
+        }
+
+        if (!Objects.isNull(credit.getDescription())) {
+            creditEntity.setDescription(credit.getDescription());
+        }
+
+        if (!Objects.isNull(credit.getAmount())) {
+            creditEntity.setAmount(credit.getAmount());
+        }
+
+        if (!Objects.isNull(credit.getPercent())) {
+            creditEntity.setPercent(credit.getPercent());
+        }
+
+        if (!Objects.isNull(credit.getCreditAmount())) {
+            creditEntity.setCreditAmount(credit.getCreditAmount());
+        }
+
+        credit = creditRepository.save(creditEntity);
+
         return new ResponseEntity<>(credit, HttpStatus.OK);
     }
 

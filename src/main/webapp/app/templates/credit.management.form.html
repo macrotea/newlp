@@ -1,0 +1,316 @@
+<!--credit Criteria BEGINS
+===========================================-->
+<form class="form-horizontal" name="form" novalidate ng-submit="submit()">
+    <fieldset>
+        <div class="col-sm-10 col-sm-offset-1">
+
+
+            <div class="form-group">
+                <!--公司-->
+                <label class="col-sm-1 control-label no-padding-right"> 客户 </label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <select class="form-control" title="选择客户" client-select client-id="searchTerm.clientId"
+                                ng-model="searchTerm.client"
+                                ng-options="client.clientName for client in [searchTerm.client] track by client.clientId"></select>                    </div>
+                </div>
+
+                <!--客户-->
+                <label class="col-sm-1 control-label no-padding-right"> 类型 </label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <select class="form-control" ng-model="searchTerm.type">
+                            <option value="0">常规</option>
+                            <option value="1">临时</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <!--收款额-->
+                <label class="col-sm-1 control-label no-padding-right"> 收款额</label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <input class="form-control" type="text" ng-model="searchTerm.amount">
+                    </div>
+                </div>
+
+                <!--信用金额-->
+                <label class="col-sm-1 control-label no-padding-right"> 信用金额</label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <input class="form-control" type="text" ng-model="searchTerm.creditAmount">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+
+                <!--收款说明-->
+                <label class="col-sm-1 control-label no-padding-right"> 收款说明</label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <input class="form-control" type="text" ng-model="searchTerm.description">
+                    </div>
+                </div>
+
+                <!--有效日期-->
+                <label class="col-sm-1 control-label no-padding-right"> 有效日期 </label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-5 pull-left">
+                        <input type="text" class="form-control" datepicker-popup="yyyy-MM-dd"
+                               show-button-bar="false" is-open="validDateOpened"
+                               datepicker-options=" {showWeeks: false, startingDay: 1 }"
+                               ng-required="true" ng-click="validDateOpened = true"
+                               ng-model="searchTerm.validDate"/>
+                                <span class="input-group-addon">
+                                <i class="fa fa-calendar bigger-110"></i>
+                                </span>
+                    </div>
+                    <div class="input-group col-xs-2 pull-left center">
+                        <span class="bigger-160">~</span>
+                    </div>
+                    <div class="input-group col-xs-5">
+                        <input type="text" class="form-control" datepicker-popup="yyyy-MM-dd"
+                               show-button-bar="false" is-open="expiryDateOpened"
+                               datepicker-options=" {showWeeks: false, startingDay: 1 }"
+                               ng-required="true" ng-click="expiryDateOpened = true"
+                               ng-model="searchTerm.expiryDate"/>
+                                <span class="input-group-addon">
+                                <i class="fa fa-calendar bigger-110"></i>
+                                </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-danger" ng-if="error">
+                <button type="button" class="close" data-dismiss="alert">
+                    <i class="ace-icon fa fa-times"></i>
+                </button>
+                <strong>
+                    <i class="ace-icon fa fa-check"></i>
+                    查询出错，请联系管理员!
+                </strong>
+                <br>
+            </div>
+
+            <!--搜索-->
+            <div class="form-group">
+                <div class="col-sm-5 col-lg-offset-1">
+                    <button class="btn btn-info" type="submit" ng-click="action = 'SUBMIT'">
+                        <i class="ace-icon fa fa-check bigger-110"></i>
+                        搜索
+                    </button>
+
+                    &nbsp; &nbsp; &nbsp;
+                    <button class="btn" type="submit" ng-click="action = 'RESET'">
+                        <i class="ace-icon fa fa-undo bigger-110"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<!--credit Criteria ENDS
+===========================================-->
+
+<!--credit Datatable BEGINS
+===========================================-->
+<form class="form-inline">
+    <div class="table-header">
+        信用额度列表
+    </div>
+    <div class="dataTables_wrapper form-inline">
+        <div class="row">
+            <div class="col-xs-6">
+                <div id="sample-table-2_length" class="dataTables_length"><label>每页
+                    <select ng-model="pageSize" ng-options="pageSize.name for pageSize in pageSizes"
+                            ng-change="onPageSizeChange()">
+                    </select> 记录</label></div>
+            </div>
+            <div class="col-xs-6">
+                <div class="dataTables_filter">
+                    <label>过滤: <input type="text" ng-model="searchText"></label>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-condensed table-striped table-bordered table-hover dataTable">
+            <thead>
+            <tr role="row">
+                <th>客户编号</th>
+                <!--<th>录入时间</th>-->
+                <th>有效日期开始</th>
+                <th>有效日期结束</th>
+                <th>额度属性</th>
+                <th>收款说明</th>
+                <th>收款额</th>
+                <th>百分比</th>
+                <th>信用金额</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="credit in data.content | filter:searchText " ng-if="!loading">
+                <td class="center col-sm-1">
+                    <select class="form-control col-sm-10" title="选择客户" client-select
+                            ng-model="credit.client"
+                            ng-options="client.clientNum for client in [credit.client] track by client.clientId"
+                            ng-disabled="!credit.editable"></select>
+                </td>
+                <td class="col-sm-1">
+                    <input type="text" class="col-sm-11" datepicker-popup="yyyy-MM-dd"
+                           show-button-bar="false" is-open="credit.validDateOpened"
+                           datepicker-options=" {showWeeks: false, startingDay: 1 }"
+                           ng-required="true" ng-click="credit.validDateOpened = true"
+                           ng-model="credit.validDate" ng-disabled="!credit.editable"/>
+                </td>
+                <td class="col-sm-1">
+                    <input type="text" class="col-sm-11" datepicker-popup="yyyy-MM-dd"
+                           show-button-bar="false" is-open="credit.expiryDateOpened"
+                           datepicker-options=" {showWeeks: false, startingDay: 1 }"
+                           ng-required="true" ng-click="credit.expiryDateOpened = true"
+                           ng-model="credit.expiryDate" ng-disabled="!credit.editable"/>
+                </td>
+                <td class="col-sm-1">
+                    <select class="form-control" ng-model="credit.type" ng-disabled="!credit.editable">
+                        <option value="0">常规</option>
+                        <option value="1">临时</option>
+                    </select>
+                </td>
+                <td class="col-sm-1">
+                    <input type="text" class="col-sm-12" ng-model="credit.description"
+                           ng-disabled="!credit.editable">
+                </td>
+                <td class="col-sm-2">
+                    <input type="number" class="col-sm-12" ng-model="credit.amount" ng-disabled="!credit.editable">
+                </td>
+                <td class="col-sm-1">
+                    <input type="number" step="0.01" class="col-sm-12" ng-model="credit.percent"
+                           ng-disabled="!credit.editable">
+                </td>
+                <td class="col-sm-2">
+                    <input type="number" class="col-sm-12" ng-model="credit.creditAmount"
+                           ng-disabled="!credit.editable">
+                </td>
+                <td class="col-sm-1 center">
+                    <div class="hidden-sm hidden-xs action-buttons" ng-if="!credit.editable">
+                        <a class="green" title="修改" href="javascript:;" ng-click="credit.editable = true">
+                            <i class="ace-icon fa fa-pencil bigger-130"></i>
+                        </a>
+
+                        <a class="red" href="javascript:;" title="删除" ng-click="remove(credit.creditId)">
+                            <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                        </a>
+
+                    </div>
+
+                    <div class="hidden-sm hidden-xs action-buttons" ng-if="credit.editable">
+                        <a class="green" title="保存" href="javascript:;"
+                           ng-click="update(credit,$index);credit.editable=false;">
+                            <i class="ace-icon fa fa-check bigger-130"></i>
+                        </a>
+
+                        <a class="red" title="取消" href="javascript:;"
+                           ng-click="cancel(credit,$index);credit.editable=false;">
+                            <i class="ace-icon fa fa-times bigger-130"></i>
+                        </a>
+
+                    </div>
+
+                    <div class="hidden-md hidden-lg">
+                        <div class="inline position-relative">
+                            <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown"
+                                    data-position="auto">
+                                <i class="ace-icon fa fa-caret-down icon-only bigger-120"></i>
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close"
+                                ng-if="!credit.editable">
+                                <li>
+                                    <a class="tooltip-success" title="修改" href="javascript:;"
+                                       ng-click="credit.editable = true">
+																			<span class="green">
+																				<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>
+																			</span>
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="tooltip-error" title="删除" href="javascript:;"
+                                       ng-click="remove(credit.creditId)">
+																			<span class="red">
+																				<i class="ace-icon fa fa-trash-o bigger-120"></i>
+																			</span>
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close"
+                                ng-if="credit.editable">
+                                <li>
+                                    <a class="tooltip-success" title="保存" href="javascript:;"
+                                       ng-click="update(credit,$index);credit.editable=false">
+																			<span class="green">
+																				<i class="ace-icon fa fa-check bigger-120"></i>
+																			</span>
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="tooltip-error" title="取消" href="javascript:;"
+                                       ng-click="cancel(credit,$index);credit.editable=false">
+																			<span class="red">
+																				<i class="ace-icon fa fa-times bigger-120"></i>
+																			</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+            <tr class="center" ng-if="loading">
+                <td colspan="10">
+                    <i class="fa fa-spinner fa-spin bigger-210"></i>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="dataTables_info" id="sample-table-2_info">总共 <span
+                        ng-bind="data.page.totalElements"></span> 条记录
+                    <span>|</span>
+                    <!--<a class="green" title="修改" href="javascript:;" ng-click="credit.editable = true">-->
+                        <!--<span class="ui-icon ace-icon fa fa-plus-circle purple"></span>-->
+                    <!--</a>-->
+                    <button class="btn btn-xs btn-success" type="submit" ng-click="add()">
+                        <i class="ace-icon fa fa-plus-circle bigger-110"></i>
+                        添加
+                    </button>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="dataTables_paginate paging_bootstrap">
+                    <pagination ng-model="page.number" ng-change="onPageChanged()"
+                                total-items="data.page.totalElements" items-per-page="page.size"
+                                boundary-links="true"
+                                class="pagination pull-right" previous-text="&lsaquo;" next-text="&rsaquo;"
+                                first-text="&laquo;" last-text="&raquo;"></pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!--credit Datatable ENDS
+===========================================-->

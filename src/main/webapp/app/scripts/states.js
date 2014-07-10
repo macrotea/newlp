@@ -260,6 +260,32 @@ angular
             })
 
             // home > setting //
+            .state('home.credit', {
+                abstract: true,
+                url: '/credit'
+            })
+            .state('home.credit.management', {
+                abstract: true,
+                url: '/management'
+            })
+            .state('home.credit.management.balance', {
+                url: '/balance',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/credit.management.balance.html'
+                    }
+                }
+            })
+            .state('home.credit.management.temp', {
+                url: '/temp',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/credit.management.temp.html'
+                    }
+                }
+            })
+
+            // home > setting //
             .state('home.setting', {
                 abstract: true,
                 url: '/setting'

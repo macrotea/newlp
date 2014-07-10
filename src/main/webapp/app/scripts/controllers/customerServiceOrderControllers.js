@@ -163,17 +163,9 @@ angular.module('newlpApp')
                 actions: {
                     edit: function (invoiceId) {
                         $state.go('home.customer_service.order.edit', {invoiceId: invoiceId});
-                    },
-                    remove: function (invoiceId) {
-                        $scope.invoiceIdToRemove = invoiceId;
-                        ngDialog.open({
-                            template: 'views/customer_service.order.remove.html',
-                            className: 'ngdialog-theme-plain',
-                            controller: 'customerServiceOrderRemoveConfirmCtrl',
-                            scope: $scope
-                        });
                     }
-                }
+                },
+                removeController:'customerServiceOrderRemoveConfirmCtrl'
             }
         };
     })

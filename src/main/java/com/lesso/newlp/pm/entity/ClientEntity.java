@@ -1,6 +1,6 @@
 package com.lesso.newlp.pm.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.*;
 import com.lesso.newlp.credit.entity.CreditEntity;
 
 import javax.persistence.*;
@@ -11,33 +11,39 @@ import java.util.Set;
 /**
  * Created by Sean on 6/23/2014.
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID")
 @Entity
-@Table(name = "PM_CLIENT", schema = "DBO",catalog = "NEWLP")
-public class ClientEntity  implements Serializable {
+@Table(name = "PM_CLIENT", schema = "DBO", catalog = "NEWLP")
+public class ClientEntity implements Serializable {
 
     @Id
-    @Column(insertable = false,updatable = false)
+    @Column(insertable = false, updatable = false)
     Long clientId;
-    @Column(insertable = false,updatable = false)
+    @Column(insertable = false, updatable = false)
     String clientNum;
-    @Column(insertable = false,updatable = false)
+    @Column(insertable = false, updatable = false)
     String clientName;
 
-    @JsonBackReference
+    //    @JsonManagedReference("inc-client")
+//    @JsonBackReference("inc-client")
+    @JsonIgnore
     @ManyToMany()
     @JoinTable(name = "PM_INC_CLIENT_REL",
             joinColumns = {@JoinColumn(name = "client_clientId")},
             inverseJoinColumns = {@JoinColumn(name = "inc_incId")})
     Set<IncEntity> incs = new HashSet<IncEntity>();
 
-    @JsonBackReference
+    //    @JsonManagedReference("member-client")
+//    @JsonBackReference("member-client")
+    @JsonIgnore
     @ManyToMany()
     @JoinTable(name = "PM_CLIENT_MEMBER_REL",
             joinColumns = {@JoinColumn(name = "client_clientId")},
             inverseJoinColumns = {@JoinColumn(name = "member_memberId")})
     Set<MemberEntity> members = new HashSet<MemberEntity>();
 
-    @JsonBackReference
+    //    @JsonManagedReference("client-credit")
+    @JsonIgnore
     @OneToMany(mappedBy = "client")
     Set<CreditEntity> credits = new HashSet<>();
 //    @JsonManagedReference

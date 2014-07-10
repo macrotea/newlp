@@ -1,6 +1,7 @@
 package com.lesso.newlp.credit.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
 import com.lesso.newlp.pm.entity.ClientEntity;
 
@@ -12,6 +13,8 @@ import java.util.Date;
 /**
  * Created by Sean on 7/3/2014.
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID")
+
 @Entity
 @Table(name = "CRE_CREDIT", schema = "DBO", catalog = "NEWLP")
 public class CreditEntity extends AbstractTimestampEntity implements Serializable {
@@ -30,7 +33,6 @@ public class CreditEntity extends AbstractTimestampEntity implements Serializabl
     Date expiryDate;
     String description;
 
-    @JsonBackReference
     @ManyToOne()
     ClientEntity client;
 
