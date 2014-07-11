@@ -29,7 +29,7 @@ import java.util.Properties;
 @Configuration
 @EnableJpaRepositories("com.lesso.newlp.*.repository")
 @EnableTransactionManagement
-public class DataSourceConfig implements TransactionManagementConfigurer {
+public class PersistenceConfig implements TransactionManagementConfigurer {
 
     @Value("${jdbc.driver}")
     private String driver;
@@ -99,6 +99,7 @@ public class DataSourceConfig implements TransactionManagementConfigurer {
         factoryBean.setPackagesToScan("com.lesso.newlp");
         factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         factoryBean.setJpaProperties(jpaProperties);
+//        factoryBean.setPersistenceUnitManager(new MergingPersistenceUnitManager());
         factoryBean.afterPropertiesSet();
 
         return factoryBean.getObject();
