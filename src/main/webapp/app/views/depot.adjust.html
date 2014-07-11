@@ -224,7 +224,7 @@
     <!--</button>-->
     <strong>
         <i class="ace-icon fa fa-check"></i>
-        订单<span ng-if="invoice.auditStatus==70">提交</span><span ng-if="invoice.auditStatus==40">退回</span>成功!
+        订单<span ng-if="invoice.auditStatus==70">提交</span><span ng-if="invoice.auditStatus==30">退回</span>成功!
     </strong>
     <br>
 </div>
@@ -248,7 +248,7 @@
             </button>
 
             &nbsp; &nbsp; &nbsp;
-            <button class="btn btn-danger" type="submit" ng-click="invoice.auditStatus = 40">
+            <button class="btn btn-danger" type="submit" ng-click="invoice.auditStatus = 30">
                 <i class="ace-icon fa fa-undo bigger-110"></i>
                 退回
             </button>

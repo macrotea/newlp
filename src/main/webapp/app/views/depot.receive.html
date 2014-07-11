@@ -258,7 +258,7 @@
     <!--</button>-->
     <strong>
         <i class="ace-icon fa fa-check"></i>
-        订单<span ng-if="invoice.auditStatus==60">接收</span><span ng-if="invoice.auditStatus==40">退回</span>成功!
+        订单<span ng-if="invoice.auditStatus==60">接收</span><span ng-if="invoice.auditStatus==30">退回</span>成功!
     </strong>
     <br>
 </div>
@@ -277,13 +277,13 @@
     <div class="clearfix form-actions">
         <div class="col-md-offset-3 col-md-9">
 
-            <button class="btn btn-info" type="submit" ng-click="invoice.auditStatus = 60">
+            <button class="btn btn-info" type="submit" ng-click="invoice.auditStatus = 60;">
                 <i class="ace-icon fa fa-check bigger-110"></i>
                 接收
             </button>
 
             &nbsp; &nbsp; &nbsp;
-            <button class="btn btn-danger" type="submit" ng-click="invoice.auditStatus = 40">
+            <button class="btn btn-danger" type="submit" ng-click="invoice.auditStatus = 30;">
                 <i class="ace-icon fa fa-undo bigger-110"></i>
                 退回
             </button>
