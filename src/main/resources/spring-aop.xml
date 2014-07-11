@@ -27,4 +27,6 @@
     <!--Aspect Beans-->
     <!--<bean id="notifyAspect" class="com.lesso.newlp.config.aspects.NotifyAspect"/>-->
 
+    <bean id="operationLogAspect" class="com.lesso.newlp.config.aspects.OperationLogAspect"/>
+
 </beans>
