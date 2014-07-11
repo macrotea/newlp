@@ -18,10 +18,11 @@ public interface InvoiceService {
 
     InvoiceEntity update(InvoiceEntity invoice) throws InvocationTargetException, IllegalAccessException;
 
+    InvoiceEntity patch(Long invoiceId, InvoiceEntity invoice) throws InvocationTargetException, IllegalAccessException;
+
     void delete(Long invoiceId);
 
     Page<InvoiceEntity> queryByAuditStatus(Integer auditStatus, Pageable pageable);
 
     Page<InvoiceEntity> search(SearchTerm searchTerm, Pageable pageable);
-
 }

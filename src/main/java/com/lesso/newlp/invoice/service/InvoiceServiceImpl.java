@@ -52,6 +52,7 @@ public class InvoiceServiceImpl implements InvoiceService {
      * @return
      */
     @Override
+    @Transactional
     public InvoiceEntity save(InvoiceEntity invoice) {
         final InvoiceEntity finalInvoice = invoice;
         invoice.getInvoiceDetails().forEach(invoiceDetail -> {
@@ -93,12 +94,12 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "LEFT JOIN PM_INC inc on i.inc_incId = inc.incId \n" +
                 "left join PM_CLIENT incClient on i.client_clientId = incClient.clientId\n" +
                 "left join MAT_MATERIAL m ON j.material_materialNum = m.materialNum \n" +
-                "WHERE i.invoiceId = ? and i.active = 1", new Object[]{invoiceId}, new RowMapper<InvoiceDetailEntity>() {
+                "WHERE i.invoiceId = ? and i.active = 1 and j.active = 1", new Object[]{invoiceId}, new RowMapper<InvoiceDetailEntity>() {
             @Override
             public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
                 InvoiceEntity invoice = new InvoiceEntity();
                 invoice.setInvoiceId(rs.getLong("invoiceId"));
-                invoice.setNum(rs.getString("num"));
+                invoice.setInvoiceNum(rs.getString("invoiceNum"));
                 invoice.setCarNum(rs.getString("carNum"));
                 invoice.setSubmitDate(rs.getDate("submitDate"));
                 invoice.setClientAddress(rs.getString("clientAddress"));
@@ -179,7 +180,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 public Object mapRow(ResultSet rs, int rowNum)
                         throws SQLException {
                     return rs.getLong("invoiceDetailId");
-                };
+                }
             });
             Iterator it=set.iterator();
             while(it.hasNext()){
@@ -187,18 +188,18 @@ public class InvoiceServiceImpl implements InvoiceService {
                 if(invoiceDataDBID.contains(ide.getInvoiceDetailId())){
                     jdbcDaoSupport.getJdbcTemplate().update("update INV_INVOICE_DETAIL set active=?, amount=?,deliveryCount=?,orderCount=?,remark=?," +
                                     "invoice_invoiceId=?,material_materialNum=?,auxiliaryUnitOne=?,auxiliaryUnitTwo=?,conversionRateOne=?,conversionRateTwo=?,price=?,unit=? WHERE invoiceDetailId=?",
-                            new Object[]{ide.getActive(),ide.getAmount(),ide.getDeliveryCount(),ide.getOrderCount(),ide.getRemark(),invoice.getInvoiceId(),ide.getMaterial().getMaterialNum(),ide.getAuxiliaryUnitOne()
-                                    ,ide.getAuxiliaryUnitTwo(),ide.getConversionRateOne(),ide.getConversionRateTwo(),ide.getPrice(),ide.getUnit(),ide.getInvoiceDetailId()});
+                            ide.getActive(),ide.getAmount(),ide.getDeliveryCount(),ide.getOrderCount(),ide.getRemark(),invoice.getInvoiceId(),ide.getMaterial().getMaterialNum(),ide.getAuxiliaryUnitOne()
+                            ,ide.getAuxiliaryUnitTwo(),ide.getConversionRateOne(),ide.getConversionRateTwo(),ide.getPrice(),ide.getUnit(),ide.getInvoiceDetailId());
                     invoiceDataDBID.remove(ide.getInvoiceDetailId());
                 }else {
                     jdbcDaoSupport.getJdbcTemplate().update("insert into INV_INVOICE_DETAIL(updated,amount,deliveryCount,orderCount,remark,invoice_invoiceId,material_materialNum,auxiliaryUnitOne,auxiliaryUnitTwo,conversionRateOne,conversionRateTwo,price,unit)" +
                                     " values(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                            new Object[]{new Date(),ide.getAmount(),ide.getDeliveryCount(),ide.getOrderCount(),ide.getRemark(),
-                                    invoice.getInvoiceId(),ide.getMaterial().getMaterialNum(),ide.getAuxiliaryUnitOne() ,
-                                    ide.getAuxiliaryUnitTwo(),ide.getConversionRateOne(),
-                                    ide.getConversionRateTwo(),ide.getPrice(),ide.getUnit()});
+                            new Date(),ide.getAmount(),ide.getDeliveryCount(),ide.getOrderCount(),ide.getRemark(),
+                            invoice.getInvoiceId(),ide.getMaterial().getMaterialNum(),ide.getAuxiliaryUnitOne(),
+                            ide.getAuxiliaryUnitTwo(),ide.getConversionRateOne(),
+                            ide.getConversionRateTwo(),ide.getPrice(),ide.getUnit());
                 }
-            };
+            }
 
             if(invoiceDataDBID.size()>0){
                 String inid="";
@@ -210,17 +211,40 @@ public class InvoiceServiceImpl implements InvoiceService {
             }
 
         }
-        jdbcDaoSupport.getJdbcTemplate().update("update INV_INVOICE  set num=?,inc_incId=?," +
+        jdbcDaoSupport.getJdbcTemplate().update("update INV_INVOICE  set invoiceNum=?,inc_incId=?," +
                         "carNum=?,client_clientId=?,clientAddress=?," +
                         "receivedDate=?,auditStatus=?,remark=?,active=?,invoiceType_invoiceTypeId=?where invoiceId=?",
-                new Object[]{invoice.getNum(),
-                        invoice.getInc().getIncId(), invoice.getCarNum(),
-                        invoice.getClient().getClientId(),invoice.getClientAddress(),
-                        invoice.getReceivedDate(),
-                        invoice.getAuditStatus(), invoice.getRemark(), invoice.getActive
-                        (), invoice.getInvoiceType().getInvoiceTypeId(),
-                        invoice.getInvoiceId()});
+                invoice.getInvoiceNum(),
+                invoice.getInc().getIncId(), invoice.getCarNum(),
+                invoice.getClient().getClientId(),invoice.getClientAddress(),
+                invoice.getReceivedDate(),
+                invoice.getAuditStatus(), invoice.getRemark(), invoice.getActive
+                (), invoice.getInvoiceType().getInvoiceTypeId(),
+                invoice.getInvoiceId());
         return invoice;
+    }
+
+    @Override
+    @Transactional
+    public InvoiceEntity patch(Long invoiceId, InvoiceEntity invoice) throws InvocationTargetException, IllegalAccessException {
+        InvoiceEntity  invoiceEntity = invoiceRepository.findOne(invoiceId);
+        if (!Objects.isNull(invoice.getAuditStatus())) {
+            invoiceEntity.setAuditStatus(invoice.getAuditStatus());
+        }
+
+        if (!Objects.isNull(invoice.getInvoiceDetails())) {
+            final InvoiceEntity finalInvoice = invoice;
+            invoiceEntity.getInvoiceDetails().forEach(a -> {
+                finalInvoice.getInvoiceDetails().forEach(b -> {
+                    if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
+                        a.setDeliveryCount(b.getDeliveryCount());
+                    }
+                });
+            });
+        }
+
+        return invoiceRepository.save(invoiceEntity);
+//        return ((InvoiceService)AopContext.currentProxy()).update(invoiceEntity);
     }
 
     /**
@@ -229,7 +253,7 @@ public class InvoiceServiceImpl implements InvoiceService {
      */
     @Override
     public void delete(Long invoiceId) {
-        jdbcDaoSupport.getJdbcTemplate().update("update INV_INVOICE set active=0 where invoiceId=?",new Object[]{invoiceId});
+        jdbcDaoSupport.getJdbcTemplate().update("update INV_INVOICE set active=0 where invoiceId=?", invoiceId);
     }
 
 
@@ -249,7 +273,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "\t\tSELECT\n" +
                 "      ROW_NUMBER () OVER (ORDER BY i.invoiceId DESC) AS rowNum,\n" +
                 "\t\t\ti.invoiceId,\n" +
-                "\t\t\ti.num,\n" +
+                "\t\t\ti.invoiceNum,\n" +
                 "\t\t\ti.auditStatus,\n" +
                 "      t.invoiceTypeId,\n" +
                 "\t\t\tt.name,\n" +
@@ -274,7 +298,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
                 InvoiceEntity invoice = new InvoiceEntity();
                 invoice.setInvoiceId(rs.getLong("invoiceId"));
-                invoice.setNum(rs.getString("num"));
+                invoice.setInvoiceNum(rs.getString("invoiceNum"));
                 invoice.setCarNum(rs.getString("carNum"));
 //                invoice.setSubmitDate(rs.getDate("submitDate"));
 //                invoice.setClientAddress(rs.getString("clientAddress"));
@@ -360,7 +384,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                         "LEFT JOIN PM_INC inc on i.inc_incId = inc.incId\n" +
                         "left join PM_CLIENT incClient on i.client_clientId = incClient.clientId\n" +
                         "left join MAT_MATERIAL m ON j.material_materialNum = m.materialNum \n" +
-                        "WHERE i.auditStatus=? and i.active =1 ",new Object[]{auditStatus},Long.class);
+                        "WHERE i.auditStatus=? and i.active =1 and j.active =1 ",new Object[]{auditStatus},Long.class);
 
         return new PageImpl<InvoiceEntity>(invoiceEntityList,pageable,total);
     }
@@ -383,7 +407,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             objList.add(searchTerm.getInvoiceTypeId());
         }
         if(searchTerm.getNum()!=null&&searchTerm.getNum().length()>0){
-            sql+=" and i.num like '%?%'";
+            sql+=" and i.invoiceNum like '%?%'";
             objList.add(searchTerm.getNum());
         }
         if(searchTerm.getIncId()!=null){
@@ -411,7 +435,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             public InvoiceEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
                 InvoiceEntity invoiceEntity=new InvoiceEntity();
                 invoiceEntity.setInvoiceId(rs.getLong("invoiceId"));
-                invoiceEntity.setNum(rs.getString("num"));
+                invoiceEntity.setInvoiceNum(rs.getString("invoiceNum"));
                 invoiceEntity.setCarNum(rs.getString("carNum"));
                 invoiceEntity.setSubmitDate(rs.getDate("submitDate"));
                 invoiceEntity.setClientAddress(rs.getString("clientAddress"));

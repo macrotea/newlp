@@ -1,10 +1,12 @@
 package com.lesso.newlp.api.v1.invoice.controller;
 
+import com.lesso.newlp.auth.model.CurrentUser;
 import com.lesso.newlp.invoice.entity.InvoiceEntity;
 import com.lesso.newlp.invoice.model.SearchTerm;
 import com.lesso.newlp.invoice.repository.InvoiceRepository;
 import com.lesso.newlp.invoice.repository.InvoiceTypeRepository;
 import com.lesso.newlp.invoice.service.InvoiceService;
+import com.lesso.newlp.log.repository.LogRepository;
 import com.lesso.newlp.material.repository.CompanyMaterialRepository;
 import com.lesso.newlp.material.repository.MaterialRepository;
 import com.lesso.newlp.pm.repository.IncRepository;
@@ -16,7 +18,9 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
 
 /**
  * Created by Sean on 6/19/2014.
@@ -57,6 +60,9 @@ public class InvoiceController {
     @Resource
     IncRepository incRepository;
 
+    @Resource
+    LogRepository logRepository;
+
     @RequestMapping()
     @SuppressWarnings("unchecked")
     public ResponseEntity<PagedResources<InvoiceEntity>> get(Model model, Pageable pageable, PagedResourcesAssembler assembler) {
@@ -65,7 +71,7 @@ public class InvoiceController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<InvoiceEntity> add(@RequestBody InvoiceEntity invoice, BindingResult result) {
+    public ResponseEntity<InvoiceEntity> add(@RequestBody InvoiceEntity invoice, BindingResult result,@CurrentUser User user) {
         invoice = invoiceService.save(invoice);
         return new ResponseEntity<>(invoice, HttpStatus.OK);
     }
@@ -84,27 +90,10 @@ public class InvoiceController {
     }
 
     @RequestMapping(value = "/{invoiceId}", method = RequestMethod.PATCH)
+    @Transactional
     public ResponseEntity<InvoiceEntity> patch(@RequestBody InvoiceEntity invoice, @PathVariable("invoiceId") Long invoiceId) throws InvocationTargetException, IllegalAccessException {
 //        invoice = invoiceService.update(invoice);
-
-        InvoiceEntity invoiceEntity = invoiceRepository.findOne(invoiceId);
-
-        if (!Objects.isNull(invoice.getAuditStatus())) {
-            invoiceEntity.setAuditStatus(invoice.getAuditStatus());
-        }
-
-        if (!Objects.isNull(invoice.getInvoiceDetails())) {
-            final InvoiceEntity finalInvoice = invoice;
-            invoiceEntity.getInvoiceDetails().forEach(a -> {
-                finalInvoice.getInvoiceDetails().forEach(b -> {
-                    if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
-                        a.setDeliveryCount(b.getDeliveryCount());
-                    }
-                });
-            });
-        }
-
-        invoice = invoiceRepository.save(invoiceEntity);
+       invoice =  invoiceService.patch(invoiceId, invoice);
 
         return new ResponseEntity<>(invoice, HttpStatus.OK);
     }
