@@ -73,7 +73,7 @@ public class WebConfig extends RepositoryRestMvcConfiguration {
 
     private static final String MESSAGE_SOURCE = "classpath:messages";
 
-    private static final String RESOURCES_HANDLER = "/assets/";
+    private static final String RESOURCES_HANDLER = "/app/";
     private static final String RESOURCES_LOCATION = RESOURCES_HANDLER + "**";
 
     @Override
@@ -145,6 +145,7 @@ public class WebConfig extends RepositoryRestMvcConfiguration {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS,false);
         objectMapper.configure(SerializationFeature.USE_EQUALITY_FOR_OBJECT_ID,true);
         objectMapper.configure(SerializationFeature.EAGER_SERIALIZER_FETCH,true);
+
 //        objectMapper.enable(MapperFeature.USE_STATIC_TYPING);
 //        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
 //        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
@@ -236,6 +237,8 @@ public class WebConfig extends RepositoryRestMvcConfiguration {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/app/").addResourceLocations("/app/**");
+        registry.addResourceHandler("/dist/").addResourceLocations("/dist/**");
         registry.addResourceHandler(RESOURCES_HANDLER).addResourceLocations(RESOURCES_LOCATION);
     }
 

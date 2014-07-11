@@ -58,6 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 /*dev*/
                 .antMatchers("/app/**").permitAll()
+                .antMatchers("/dist/**").permitAll()
 
                 /*production*/
                 .antMatchers("/avatars/**").permitAll()
@@ -73,8 +74,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/index.jsp").permitAll()
 
                 .antMatchers("/").permitAll()
-                .antMatchers("/auth/authenticate").permitAll()
-                .antMatchers("/logout").permitAll()
+                .antMatchers("/api/v1/auth/authenticate").permitAll()
+                .antMatchers("/api/v1/auth/logout").permitAll()
                 .antMatchers("/**").authenticated()
 //                .antMatchers("/**").permitAll()
 //                .antMatchers("/admin/**").hasRole("ADMIN")
@@ -83,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .httpBasic()
                 .and()
-                .logout().logoutUrl("/logout").logoutSuccessUrl("/")
+                .logout().logoutUrl("/api/v1/auth/logout").logoutSuccessUrl("/")
                 .and().sessionManagement()
                 .sessionAuthenticationStrategy(compositeSessionAuthenticationStrategy())
         ;
