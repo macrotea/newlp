@@ -92,6 +92,7 @@ angular.module('newlpApp')
 
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
+            $scope.success = 40 == invoice.auditStatus;
         });
 
         //单据明细

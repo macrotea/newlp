@@ -166,6 +166,8 @@ angular.module('newlpApp')
 
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
+
+            $scope.success = 70 == invoice.auditStatus;
         });
 
         //单据明细
@@ -232,6 +234,8 @@ angular.module('newlpApp')
 
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
+
+            $scope.success = 60 == invoice.auditStatus;
         });
 
         $scope.submit = function () {
@@ -251,6 +255,8 @@ angular.module('newlpApp')
 
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
+
+            $scope.success = 70 == invoice.auditStatus || 30 == invoice.auditStatus;
         });
 
         $scope.submit = function () {
