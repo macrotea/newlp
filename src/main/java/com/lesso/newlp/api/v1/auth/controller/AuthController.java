@@ -1,4 +1,4 @@
-package com.lesso.newlp.auth.controller;
+package com.lesso.newlp.api.v1.auth.controller;
 
 import com.google.common.base.Strings;
 //import org.apache.logging.log4j.LogManager;
@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 
 @Controller
-@RequestMapping(value = "/auth")
+@RequestMapping(value = "/api/v1/auth")
 public class AuthController {
 
 //    Logger logger = LogManager.getLogger();
