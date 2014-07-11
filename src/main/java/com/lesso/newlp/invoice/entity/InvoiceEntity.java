@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by Sean on 6/17/2014.
  */
-@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID")
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID",scope = InvoiceEntity.class)
 @Entity
 @Table(name = "INV_INVOICE", schema = "DBO",catalog = "NEWLP")
 public class InvoiceEntity extends AbstractTimestampEntity implements Serializable {
@@ -24,7 +24,7 @@ public class InvoiceEntity extends AbstractTimestampEntity implements Serializab
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long invoiceId;
-    String num;                          //单据编号
+    String invoiceNum;                          //单据编号
     String carNum;                   //车号
     String clientAddress;       //联系地址
     Date createdDate;           //创建日期,客户下单-创建日期(保存未发送)
@@ -70,12 +70,12 @@ public class InvoiceEntity extends AbstractTimestampEntity implements Serializab
         this.invoiceId = invoiceId;
     }
 
-    public String getNum() {
-        return num;
+    public String getInvoiceNum() {
+        return invoiceNum;
     }
 
-    public void setNum(String num) {
-        this.num = num;
+    public void setInvoiceNum(String invoiceNum) {
+        this.invoiceNum = invoiceNum;
     }
 
     public String getClientAddress() {
