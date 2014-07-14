@@ -1,5 +1,6 @@
 package com.lesso.newlp.invoice.service;
 
+import com.google.common.base.Strings;
 import com.lesso.newlp.invoice.entity.InvoiceDetailEntity;
 import com.lesso.newlp.invoice.entity.InvoiceEntity;
 import com.lesso.newlp.invoice.entity.InvoiceTypeEntity;
@@ -7,6 +8,8 @@ import com.lesso.newlp.invoice.model.AuditStatus;
 import com.lesso.newlp.invoice.model.SearchTerm;
 import com.lesso.newlp.invoice.repository.InvoiceRepository;
 import com.lesso.newlp.invoice.repository.InvoiceTypeRepository;
+import com.lesso.newlp.log.entity.OperationLogEntity;
+import com.lesso.newlp.log.repository.LogRepository;
 import com.lesso.newlp.material.entity.MaterialEntity;
 import com.lesso.newlp.material.repository.MaterialTypeRepository;
 import com.lesso.newlp.pm.entity.ClientEntity;
@@ -26,6 +29,8 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Sean on 6/20/2014.
@@ -46,6 +51,9 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Resource
     MaterialTypeRepository materialTypeRepository;
 
+    @Resource
+    LogRepository logRepository;
+
     /**
      * 创建订单
      * @param invoice
@@ -54,11 +62,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     @Transactional
     public InvoiceEntity save(InvoiceEntity invoice) {
-        final InvoiceEntity finalInvoice = invoice;
-        invoice.getInvoiceDetails().forEach(invoiceDetail -> {
-            invoiceDetail.setInvoice(finalInvoice);
-            invoiceDetail.setAmount(invoiceDetail.getPrice().multiply(new BigDecimal(Double.toString(invoiceDetail.getOrderCount()))));
-        });
 
         if(AuditStatus.ORDER_CREATOR_SAVE == invoice.getAuditStatus()){
             invoice.setCreatedDate( new Date());
@@ -67,16 +70,39 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoice.setSubmitDate( new Date());
         }
 
+        final InvoiceEntity finalInvoice = invoice;
+        invoice.getInvoiceDetails().forEach(invoiceDetail -> {
+            invoiceDetail.setInvoice(finalInvoice);
+            invoiceDetail.setAmount(invoiceDetail.getPrice().multiply(new BigDecimal(Double.toString(invoiceDetail.getOrderCount()))));
+        });
+
+        InvoiceTypeEntity invoiceTypeEntity = invoiceTypeRepository.findOne(invoice.getInvoiceType().getInvoiceTypeId());
+
+
+        /*生成流水号*/
+        StringBuilder sequence = new StringBuilder();
+        sequence.append(invoice.getInc().getIncShortName())
+                .append(invoiceTypeEntity.getType() == 1 ? "R" : "C")
+                .append(new DateTime().toString("yyMMdd"));
+
+
+        String maxInvoiceNum = jdbcDaoSupport.getJdbcTemplate().queryForObject("SELECT max(i.invoiceNum) from INV_INVOICE i with (TABLOCKX) where i.invoiceNum like ?",new Object[]{"%"+sequence.toString()+"%"},String.class);
+
+
+        if(null == maxInvoiceNum){
+            sequence.append("0001");
+        }else {
+            sequence.append(
+                    Strings.padStart(String.valueOf(Integer.parseInt(maxInvoiceNum
+                            .substring(maxInvoiceNum.length() - 4, maxInvoiceNum.length())) + 1), 4, '0')
+            );
+        }
+
+        invoice.setInvoiceNum(sequence.toString());
+
         invoice=  invoiceRepository.save(invoice);
 
-//        invoice.getInvoiceDetails().forEach(invoiceDetail -> {
-//            StringBuilder str = new StringBuilder();
-//            str.append(invoice.getInc().getIncShortName())
-//                    .append( invoiceDetail.getMaterial().getMaterialType().getShortName())
-//                    .append(invoice.getInvoiceType().getType() == 1? "R": "C")
-//                    .append(new DateTime().toString("yyyyMMdd"))
-//                    .append(invoice.getInvoiceId());
-//        });
+//        int i = 1/0;
         return invoice;
     }
 
@@ -465,5 +491,27 @@ public class InvoiceServiceImpl implements InvoiceService {
             }
         });
         return new PageImpl<InvoiceEntity>(invoiceEntityList,pageable,dbCount);
+    }
+
+    @Override
+    public Integer getPreAuditStatusByInvoiceId(Long invoiceId) {
+        final Integer[] preAuditStatus = {null};
+
+        InvoiceEntity invoiceEntity = invoiceRepository.findOne(invoiceId);
+        Integer currentAuditStatus = invoiceEntity.getAuditStatus();
+        List<OperationLogEntity> logEntities = logRepository.findByInvoiceIdAndAuditStatus(invoiceId, currentAuditStatus);
+        for (OperationLogEntity e : logEntities) {
+            Matcher m = Pattern.compile("(\\d+)\\s+to\\s+\\d+").matcher(e.getDescription());
+            if (m.find()) {
+                Integer n = Integer.parseInt(m.group(1));
+                if(n < currentAuditStatus){
+                    preAuditStatus[0] = n;
+                    break;
+                }
+            }
+        }
+
+        return preAuditStatus[0];
+
     }
 }

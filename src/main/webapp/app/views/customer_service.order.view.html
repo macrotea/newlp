@@ -155,6 +155,7 @@
                     <tr>
                         <th>物料编码</th>
                         <th>订单数量</th>
+                        <th>实发数量</th>
                         <th>主计量单位</th>
                         <th>辅计量单位1</th>
                         <th>辅计量单位2</th>
@@ -175,6 +176,7 @@
                                 </div>
                             </div>
                         </td>
+                        <td class="align-middle">{{invoiceDetail.deliveryCount}}</td>
                         <td class="align-middle">{{invoiceDetail.material.unit}}</td>
                         <td class="align-middle">{{(invoiceDetail.orderCount * invoiceDetail.material.conversionRateOne) | number:4}}
                             {{invoiceDetail.material.auxiliaryUnitOne}}

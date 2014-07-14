@@ -12,10 +12,12 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
  * Created by Sean on 6/18/2014.
  */
 @RepositoryRestResource(collectionResourceRel = "invoices", path = "invoices")
-public interface InvoiceRepository extends JpaRepository<InvoiceEntity,Long> {
+public interface InvoiceRepository extends JpaRepository<InvoiceEntity, Long> {
 
     @Query("select inv from InvoiceEntity inv where inv.auditStatus = :auditStatus  and inv.active = true")
     Page<InvoiceEntity> queryByAuditStatus(@Param("auditStatus") Integer auditStatus, Pageable pageable);
 
+    @Query("select inv from InvoiceEntity  inv where  inv.invoiceNum like :invoiceNum order by inv.invoiceNum desc")
+    Page<InvoiceEntity> getByMaxLikeInvoiceNum(@Param("invoiceNum") String invoiceNum, Pageable pageable);
 
 }

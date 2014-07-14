@@ -25,4 +25,6 @@ public interface InvoiceService {
     Page<InvoiceEntity> queryByAuditStatus(Integer auditStatus, Pageable pageable);
 
     Page<InvoiceEntity> search(SearchTerm searchTerm, Pageable pageable);
+
+    Integer getPreAuditStatusByInvoiceId(Long invoiceId);
 }
