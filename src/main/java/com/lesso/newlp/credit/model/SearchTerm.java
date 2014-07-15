@@ -12,6 +12,8 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SearchTerm implements Serializable{
 
+    Long clientId;
+    String clientNum;
     Long creditId;
     Integer type;
     BigDecimal amount;                             //收款额
@@ -21,6 +23,22 @@ public class SearchTerm implements Serializable{
     Date validDate;
     Date expiryDate;
     String description;
+
+    public Long getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientNum() {
+        return clientNum;
+    }
+
+    public void setClientNum(String clientNum) {
+        this.clientNum = clientNum;
+    }
 
     public Long getCreditId() {
         return creditId;

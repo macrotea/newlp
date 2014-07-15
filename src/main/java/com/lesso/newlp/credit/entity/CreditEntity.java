@@ -13,7 +13,7 @@ import java.util.Date;
 /**
  * Created by Sean on 7/3/2014.
  */
-@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID")
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID",scope = CreditEntity.class)
 
 @Entity
 @Table(name = "CRE_CREDIT", schema = "DBO", catalog = "NEWLP")

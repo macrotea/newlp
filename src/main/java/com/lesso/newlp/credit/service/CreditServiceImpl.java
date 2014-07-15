@@ -83,6 +83,10 @@ public class CreditServiceImpl implements CreditService {
                 "left join PM_CLIENT p on i.client_clientId = p.clientId\n" +
                 "where i.active =1 ";
         List<Object> objList=new ArrayList<Object>();
+        if(searchTerm.getClientId() !=null){
+            sql+=" and i.client_clientId = ?";
+            objList.add(searchTerm.getClientId());
+        }
         if(searchTerm.getCreditId() !=null){
             sql+=" and i.creditId = ?";
             objList.add(searchTerm.getCreditId());
@@ -121,7 +125,7 @@ public class CreditServiceImpl implements CreditService {
         }
         int start =pageable.getPageNumber()*pageable.getPageSize();
         int end=(pageable.getPageNumber()+1)*pageable.getPageSize()+1;
-        String sqlList="select * from ( "+sql+" )a where a.rowNum>"+start+" and a.rowNum >"+end+" ";
+        String sqlList="select * from ( "+sql+" )a where a.rowNum>"+start+" and a.rowNum <"+end+" ";
 
         List<CreditEntity> creditEntityList=jdbcDaoSupport.getJdbcTemplate().query(sqlList,objList.toArray(),new RowMapper<CreditEntity>() {
             @Override
@@ -131,7 +135,7 @@ public class CreditServiceImpl implements CreditService {
                 creditEntity.setActive(rs.getBoolean("active"));
                 creditEntity.setType(rs.getInt("type"));
                 creditEntity.setAmount(rs.getBigDecimal("amount"));
-                creditEntity.setPercent(rs.getDouble("percent"));
+                creditEntity.setPercent(rs.getDouble("percent_"));
                 creditEntity.setCreditAmount(rs.getBigDecimal("creditAmount"));
                 creditEntity.setInsertDate(rs.getDate("insertDate"));
                 creditEntity.setValidDate(rs.getDate("validDate"));
