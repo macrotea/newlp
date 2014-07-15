@@ -25,6 +25,8 @@ angular.module('newlpApp')
     })
     .controller('logoutCtrl', function ($scope, $state, authService) {
 
+        authService.logout();
+
         $scope.user = {};
 
         /*handle login click*/

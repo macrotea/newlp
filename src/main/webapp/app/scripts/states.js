@@ -25,12 +25,8 @@ angular
 
             .state("logout", {
                 url: "/logout",
-                replace: true,
                 templateUrl: 'views/auth.login.html',
-                controller: 'logoutCtrl',
-                onEnter:  function (authService) {
-                    authService.logout();
-                }
+                controller: 'logoutCtrl'
             })
 
             // Home //
@@ -300,10 +296,12 @@ angular
             })
         ;
     })
-    .run(function ($rootScope, $state, $stateParams,$modal) {
+    .run(function ($rootScope, $state, $stateParams,$modal,currentUser) {
 
         $rootScope.$state = $state;
         $rootScope.$stateParams = $stateParams;
         $rootScope.$modal = $modal;
 
+        $rootScope.currentUser = {};
+        $rootScope.currentUser.username = currentUser.getUsername();
     });

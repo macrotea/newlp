@@ -10,7 +10,7 @@ angular.module('newlpApp')
             }
         }
     })
-    .factory('authService',  function ( $http,  localStorageService) {
+    .factory('authService',  function ( $rootScope,$http,  localStorageService) {
 
         return {
             login: function (username, password) {
@@ -18,38 +18,41 @@ angular.module('newlpApp')
             },
             logout: function () {
                 localStorageService.remove('username');
-                $http.post('/logout', $.param({
+                $http.post('/api/v1/auth/logout', $.param({
                 }), {
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                 });
             },
             authenticate: function (username, password) {
-                return $http.post('/auth/authenticate', $.param({
+                return $http.post('/api/v1/auth/authenticate', $.param({
                     username: username,
                     password: password
                 }), {
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                 });
             },
-            isAuthenticated: function () {
-                return $http.get('/auth/authenticate', $.param({
-                    username: username
-                }), {
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-                });
-            },
+//            isAuthenticated: function () {
+//                return $http.get('/api/v1/auth/authenticate', $.param({
+//                    username: username
+//                }), {
+//                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+//                });
+//            },
+//            getCurrentUsername: function () {
+//                return localStorageService.get('username');
+//            },
+//            getPreUsername: function () {
+//                return localStorageService.get('username');
+//            }
             setCredentials: function (username) {
+                $rootScope.currentUser ={};
+                $rootScope.currentUser.username =username;
                 localStorageService.set('username', username);
             },
             clearCredentials: function () {
+                $rootScope.currentUser =undefined;
                 document.execCommand('ClearAuthenticationCache');
                 localStorageService.remove('username');
-            },
-            getCurrentUsername: function () {
-                return localStorageService.get('username');
-            },
-            getPreUsername: function () {
-                return localStorageService.get('username');
             }
         };
     })
