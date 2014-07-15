@@ -97,7 +97,8 @@ public class PersistenceConfig implements TransactionManagementConfigurer {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(dataSource());
         factoryBean.setPackagesToScan("com.lesso.newlp");
-        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        factoryBean.setMappingResources("META-INF/orm.xml");
+        factoryBean.setJpaVendorAdapter(jpaVendorAdapter);
         factoryBean.setJpaProperties(jpaProperties);
 //        factoryBean.setPersistenceUnitManager(new MergingPersistenceUnitManager());
         factoryBean.afterPropertiesSet();

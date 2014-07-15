@@ -5,20 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.lesso.newlp.invoice.entity.InvoiceDetailEntity;
-import com.lesso.newlp.invoice.entity.InvoiceEntity;
-import com.lesso.newlp.invoice.entity.InvoiceTypeEntity;
-import com.lesso.newlp.material.entity.MaterialAttributeEntity;
-import com.lesso.newlp.material.entity.MaterialEntity;
-import com.lesso.newlp.material.entity.MaterialTypeEntity;
-import com.lesso.newlp.pm.entity.ClientEntity;
-import com.lesso.newlp.pm.entity.IncEntity;
-import com.lesso.newlp.pm.entity.MemberEntity;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
-import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.data.web.SortHandlerMethodArgumentResolver;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
@@ -29,13 +18,13 @@ import org.springframework.security.web.bind.support.AuthenticationPrincipalArgu
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import org.springframework.web.servlet.view.velocity.VelocityConfig;
@@ -68,7 +57,7 @@ import java.util.Map;
 @EnableSpringDataWebSupport
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 //public class WebConfig extends WebMvcConfigurerAdapter {
-public class WebConfig extends RepositoryRestMvcConfiguration {
+public class WebConfig extends DelegatingWebMvcConfiguration {
 
 
     private static final String MESSAGE_SOURCE = "classpath:messages";
@@ -100,14 +89,7 @@ public class WebConfig extends RepositoryRestMvcConfiguration {
 //        mapper.registerModule(new Jackson2HalModule());
     }
 
-    @Override
-    protected void configureHttpMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
-//        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
-//        messageConverters.add(fastJsonHttpMessageConverter);
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(objectMapper());
-        messageConverters.add(converter);
-    }
+
 
 
 //    @Override
@@ -207,17 +189,35 @@ public class WebConfig extends RepositoryRestMvcConfiguration {
     }
 
     @Override
-    protected void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-        config.exposeIdsFor(MaterialEntity.class);
-        config.exposeIdsFor(MaterialTypeEntity.class);
-        config.exposeIdsFor(MaterialAttributeEntity.class);
-        config.exposeIdsFor(InvoiceEntity.class);
-        config.exposeIdsFor(InvoiceTypeEntity.class);
-        config.exposeIdsFor(InvoiceDetailEntity.class);
-        config.exposeIdsFor(IncEntity.class);
-        config.exposeIdsFor(ClientEntity.class);
-        config.exposeIdsFor(MemberEntity.class);
+    @Bean
+    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+
+//        RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping() {
+//
+//            @Override
+//            protected boolean isHandler(Class<?> beanType) {
+//                return !(beanType == null || ClassUtils.getPackageName(beanType).startsWith("org.springframework.data")) && super.isHandler(beanType);
+//            }
+//        };
+
+        RequestMappingHandlerMapping handlerMapping =super.requestMappingHandlerMapping();
+
+        handlerMapping.setOrder(0);
+        handlerMapping.setInterceptors(getInterceptors());
+        handlerMapping.setRemoveSemicolonContent(false);
+        handlerMapping.setContentNegotiationManager(mvcContentNegotiationManager());
+
+        return handlerMapping;
     }
+
+    @Override
+    @Bean
+    public HandlerMapping resourceHandlerMapping() {
+        AbstractHandlerMapping handlerMapping = (AbstractHandlerMapping) super.resourceHandlerMapping();
+        handlerMapping.setOrder(-1);
+        return handlerMapping;
+    }
+
 //    @Override
 //    public Validator getValidator() {
 //        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
