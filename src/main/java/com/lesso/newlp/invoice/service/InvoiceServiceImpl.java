@@ -299,7 +299,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "\t\tSELECT\n" +
                 "      ROW_NUMBER () OVER (ORDER BY i.invoiceId DESC) AS rowNum,\n" +
                 "\t\t\ti.invoiceId,\n" +
-                "\t\t\ti.invoiceNum,\n" +
+//                "\t\t\ti.num,\n" +
                 "\t\t\ti.auditStatus,\n" +
                 "      t.invoiceTypeId,\n" +
                 "\t\t\tt.name,\n" +
@@ -319,12 +319,12 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "\t\tWHERE\n" +
                 "\t\t\ti.auditStatus = ? and i.active =1\n" +
                 "\t) a\n" +
-                "WHERE  a.rowNum > "+pageable.getPageNumber() * pageable.getPageSize() +" AND a.rowNum <"+((pageable.getPageNumber() + 1)*pageable.getPageSize()+1), new Object[]{auditStatus}, new RowMapper<InvoiceDetailEntity>() {
+                "WHERE  a.rowNum > " + pageable.getPageNumber() * pageable.getPageSize() + " AND a.rowNum <" + ((pageable.getPageNumber() + 1) * pageable.getPageSize() + 1), new Object[]{auditStatus}, new RowMapper<InvoiceDetailEntity>() {
             @Override
             public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
                 InvoiceEntity invoice = new InvoiceEntity();
                 invoice.setInvoiceId(rs.getLong("invoiceId"));
-                invoice.setInvoiceNum(rs.getString("invoiceNum"));
+//                invoice.setNum(rs.getString("num"));
                 invoice.setCarNum(rs.getString("carNum"));
 //                invoice.setSubmitDate(rs.getDate("submitDate"));
 //                invoice.setClientAddress(rs.getString("clientAddress"));
@@ -334,22 +334,26 @@ public class InvoiceServiceImpl implements InvoiceService {
                 invoice.setReceivedDate(rs.getDate("receivedDate"));
                 invoice.setAuditStatus(rs.getInt("auditStatus"));
 //                invoice.setActive(rs.getBoolean("active"));
+
                 IncEntity incEntity = new IncEntity();
                 incEntity.setIncId(rs.getLong("incId"));
                 incEntity.setIncName(rs.getString("incName"));
 //                incEntity.setIncShortName(rs.getString("incShortName"));
                 invoice.setInc(incEntity);
+
                 ClientEntity clientEntity = new ClientEntity();
                 clientEntity.setClientId(rs.getLong("clientId"));
                 clientEntity.setClientName(rs.getString("clientName"));
 //                clientEntity.setClientNum(rs.getString("clientNum"));
                 invoice.setClient(clientEntity);
+
                 InvoiceTypeEntity invoiceTypeEntity = new InvoiceTypeEntity();
                 invoiceTypeEntity.setInvoiceTypeId(rs.getLong("invoiceTypeId"));
                 invoiceTypeEntity.setType(rs.getInt("type"));
                 invoiceTypeEntity.setName(rs.getString("name"));
 //                invoiceTypeEntity.setActive(rs.getBoolean("active"));
                 invoice.setInvoiceType(invoiceTypeEntity);
+
                 invoice.setInvoiceDetails(new HashSet<InvoiceDetailEntity>());
                 InvoiceDetailEntity invoiceDetailEntity = new InvoiceDetailEntity();
 //                invoiceDetailEntity.setInvoiceDetailId(rs.getLong("invoiceDetailId"));
@@ -384,12 +388,11 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (list != null) {
             for (int i = 0; i < list.size(); i++) {
                 if (hashMap.containsKey(list.get(i).getInvoice().getInvoiceId())) {
-                    InvoiceEntity invoiceEntity1 = (InvoiceEntity)hashMap.get(list.get(i).getInvoice().getInvoiceId());
+                    InvoiceEntity invoiceEntity1 = (InvoiceEntity) hashMap.get(list.get(i).getInvoice().getInvoiceId());
                     Set<InvoiceDetailEntity> set1 = invoiceEntity1.getInvoiceDetails();
                     set1.add(list.get(i));
-                }
-                else {
-                    hashMap.put(list.get(i).getInvoice().getInvoiceId(),list.get(i).getInvoice());
+                } else {
+                    hashMap.put(list.get(i).getInvoice().getInvoiceId(), list.get(i).getInvoice());
                     Set<InvoiceDetailEntity> set2 = list.get(i).getInvoice().getInvoiceDetails();
                     set2.add(list.get(i));
                     list.get(i).getInvoice().setInvoiceDetails(set2);
@@ -406,13 +409,13 @@ public class InvoiceServiceImpl implements InvoiceService {
                         "INV_INVOICE\n" +
                         ") i\n" +
                         "LEFT JOIN INV_INVOICE_TYPE t ON i.invoiceType_invoiceTypeId=t.invoiceTypeId\n" +
-                        "LEFT JOIN INV_INVOICE_DETAIL j ON i.invoiceId=j.invoice_invoiceId\n" +
+//                        "LEFT JOIN INV_INVOICE_DETAIL j ON i.invoiceId=j.invoice_invoiceId\n" +
                         "LEFT JOIN PM_INC inc on i.inc_incId = inc.incId\n" +
                         "left join PM_CLIENT incClient on i.client_clientId = incClient.clientId\n" +
-                        "left join MAT_MATERIAL m ON j.material_materialNum = m.materialNum \n" +
-                        "WHERE i.auditStatus=? and i.active =1 and j.active =1 ",new Object[]{auditStatus},Long.class);
+//                        "left join MAT_MATERIAL m ON j.material_materialNum = m.materialNum \n" +
+                        "WHERE i.auditStatus=? and i.active =1 ", new Object[]{auditStatus}, Long.class);
 
-        return new PageImpl<InvoiceEntity>(invoiceEntityList,pageable,total);
+        return new PageImpl<InvoiceEntity>(invoiceEntityList, pageable, total);
     }
 
     @Override
