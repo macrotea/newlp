@@ -76,15 +76,23 @@
             <tr ng-repeat="invoiceDetail in invoiceDetails">
                 <td class="align-middle" ng-bind="invoiceDetail.material.materialNum"></td>
                 <td class="align-middle">
-                    <span class="align-middle" ng-bind="invoiceDetail.orderCount" ng-if="readOnly" ></span>
-                    <div class="ace-spinner touch-spinner" style="width: 120px;"  ng-if="!readOnly">
+                    <span class="align-middle" ng-bind="invoiceDetail.orderCount" ng-if="!fields.orderCount.editable" ></span>
+                    <div class="ace-spinner touch-spinner" style="width: 120px;"  ng-if="fields.orderCount.editable" >
                         <div class="input-group">
                             <input type="number" min="0" class="input-mini spinner-input form-control"
                                    ng-model="invoiceDetail.orderCount" ng-change="invoiceDetail.deliveryCount=invoiceDetail.orderCount">
                         </div>
                     </div>
                 </td>
-                <td class="align-middle" ng-bind="invoiceDetail.deliveryCount"></td>
+                <td class="align-middle">
+                    <span class="align-middle" ng-bind="invoiceDetail.deliveryCount" ng-if="!fields.deliveryCount.editable" ></span>
+                    <div class="ace-spinner touch-spinner" style="width: 120px;"  ng-if="fields.deliveryCount.editable" >
+                        <div class="input-group">
+                            <input type="number" min="0" class="input-mini spinner-input form-control"
+                                   ng-model="invoiceDetail.deliveryCount">
+                        </div>
+                    </div>
+                </td>
                 <td class="align-middle" ng-bind="invoiceDetail.material.unit"></td>
                 <td class="align-middle">{{(invoiceDetail.orderCount * invoiceDetail.material.conversionRateOne) |
                     number:4}}
@@ -95,11 +103,11 @@
                 <td class="align-middle">{{invoiceDetail.material.price}}</td>
                 <td class="align-middle">{{(invoiceDetail.orderCount*invoiceDetail.material.price) |number:2}}</td>
                 <td class="align-middle">
-                    <span class="align-middle" ng-bind="invoiceDetail.orderCount" ng-if="readOnly"></span>
+                    <span class="align-middle" ng-bind="invoiceDetail.remark"  ng-if="!fields.remark.editable"></span>
                     <input class="input-sm" type="text" placeholder="备注"
-                                                ng-model="invoiceDetail.remark"  ng-if="!readOnly">
+                                                ng-model="invoiceDetail.remark"   ng-if="fields.remark.editable">
                 </td>
-                <td class="align-middle"  ng-if="!readOnly">
+                <td class="align-middle"  ng-if="fields.actions.editable">
                     <div class="btn-group">
                         <button type="button" class="btn btn-xs btn-danger"
                                 ng-click="remove(invoiceDetail.material.materialNum)">

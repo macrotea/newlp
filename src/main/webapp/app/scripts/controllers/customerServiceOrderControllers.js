@@ -4,6 +4,17 @@
 angular.module('newlpApp')
     .controller('customerServiceOrderAddController', function ($scope, $state, $http, Material, Invoice) {
 
+        $scope.options = {
+            fields:{
+                orderCount:{
+                    editable:true
+                },
+                actions:{
+                    editable:true
+                }
+            }
+        };
+
         //init
         $scope.invoice = {
             num: '',
@@ -38,6 +49,18 @@ angular.module('newlpApp')
     })
 
     .controller('customerServiceOrderEditController', function ($scope, $state, $stateParams, $http, Material, Invoice) {
+
+        $scope.options = {
+            fields:{
+                orderCount:{
+                    editable:true
+                },
+                actions:{
+                    editable:true
+                }
+            }
+        };
+
 
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;

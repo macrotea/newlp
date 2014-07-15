@@ -135,9 +135,19 @@ angular.module('newlpApp')
                 transclude: true,
                 scope: {
                     invoiceDetails: '=invoiceDetails',
-                    readOnly:'=readOnly'
+                    readOnly:'=readOnly',
+                    options:'=options'
                 },
                 controller: function ($scope,  Material) {
+
+                    $scope.fields = $scope.options.fields?$scope.options.fields:{};
+                    $scope.fields.orderCount = $scope.options.fields.orderCount?$scope.options.fields.orderCount:{};
+                    $scope.fields.deliveryCount = $scope.options.fields.deliveryCount?$scope.options.fields.deliveryCount:{};
+                    $scope.fields.orderCount = $scope.options.fields.orderCount?$scope.options.fields.orderCount:{};
+                    $scope.fields.remark = $scope.options.fields.remark?$scope.options.fields.remark:{};
+                    $scope.fields.actions = $scope.options.fields.actions?$scope.options.fields.actions:{};
+
+
                     //init temp variables
                     $scope.data = undefined;
                     $scope.searchTerm = '';

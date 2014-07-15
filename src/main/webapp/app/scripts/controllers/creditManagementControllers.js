@@ -3,21 +3,12 @@
  */
 angular.module('newlpApp')
 
-    .controller('creditManagementBalanceController', function ($scope, $state,  ngDialog) {
+    .controller('creditManagementBalanceController', function ($scope) {
         $scope.searchForm = {
             options: {
                 criteria: {
                 },
                 actions: {
-                    remove: function (creditId) {
-                        $scope.creditIdToRemove = creditId;
-                        ngDialog.open({
-                            template: 'views/credit.management.remove.html',
-                            className: 'ngdialog-theme-plain',
-                            controller: 'creditManagementRemoveConfirmCtrl',
-                            scope: $scope
-                        });
-                    }
                 }
             }
         };
