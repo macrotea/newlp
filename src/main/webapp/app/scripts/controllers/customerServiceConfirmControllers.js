@@ -20,7 +20,8 @@ angular.module('newlpApp')
                     edit: function (invoiceId) {
                         $state.go('home.customer_service.confirm.receive', {invoiceId: invoiceId});
                     }
-                }
+                },
+                sendBackController:'customerServiceConfirmSendBackConfirmCtrl'
             }
         };
 
@@ -92,6 +93,27 @@ angular.module('newlpApp')
                     }
                 }
             }
+        };
+    })
+
+    .controller('customerServiceConfirmSendBackConfirmCtrl', function ($scope, ngDialog, Invoice) {
+
+        var invoiceIdToRemove = $scope.$parent.$parent.invoiceIdToRemove;
+        Invoice.getPreAuditStatusByInvoiceId({invoiceId: invoiceIdToRemove},function(data){
+            $scope.confirm = function () {
+                Invoice.patch({invoiceId: invoiceIdToRemove, auditStatus: data.auditStatus}, function (data) {
+                    $scope.$parent.data.content = $scope.$parent.data.content.filter(function (invoice) {
+                        return invoice.invoiceId != $scope.$parent.invoiceIdToRemove;
+                    });
+                    $scope.$parent.invoiceIdToRemove = undefined;
+                    $scope.closeThisDialog();
+                });
+            };
+        });
+
+
+        $scope.cancel = function () {
+            ngDialog.close();
         };
     })
 ;

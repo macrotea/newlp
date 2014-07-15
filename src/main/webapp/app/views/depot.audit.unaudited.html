@@ -151,9 +151,9 @@
 <div class="dataTables_wrapper form-inline">
     <div class="row">
         <div class="col-xs-6">
-            <!--<div id="sample-table-2_length" class="dataTables_length"><label>每页-->
-            <!--<select  ng-model="pageSize" ng-options="pageSize.name for pageSize in pageSizes" ng-change="onPageSizeChange()">-->
-            <!--</select> 记录</label></div>-->
+            <div id="sample-table-2_length" class="dataTables_length"><label>每页
+            <select  ng-model="pageSize" ng-options="pageSize.name for pageSize in pageSizes" ng-change="onPageSizeChange()">
+            </select> 记录</label></div>
         </div>
         <div class="col-xs-6">
             <div class="dataTables_filter"><label>过滤: <input type="text" ng-model="searchText"></label>
@@ -189,7 +189,7 @@
             <td ng-bind="invoice.invoiceNum"></td>
             <td ng-bind="invoice.inc.incName">/td>
             <td ng-bind="invoice.client.clientName">/td>
-            <td ng-bind="invoice.receivedDate | date:'yyyy-MM-dd HH:mm:ss'">/td>
+            <td ng-bind="invoice.receivedDate | date:'yyyy-MM-dd'">/td>
             <td ng-bind="invoice.carNum">/td>
             <td>
                 <div class="hidden-sm hidden-xs action-buttons">

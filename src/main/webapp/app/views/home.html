@@ -71,7 +71,18 @@
     <!-- /.navbar -->
 
     <div class="main-container" id="main-container" ng-controller="mainCtrl">
-        <div class="sidebar responsive" id="sidebar"  ng-init="collapseSidebar=false" ng-class="{'menu-min':collapseSidebar}">
+        <div class="alert alert-block alert-danger center" ng-if="!currentUser.username">
+
+            <p>
+                <strong>
+                    你的登陆状态已经失效！
+                    <button class="btn btn-sm btn-success" ui-sref="logout">重新登陆</button>
+                </strong>
+            </p>
+
+        </div>
+        <div class="sidebar responsive" id="sidebar" ng-init="collapseSidebar=false"
+             ng-class="{'menu-min':collapseSidebar}">
             <!-- sidebar goes here -->
             <div class="sidebar-shortcuts" id="sidebar-shortcuts">
 
@@ -94,7 +105,7 @@
 
                 <!--panels
                 =====================================-->
-                <li  ng-repeat="panel in panels | orderBy:'order'" ng-init="panel.isOpen= true">
+                <li ng-repeat="panel in panels | orderBy:'order'" ng-init="panel.isOpen= true">
                     <!--ng-class="{active:$state.includes(panel.state)}"-->
                     <a class="dropdown-toggle" href="javascript:;" ng-click="panel.isOpen = !panel.isOpen;">
                         <i class="{{panel.iconClass}}"></i>
@@ -109,7 +120,7 @@
                     <!-- optional arrow for minimized menu & hover submenu -->
                     <ul class="submenu" ng-class="{'show':panel.isOpen}">
                         <li ng-repeat="pane in panel.panes" ui-sref-active="active">
-                            <a  ui-sref="{{pane.state}}">
+                            <a ui-sref="{{pane.state}}">
                                 <i class="menu-icon fa fa-caret-right"></i>
                                 <span class="menu-text">{{pane.name}}</span>
                             </a>
@@ -118,7 +129,8 @@
                 </li>
             </ul>
 
-            <div id="sidebar-collapse" class="sidebar-toggle sidebar-collapse" ng-click="collapseSidebar=!collapseSidebar">
+            <div id="sidebar-collapse" class="sidebar-toggle sidebar-collapse"
+                 ng-click="collapseSidebar=!collapseSidebar">
                 <i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left"
                    data-icon2="ace-icon fa fa-angle-double-right"></i>
             </div>

@@ -41,6 +41,17 @@ angular.module('newlpApp')
                 headers: {
                     'Content-Type': 'application/json'
                 }
+            },
+            getPreAuditStatusByInvoiceId:{
+                url: '/api/v1/invoices/:invoiceId/auditStatus/getPreAuditStatusByInvoiceId',
+                method: 'GET',
+                params: {
+                    invoiceId: '@invoiceId'
+                },
+                isArray: false,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }
         })
     })

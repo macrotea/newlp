@@ -22,7 +22,6 @@ angular.module('newlpApp')
         //init temp variables
         $scope.data = undefined;
         $scope.searchTerm = '';
-        var selectedNums = [];
         $scope.currentPage = 1;
 
 
@@ -43,8 +42,15 @@ angular.module('newlpApp')
 
         //add to selected list
         $scope.add = function (material) {
-            if (selectedNums.indexOf(material.materialNum) < 0) {
-                selectedNums.push(material.materialNum);
+
+            var notExist = true;
+            $scope.invoice.invoiceDetails.forEach(function (invoiceDetail) {
+                if (material.materialNum == invoiceDetail.material.materialNum) {
+                    notExist = false;
+                }
+            });
+
+            if (notExist) {
                 var invoiceDetail = {};
                 invoiceDetail.orderCount = 1;
                 invoiceDetail.remark = '明细备注';
@@ -57,17 +63,23 @@ angular.module('newlpApp')
                 invoiceDetail.material = material;
                 $scope.invoice.invoiceDetails.push(invoiceDetail);
             }
+
         };
 
         //remove to selected list
         $scope.remove = function (materialNum) {
-            if (selectedNums.indexOf(materialNum) >= 0) {
-                selectedNums = selectedNums.filter(function (n) {
-                    return materialNum != n;
+
+            var isExist = false;
+            $scope.invoice.invoiceDetails.forEach(function (invoiceDetail) {
+                if (materialNum == invoiceDetail.material.materialNum) {
+                    isExist = true;
+                }
+            });
+
+            if (isExist) {
+                $scope.invoice.invoiceDetails = $scope.invoice.invoiceDetails.filter(function (invoiceDetail) {
+                    return materialNum != invoiceDetail.material.materialNum;
                 });
-                $scope.invoice.invoiceDetails = $scope.invoice.invoiceDetails.filter(function (material) {
-                    return materialNum != material.materialNum;
-                })
             }
         };
 
@@ -102,7 +114,6 @@ angular.module('newlpApp')
         //init temp variables
         $scope.data = undefined;
         $scope.searchTerm = '';
-        var selectedNums = [];
         $scope.currentPage = 1;
 
 
@@ -123,8 +134,15 @@ angular.module('newlpApp')
 
         //add to selected list
         $scope.add = function (material) {
-            if (selectedNums.indexOf(material.materialNum) < 0) {
-                selectedNums.push(material.materialNum);
+
+            var notExist = true;
+            $scope.invoice.invoiceDetails.forEach(function (invoiceDetail) {
+                if (material.materialNum == invoiceDetail.material.materialNum) {
+                    notExist = false;
+                }
+            });
+
+            if (notExist) {
                 var invoiceDetail = {};
                 invoiceDetail.orderCount = 1;
                 invoiceDetail.remark = '明细备注';
@@ -137,17 +155,23 @@ angular.module('newlpApp')
                 invoiceDetail.material = material;
                 $scope.invoice.invoiceDetails.push(invoiceDetail);
             }
+
         };
 
         //remove to selected list
         $scope.remove = function (materialNum) {
-            if (selectedNums.indexOf(materialNum) >= 0) {
-                selectedNums = selectedNums.filter(function (n) {
-                    return materialNum != n;
+
+            var isExist = false;
+            $scope.invoice.invoiceDetails.forEach(function (invoiceDetail) {
+                if (materialNum == invoiceDetail.material.materialNum) {
+                    isExist = true;
+                }
+            });
+
+            if (isExist) {
+                $scope.invoice.invoiceDetails = $scope.invoice.invoiceDetails.filter(function (invoiceDetail) {
+                    return materialNum != invoiceDetail.material.materialNum;
                 });
-                $scope.invoice.invoiceDetails = $scope.invoice.invoiceDetails.filter(function (material) {
-                    return materialNum != material.materialNum;
-                })
             }
         };
 
@@ -262,7 +286,7 @@ angular.module('newlpApp')
         $scope.submit = function () {
             Invoice.patch({
                 invoiceId: $scope.invoice.invoiceId,
-                invoiceDetails:$scope.invoice.invoiceDetails,
+                invoiceDetails: $scope.invoice.invoiceDetails,
                 auditStatus: $scope.invoice.auditStatus
             }).$promise.then(function (data) {
                     console.log(data);
@@ -279,42 +303,71 @@ angular.module('newlpApp')
                 criteria: {
                     auditStatus: 40
                 },
-                actions:{
-                    edit:function (invoiceId) {
-                            $state.go('home.depot.receive', {invoiceId: invoiceId})
+                actions: {
+                    edit: function (invoiceId) {
+                        $state.go('home.depot.receive', {invoiceId: invoiceId})
                     }
                 },
-                sendBackController:'depotSendBackConfirmCtrl'
+                sendBackController: 'customerServiceConfirmSendBackConfirmCtrl'
             }
         };
     })
 
     .controller('depotAuditUnauditedController', function ($scope, $state, $location, $stateParams, Invoice, ngDialog) {
 
-        $scope.currentPage = 1;
+        /*init params*/
+        $scope.pageSizes=[
+            {name: 20,value:20},
+            {name: 50,value:50},
+            {name: 100,value:100}
+        ];
+        $scope.pageSize =$scope.pageSizes[0];
+        $scope.page ={};
+        $scope.page.number=1;
+        $scope.page.size=$scope.pageSize.value;
+        $scope.searchTerm = {
+            auditStatus: ';auditStatuses=50,60'
+        };
+        $scope.onPageSizeChange = function () {
+            $scope.page.size = $scope.pageSize.value;
+            $scope.onPageChanged();
+        };
+
+
         $scope.queryByAuditStatus = function () {
             $scope.loading = true;
             Invoice.queryByAuditStatus({
-                    page: $scope.currentPage - 1,
-                    auditStatus: 50
+                    page: $scope.page.number - 1,
+                    size:$scope.page.size,
+                    auditStatus: ';auditStatuses=50,60'
                 },
                 function (data) {
-                    Invoice.queryByAuditStatus({
-                            page: $scope.currentPage - 1,
-                            auditStatus: 60
-                        },
-                        function (dataTmp) {
-
-                            data.content = data.content.concat(dataTmp.content);
-                            data.page.totalElements = data.page.totalElements + dataTmp.page.totalElements;
-                            data.page.totalPages = data.page.totalPages > dataTmp.page.totalPages ? data.page.totalPages : dataTmp.page.totalPages;
-                            $scope.data = data;
-
-                            $scope.loading = false;
-                        });
+                    $scope.data = data;
+                    $scope.loading = false;
                 });
 
+//            Invoice.queryByAuditStatus({
+//                    page: $scope.currentPage - 1,
+//                    auditStatus: 50
+//                },
+//                function (data) {
+//                    Invoice.queryByAuditStatus({
+//                            page: $scope.currentPage - 1,
+//                            auditStatus: 60
+//                        },
+//                        function (dataTmp) {
+//
+//                            data.content = data.content.concat(dataTmp.content);
+//                            data.page.totalElements = data.page.totalElements + dataTmp.page.totalElements;
+//                            data.page.totalPages = data.page.totalPages > dataTmp.page.totalPages ? data.page.totalPages : dataTmp.page.totalPages;
+//                            $scope.data = data;
+//
+//                            $scope.loading = false;
+//                        });
+//                });
+
         };
+
 
         //submit search
         $scope.search = function () {
@@ -324,10 +377,16 @@ angular.module('newlpApp')
             }
 
             $scope.searchTerm.auditStatus = 50;
-            Invoice.search({page: $scope.currentPage - 1}, $scope.searchTerm).$promise.then(function (data) {
+            Invoice.search({
+                page: $scope.page.number - 1,
+                size:$scope.page.size
+            }, $scope.searchTerm).$promise.then(function (data) {
 
                 $scope.searchTerm.auditStatus = 60;
-                Invoice.search({page: $scope.currentPage - 1}, $scope.searchTerm,
+                Invoice.search({
+                        page: $scope.page.number - 1,
+                        size:$scope.page.size
+                    }, $scope.searchTerm,
                     function (dataTmp) {
 
                         data.content = data.content.concat(dataTmp.content);
@@ -346,7 +405,6 @@ angular.module('newlpApp')
 
         //handle Criteria Query Form action
         $scope.submit = function () {
-            $scope.currentPage = 1;
             if ($scope.action == 'RESET') {
                 $scope.reset();
             }
@@ -375,7 +433,7 @@ angular.module('newlpApp')
             $scope.onPageChanged();
         };
 
-        $scope.edit = function (invoiceId,auditStatus) {
+        $scope.edit = function (invoiceId, auditStatus) {
             auditStatus == 50 ? $state.go('home.depot.edit', {invoiceId: invoiceId}) :
                 auditStatus == 60 ? $state.go('home.depot.adjust', {invoiceId: invoiceId}) :
                     undefined;
@@ -412,8 +470,8 @@ angular.module('newlpApp')
                 criteria: {
                     auditStatus: 70
                 },
-                actions:{
-                    view:function (invoiceId) {
+                actions: {
+                    view: function (invoiceId) {
                         $state.go('home.depot.view', {invoiceId: invoiceId});
                     }
                 }

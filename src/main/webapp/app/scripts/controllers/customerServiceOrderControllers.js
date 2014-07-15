@@ -19,57 +19,6 @@ angular.module('newlpApp')
             },
             invoiceDetails: []
         };
-        //init temp variables
-        $scope.data = undefined;
-        $scope.searchTerm = '';
-        var selectedNums = [];
-        $scope.currentPage = 1;
-
-
-        //search materials
-        $scope.search = function () {
-            $scope.loading = true;
-
-            Material.findByNameOrNumLike({
-                page: $scope.currentPage - 1,
-                searchTerm:$scope.searchTerm
-            },{}, function (data) {
-                $scope.loading = false;
-                $scope.data = data;
-            });
-        };
-        $scope.onPageChanged = $scope.search;
-
-
-        //add to selected list
-        $scope.add = function (material) {
-            if (selectedNums.indexOf(material.materialNum) < 0) {
-                selectedNums.push(material.materialNum);
-                var invoiceDetail = {};
-                invoiceDetail.orderCount = 1;
-                invoiceDetail.remark = '明细备注';
-                invoiceDetail.unit = material.unit;
-                invoiceDetail.auxiliaryUnitOne = material.auxiliaryUnitOne;
-                invoiceDetail.auxiliaryUnitTwo = material.auxiliaryUnitTwo;
-                invoiceDetail.conversionRateOne = material.conversionRateOne;
-                invoiceDetail.conversionRateTwo = material.conversionRateTwo;
-                invoiceDetail.price = material.price;
-                invoiceDetail.material = material;
-                $scope.invoice.invoiceDetails.push(invoiceDetail);
-            }
-        };
-
-        //remove to selected list
-        $scope.remove = function (materialNum) {
-            if (selectedNums.indexOf(materialNum) >= 0) {
-                selectedNums = selectedNums.filter(function (n) {
-                    return materialNum != n;
-                });
-                $scope.invoice.invoiceDetails = $scope.invoice.invoiceDetails.filter(function (material) {
-                    return materialNum != material.materialNum;
-                })
-            }
-        };
 
         //submit
         $scope.submit = function () {
@@ -94,56 +43,6 @@ angular.module('newlpApp')
             $scope.invoice = invoice;
             $scope.success = 40 == invoice.auditStatus;
         });
-
-        //单据明细
-        $scope.data = undefined;
-        $scope.searchTerm = '';
-        $scope.currentPage = 1;
-
-        $scope.search = function () {
-            $scope.loading = true;
-
-            Material.findByNameOrNumLike({
-                page: $scope.currentPage - 1,
-                searchTerm:$scope.searchTerm
-            },{}, function (data) {
-                $scope.loading = false;
-                $scope.data = data;
-            });
-        };
-        $scope.onPageChanged = $scope.search;
-
-
-        $scope.add = function (material) {
-
-            var notExist = true;
-            $scope.invoice.invoiceDetails.forEach(function (invoiceDetail) {
-                if (invoiceDetail.material.materialNum == material.materialNum) {
-                    notExist = false;
-                }
-            });
-
-            if (notExist) {
-                var invoiceDetail = {};
-                invoiceDetail.orderCount = 1;
-                invoiceDetail.remark = '明细备注';
-                invoiceDetail.unit = material.unit;
-                invoiceDetail.auxiliaryUnitOne = material.auxiliaryUnitOne;
-                invoiceDetail.auxiliaryUnitTwo = material.auxiliaryUnitTwo;
-                invoiceDetail.conversionRateOne = material.conversionRateOne;
-                invoiceDetail.conversionRateTwo = material.conversionRateTwo;
-                invoiceDetail.price = material.price;
-                invoiceDetail.material = material;
-                $scope.invoice.invoiceDetails.push(invoiceDetail);
-            }
-
-        };
-
-        $scope.remove = function (materialNum) {
-            $scope.invoice.invoiceDetails = $scope.invoice.invoiceDetails.filter(function (invoiceDetail) {
-                return materialNum != invoiceDetail.material.materialNum;
-            })
-        };
 
         $scope.submit = function () {
             Invoice.update({}, $scope.invoice).$promise.then(function (data) {
