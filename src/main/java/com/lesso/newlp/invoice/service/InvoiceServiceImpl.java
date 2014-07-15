@@ -120,7 +120,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "LEFT JOIN PM_INC inc on i.inc_incId = inc.incId \n" +
                 "left join PM_CLIENT incClient on i.client_clientId = incClient.clientId\n" +
                 "left join MAT_MATERIAL m ON j.material_materialNum = m.materialNum \n" +
-                "WHERE i.invoiceId = ? and i.active = 1 and j.active = 1", new Object[]{invoiceId}, new RowMapper<InvoiceDetailEntity>() {
+                "WHERE i.invoiceId = ? and i.active = 1", new Object[]{invoiceId}, new RowMapper<InvoiceDetailEntity>() {
             @Override
             public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
                 InvoiceEntity invoice = new InvoiceEntity();
@@ -135,23 +135,28 @@ public class InvoiceServiceImpl implements InvoiceService {
                 invoice.setReceivedDate(rs.getDate("receivedDate"));
                 invoice.setAuditStatus(rs.getInt("auditStatus"));
                 invoice.setActive(rs.getBoolean("active"));
+
                 IncEntity incEntity = new IncEntity();
                 incEntity.setIncId(rs.getLong("incId"));
                 incEntity.setIncName(rs.getString("incName"));
                 incEntity.setIncShortName(rs.getString("incShortName"));
                 invoice.setInc(incEntity);
+
                 ClientEntity clientEntity = new ClientEntity();
                 clientEntity.setClientId(rs.getLong("clientId"));
                 clientEntity.setClientName(rs.getString("clientName"));
                 clientEntity.setClientNum(rs.getString("clientNum"));
                 invoice.setClient(clientEntity);
+
                 InvoiceTypeEntity invoiceTypeEntity = new InvoiceTypeEntity();
                 invoiceTypeEntity.setInvoiceTypeId(rs.getLong("invoiceTypeId"));
                 invoiceTypeEntity.setType(rs.getInt("type"));
                 invoiceTypeEntity.setName(rs.getString("name"));
                 invoiceTypeEntity.setActive(rs.getBoolean("active"));
                 invoice.setInvoiceType(invoiceTypeEntity);
+
                 invoice.setInvoiceDetails(new HashSet<InvoiceDetailEntity>());
+
                 InvoiceDetailEntity invoiceDetailEntity = new InvoiceDetailEntity();
                 invoiceDetailEntity.setInvoiceDetailId(rs.getLong("invoiceDetailId"));
                 invoiceDetailEntity.setOrderCount(rs.getDouble("orderCount"));
@@ -165,6 +170,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 invoiceDetailEntity.setConversionRateOne(rs.getDouble("conversionRateOne"));
                 invoiceDetailEntity.setConversionRateTwo(rs.getDouble("conversionRateTwo"));
                 invoiceDetailEntity.setPrice(rs.getBigDecimal("price"));
+
                 MaterialEntity materialEntity = new MaterialEntity();
                 materialEntity.setMaterialNum(rs.getString("materialNum"));
                 materialEntity.setName(rs.getString("materName"));
@@ -176,17 +182,66 @@ public class InvoiceServiceImpl implements InvoiceService {
                 materialEntity.setPrice(rs.getBigDecimal("materPrice"));
                 invoiceDetailEntity.setMaterial(materialEntity);
                 invoiceDetailEntity.setInvoice(invoice);
+
                 return invoiceDetailEntity;
             }
         });
-        InvoiceEntity invoiceEntity = new InvoiceEntity();
+        InvoiceEntity invoiceEntity = jdbcDaoSupport.getJdbcTemplate().queryForObject("SELECT\n" +
+                "\t*\n" +
+                "\n" +
+                "FROM\n" +
+                "\tINV_INVOICE i\n" +
+                "LEFT JOIN INV_INVOICE_TYPE t ON i.invoiceType_invoiceTypeId = t.invoiceTypeId\n" +
+                "LEFT JOIN PM_INC inc ON i.inc_incId = inc.incId\n" +
+                "LEFT JOIN PM_CLIENT incClient ON i.client_clientId = incClient.clientId\n" +
+                "WHERE\n" +
+                "  \n" +
+                "\ti.invoiceId = ?\n" +
+                " AND i.active = 1\n" +
+                "\n", new Object[]{invoiceId}, new RowMapper<InvoiceEntity>() {
+            @Override
+            public InvoiceEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+                InvoiceEntity invoice = new InvoiceEntity();
+                invoice.setInvoiceId(rs.getLong("invoiceId"));
+                invoice.setInvoiceNum(rs.getString("invoiceNum"));
+                invoice.setCarNum(rs.getString("carNum"));
+                invoice.setSubmitDate(rs.getDate("submitDate"));
+                invoice.setClientAddress(rs.getString("clientAddress"));
+                invoice.setCreatedDate(rs.getDate("createdDate"));
+                invoice.setDeliveryDate(rs.getDate("deliveryDate"));
+                invoice.setRemark(rs.getString("remark"));
+                invoice.setReceivedDate(rs.getDate("receivedDate"));
+                invoice.setAuditStatus(rs.getInt("auditStatus"));
+                invoice.setActive(rs.getBoolean("active"));
+
+                IncEntity incEntity = new IncEntity();
+                incEntity.setIncId(rs.getLong("incId"));
+                incEntity.setIncName(rs.getString("incName"));
+                incEntity.setIncShortName(rs.getString("incShortName"));
+                invoice.setInc(incEntity);
+
+                ClientEntity clientEntity = new ClientEntity();
+                clientEntity.setClientId(rs.getLong("clientId"));
+                clientEntity.setClientName(rs.getString("clientName"));
+                clientEntity.setClientNum(rs.getString("clientNum"));
+                invoice.setClient(clientEntity);
+
+                InvoiceTypeEntity invoiceTypeEntity = new InvoiceTypeEntity();
+                invoiceTypeEntity.setInvoiceTypeId(rs.getLong("invoiceTypeId"));
+                invoiceTypeEntity.setType(rs.getInt("type"));
+                invoiceTypeEntity.setName(rs.getString("name"));
+                invoiceTypeEntity.setActive(rs.getBoolean("active"));
+                invoice.setInvoiceType(invoiceTypeEntity);
+
+                return invoice;
+            }
+        });
         if (list != null) {
-            invoiceEntity = list.get(0).getInvoice();
             Set<InvoiceDetailEntity> set = new HashSet<InvoiceDetailEntity>();
             set.addAll(list);
             invoiceEntity.setInvoiceDetails(set);
         }
-        return  invoiceEntity;
+        return invoiceEntity;
 //        return  invoiceRepository.findOne(invoiceId);
     }
 
