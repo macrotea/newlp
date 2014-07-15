@@ -17,7 +17,7 @@ public class OperationLogEntity extends AbstractTimestampEntity implements Seria
     Long operationLogId;
     Date operationDate;
     String entity;
-    String relId;
+    Long relId;
     Long incId;
     String memberId;
     String description;
@@ -54,11 +54,11 @@ public class OperationLogEntity extends AbstractTimestampEntity implements Seria
         this.memberId = memberId;
     }
 
-    public String getRelId() {
+    public Long getRelId() {
         return relId;
     }
 
-    public void setRelId(String relId) {
+    public void setRelId(Long relId) {
         this.relId = relId;
     }
 

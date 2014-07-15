@@ -51,9 +51,9 @@ public class OperationLogAspect {
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
         logEntity.setMemberId(user.getUsername());
-        logEntity.setDescription("创建订单");
+        logEntity.setDescription("创建订单;");
         logEntity.setIncId(invoiceEntity.getInc().getIncId());
-        logEntity.setRelId(invoiceEntity.getInvoiceNum());
+        logEntity.setRelId(invoiceEntity.getInvoiceId());
         logEntity.setOperationDate(new Date());
         logRepository.save(logEntity);
 
@@ -75,9 +75,9 @@ public class OperationLogAspect {
         logger.debug("Around after is running!");
         logger.debug("******");
 
-        StringBuilder description  = new StringBuilder("更新订单");
+        StringBuilder description  = new StringBuilder("更新订单;");
         if (!Objects.isNull(invoiceUpdated.getAuditStatus())) {
-            description.append("更新订单状态：").append(invoiceEntity.getAuditStatus()).append("  to ").append(invoiceUpdated.getAuditStatus()).append(";");
+            description.append("订单状态:").append(invoiceEntity.getAuditStatus()).append("  to ").append(invoiceUpdated.getAuditStatus()).append(";");
         }
 
         if (!Objects.isNull(invoiceUpdated.getInvoiceDetails())) {
@@ -85,7 +85,7 @@ public class OperationLogAspect {
             invoiceEntity.getInvoiceDetails().forEach(a -> finalInvoice.getInvoiceDetails().forEach(b -> {
                 if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
                     if(!a.getDeliveryCount().equals(b.getDeliveryCount())){
-                        description.append("更新订单明细").append(a.getInvoiceDetailId()).append(a.getDeliveryCount()).append("  to ").append(b.getDeliveryCount()).append(";");
+                        description.append("订单明细:").append(a.getInvoiceDetailId()).append(a.getDeliveryCount()).append("  to ").append(b.getDeliveryCount()).append(";");
                     }
                 }
             }));
@@ -97,7 +97,7 @@ public class OperationLogAspect {
         logEntity.setMemberId(user.getUsername());
         logEntity.setDescription(description.toString());
         logEntity.setIncId(invoiceEntity.getInc().getIncId());
-        logEntity.setRelId(invoiceEntity.getInvoiceNum());
+        logEntity.setRelId(invoiceEntity.getInvoiceId());
         logEntity.setOperationDate(new Date());
         logRepository.save(logEntity);
         return retVal;
@@ -121,7 +121,7 @@ public class OperationLogAspect {
 
         StringBuilder description  = new StringBuilder("更新订单;");
         if (!Objects.isNull(invoiceUpdated.getAuditStatus())) {
-            description.append("订单状态：").append(invoiceEntity.getAuditStatus()).append("  to ").append(invoiceUpdated.getAuditStatus()).append(";");
+            description.append("订单状态:").append(invoiceEntity.getAuditStatus()).append("  to ").append(invoiceUpdated.getAuditStatus()).append(";");
         }
 
         if (!Objects.isNull(invoiceUpdated.getInvoiceDetails())) {
@@ -129,7 +129,7 @@ public class OperationLogAspect {
             invoiceEntity.getInvoiceDetails().forEach(a -> finalInvoice.getInvoiceDetails().forEach(b -> {
                 if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
                     if(!a.getDeliveryCount().equals(b.getDeliveryCount())){
-                        description.append("实发数量：").append(a.getInvoiceDetailId()).append(a.getDeliveryCount()).append("  to ").append(b.getDeliveryCount()).append(";");
+                        description.append("实发数量:").append(a.getInvoiceDetailId()).append(a.getDeliveryCount()).append("  to ").append(b.getDeliveryCount()).append(";");
                     }
                 }
             }));
@@ -141,7 +141,7 @@ public class OperationLogAspect {
         logEntity.setMemberId(user.getUsername());
         logEntity.setDescription(description.toString());
         logEntity.setIncId(invoiceEntity.getInc().getIncId());
-        logEntity.setRelId(invoiceEntity.getInvoiceNum());
+        logEntity.setRelId(invoiceEntity.getInvoiceId());
         logEntity.setOperationDate(new Date());
         logRepository.save(logEntity);
         return retVal;
@@ -153,7 +153,7 @@ public class OperationLogAspect {
         logger.debug("logPatchAround() is running!");
         logger.debug("hijacked : " + joinPoint.getSignature().getName());
 
-        InvoiceEntity invoiceEntity = invoiceService.findById((Long) joinPoint.getArgs()[0]);
+        InvoiceEntity invoiceEntity = invoiceRepository.findOne((Long) joinPoint.getArgs()[0]);
 
         logger.debug("Around before is running!");
 
@@ -168,7 +168,7 @@ public class OperationLogAspect {
         logEntity.setMemberId(user.getUsername());
         logEntity.setDescription("删除订单");
         logEntity.setIncId(invoiceEntity.getInc().getIncId());
-        logEntity.setRelId(invoiceEntity.getInvoiceNum());
+        logEntity.setRelId(invoiceEntity.getInvoiceId());
         logEntity.setOperationDate(new Date());
         logRepository.save(logEntity);
         return retVal;
