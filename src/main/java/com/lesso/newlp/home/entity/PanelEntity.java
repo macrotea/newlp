@@ -1,7 +1,9 @@
 package com.lesso.newlp.home.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.lesso.newlp.invoice.entity.InvoiceEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -15,6 +17,7 @@ import java.util.Set;
  * Date: 11/13/13
  * Time: 2:51 PM
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID",scope = PanelEntity.class)
 @Entity
 @Table(name = "ST_HOME_PANEL", schema = "DBO", catalog = "NEWLP")
 public class PanelEntity implements Serializable {
@@ -37,7 +40,6 @@ public class PanelEntity implements Serializable {
         this.panelId = panelId;
     }
 
-    @JsonManagedReference("panel-pane")
     @OneToMany(mappedBy = "panel")
     @LazyCollection(LazyCollectionOption.FALSE)
     @OrderBy("order ASC")

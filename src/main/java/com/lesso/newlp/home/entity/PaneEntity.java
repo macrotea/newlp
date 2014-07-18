@@ -1,6 +1,8 @@
 package com.lesso.newlp.home.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,6 +12,7 @@ import java.io.Serializable;
  * Date: 11/13/13
  * Time: 2:53 PM
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID",scope = PanelEntity.class)
 @Entity
 @Table(name = "ST_HOME_PANE", schema = "DBO", catalog = "NEWLP")
 public class PaneEntity implements Serializable {
@@ -23,7 +26,7 @@ public class PaneEntity implements Serializable {
     @Column(name = "order_")
     Integer order;
 
-    @JsonBackReference("panel-pane")
+    @JsonIgnore
     @ManyToOne()
     PanelEntity panel;
 

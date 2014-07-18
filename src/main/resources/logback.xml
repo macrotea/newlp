@@ -12,6 +12,7 @@
     <logger name="org.springframework.web" level="debug"/>
     <logger name="org.springframework.data" level="debug"/>
     <logger name="org.springframework.jdbc" level="debug"/>
+    <!--<logger name="org.springframework.security" level="debug"/>-->
 
 
     <!-- ### log just the SQL ### -->

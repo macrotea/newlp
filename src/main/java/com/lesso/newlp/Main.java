@@ -35,5 +35,14 @@ public class Main {
 //
 //
 //        System.out.println(objectMapper.writeValueAsString(test));
+
+//        Matcher m = Pattern.compile("(\\d+)\\s+to\\s+\\d+").matcher("更新订单;订单状态:40  to 40;");
+//
+//        if(m.find()){
+//            System.out.println(m.group(1));
+//        }
+
+        String a = "KJC1406210002";
+        System.out.println(a.substring(a.length() - 4,a.length()));
     }
 }
