@@ -73,7 +73,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         final InvoiceEntity finalInvoice = invoice;
         invoice.getInvoiceDetails().forEach(invoiceDetail -> {
             invoiceDetail.setInvoice(finalInvoice);
-            invoiceDetail.setAmount(invoiceDetail.getPrice().multiply(new BigDecimal(Double.toString(invoiceDetail.getOrderCount()))));
+            invoiceDetail.setAmount(invoiceDetail.getPrice().multiply(new BigDecimal(Double.toString(invoiceDetail.getDeliveryCount()))));
         });
 
         InvoiceTypeEntity invoiceTypeEntity = invoiceTypeRepository.findOne(invoice.getInvoiceType().getInvoiceTypeId());
@@ -210,7 +210,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 return invoice;
             }
         });
-        if (list.size() != 0) {
+        if (null != list) {
             Set<InvoiceDetailEntity> set = new HashSet<InvoiceDetailEntity>();
             set.addAll(list);
             invoice.setInvoiceDetails(set);
@@ -240,6 +240,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             Iterator it=set.iterator();
             while(it.hasNext()){
                 InvoiceDetailEntity ide =(InvoiceDetailEntity) it.next();
+                ide.setAmount(ide.getPrice().multiply(new BigDecimal(Double.toString(ide.getDeliveryCount()))));
                 if(invoiceDataDBID.contains(ide.getInvoiceDetailId())){
                     jdbcDaoSupport.getJdbcTemplate().update("update INV_INVOICE_DETAIL set active=?, amount=?,deliveryCount=?,orderCount=?,remark=?," +
                                     "invoice_invoiceId=?,material_materialNum=?,auxiliaryUnitOne=?,auxiliaryUnitTwo=?,conversionRateOne=?,conversionRateTwo=?,price=?,unit=? WHERE invoiceDetailId=?",
@@ -293,6 +294,9 @@ public class InvoiceServiceImpl implements InvoiceService {
                 finalInvoice.getInvoiceDetails().forEach(b -> {
                     if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
                         a.setDeliveryCount(b.getDeliveryCount());
+                    }
+                    if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
+                        a.setAmount(a.getPrice().multiply(new BigDecimal(Double.toString(a.getDeliveryCount()))));
                     }
                 });
             });

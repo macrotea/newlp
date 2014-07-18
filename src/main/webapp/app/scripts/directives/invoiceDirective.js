@@ -381,13 +381,6 @@ angular.module('newlpApp')
                             });
                     };
 
-//                    //submit
-//                    $scope.submit = function () {
-//
-//                        if ('sendBack' == $scope.submitType) {
-//                            $scope.invoice.auditStatus = $scope.actions.sendBack.auditStatus;
-//                        }
-//                    };
                 },
                 link: function (scope, element, attrs, ctrl) {
                     scope.$watch(attrs['invoice'],function(){

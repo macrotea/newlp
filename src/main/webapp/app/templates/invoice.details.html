@@ -101,7 +101,7 @@
                 <td class="align-middle" ng-bind="invoiceDetail.conversionRateOne">
                 </td>
                 <td class="align-middle">{{invoiceDetail.material.price}}</td>
-                <td class="align-middle">{{(invoiceDetail.orderCount*invoiceDetail.material.price) |number:2}}</td>
+                <td class="align-middle">{{(invoiceDetail.deliveryCount*invoiceDetail.material.price) |number:2}}</td>
                 <td class="align-middle">
                     <span class="align-middle" ng-bind="invoiceDetail.remark"  ng-if="!fields.remark.editable"></span>
                     <input class="input-sm" type="text" placeholder="备注"
