@@ -133,8 +133,8 @@ public class OperationLogAspect {
                     }
                 }
             }));
-        }
 
+        }
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
@@ -150,7 +150,7 @@ public class OperationLogAspect {
 
     @Around("execution(* com.lesso.newlp.invoice.service.InvoiceServiceImpl.delete(..))")
     public Object logDeleteAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        logger.debug("logPatchAround() is running!");
+        logger.debug("logDeleteAround() is running!");
         logger.debug("hijacked : " + joinPoint.getSignature().getName());
 
         InvoiceEntity invoiceEntity = invoiceRepository.findOne((Long) joinPoint.getArgs()[0]);
