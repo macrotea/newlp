@@ -53,7 +53,7 @@ public class WebAppInitializer  extends AbstractAnnotationConfigDispatcherServle
 
     @Override
     protected String[] getServletMappings() {
-        return new String[]{"/","/api/rest/*"};
+        return new String[]{"/"};
     }
 
     @Override

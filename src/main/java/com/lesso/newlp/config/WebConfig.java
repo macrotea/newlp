@@ -17,9 +17,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.HashMap;
@@ -46,10 +46,13 @@ import java.util.Map;
 @EnableWebMvc
 @EnableSpringDataWebSupport
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@Import(RESTConfig.class)
 //public class WebConfig extends WebMvcConfigurerAdapter {
 public class WebConfig extends DelegatingWebMvcConfiguration {
 
+    @Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        configurer.enable();
+    }
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
@@ -67,7 +70,6 @@ public class WebConfig extends DelegatingWebMvcConfiguration {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(objectMapper());
         converters.add(converter);
-        int a =1;
     }
 
 
@@ -80,12 +82,6 @@ public class WebConfig extends DelegatingWebMvcConfiguration {
 //        argumentResolvers.add(currentUserWebArgumentResolver);
     }
 
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/app/**").addResourceLocations("/app/");
-        registry.addResourceHandler("/dist/**").addResourceLocations("/dist/");
-    }
 
     @Override
     @Bean

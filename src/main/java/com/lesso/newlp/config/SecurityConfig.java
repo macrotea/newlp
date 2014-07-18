@@ -61,17 +61,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/dist/**").permitAll()
 
                 /*production*/
-                .antMatchers("/avatars/**").permitAll()
-                .antMatchers("/fonts/**").permitAll()
-                .antMatchers("/images/**").permitAll()
-                .antMatchers("/scripts/**").permitAll()
-                .antMatchers("/styles/**").permitAll()
-                .antMatchers("/views/**").permitAll()
-
-                .antMatchers("/index.html").permitAll()
-                .antMatchers("/favicon.ico").permitAll()
-                .antMatchers("/robots.txt").permitAll()
-                .antMatchers("/index.jsp").permitAll()
 
                 .antMatchers("/").permitAll()
                 .antMatchers("/api/v1/auth/authenticate").permitAll()

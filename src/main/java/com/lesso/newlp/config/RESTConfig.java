@@ -46,7 +46,6 @@ public class RESTConfig extends RepositoryRestMvcConfiguration {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(objectMapper());
         converters.add(converter);
-        int a =1;
     }
 
     @Override
@@ -83,4 +82,6 @@ public class RESTConfig extends RepositoryRestMvcConfiguration {
         objectMapper.getSerializationConfig().with(dateFormat);
         return objectMapper;
     }
+
+
 }
