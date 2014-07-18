@@ -2,27 +2,15 @@
  * Created by Sean on 6/17/2014.
  */
 angular.module('newlpApp')
-    .controller('customerServiceOrderAddController', function ($scope, $state, $http, Material, Invoice) {
-
-        $scope.options = {
-            fields:{
-                orderCount:{
-                    editable:true
-                },
-                actions:{
-                    editable:true
-                }
-            }
-        };
+    .controller('customerServiceOrderAddController', function ($scope) {
 
         //init
         $scope.invoice = {
-            num: '',
             inc: null,
             client: null,
             carNum: '',
             clientAddress: '',
-            receivedDate: new Date(),
+            receivedDate: moment().format('YYYY-MM-DD'),
             remark: '',
             auditStatus: '0',
             invoiceType: {
@@ -31,53 +19,150 @@ angular.module('newlpApp')
             invoiceDetails: []
         };
 
-        //submit
-        $scope.submit = function () {
-            Invoice.save({}, $scope.invoice).$promise.then(function (data) {
-                console.log(data);
-                $scope.success = true;
-            }, function (data) {
-                $scope.error = true;
-            });
+        $scope.options = {
+            fields:{
+                invoiceNum:{
+                    hidden:true
+                },
+                inc:{
+                    editable:true
+                },
+                client:{
+                    editable:true
+                },
+                invoiceType:{
+                    editable:true
+                },
+                receivedDate:{
+                    editable:true
+                },
+                carNum:{
+                    editable:true
+                },
+                clientAddress:{
+                    editable:true
+                },
+                remark:{
+                    editable:true
+                },
+                orderCount:{
+                    editable:true
+                }
+            },
+            actions:{
+                save:{
+                    auditStatus:40
+                },
+                draft:{
+                    auditStatus:30
+                }
+            },
+            activeStatus:0,
+            activeInvoiceTypes:[1,3]
         };
     })
 
-    .controller('customerServiceOrderViewController', function ($scope, $state, $stateParams, $http, Material, Invoice) {
+    .controller('customerServiceOrderViewController', function ($scope, $state, $stateParams, Invoice) {
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
         });
+
+        $scope.options = {
+            readOnly:true,
+            activeStatus:40
+        };
     })
 
-    .controller('customerServiceOrderEditController', function ($scope, $state, $stateParams, $http, Material, Invoice) {
+    .controller('customerServiceOrderReceiveController', function ($scope, $state, $stateParams, Invoice) {
 
         $scope.options = {
             fields:{
-                orderCount:{
+                inc:{
                     editable:true
                 },
-                actions:{
+                client:{
+                    editable:true
+                },
+                invoiceType:{
+                    editable:true
+                },
+                receivedDate:{
+                    editable:true
+                },
+                carNum:{
+                    editable:true
+                },
+                clientAddress:{
+                    editable:true
+                },
+                remark:{
+                    editable:true
+                },
+                orderCount:{
                     editable:true
                 }
-            }
+            },
+            actions:{
+                receive:{
+                    auditStatus:30
+                }
+            },
+            activeStatus:20,
+            activeInvoiceTypes:[1,3]
         };
-
 
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
-            $scope.success = 40 == invoice.auditStatus;
         });
-
-        $scope.submit = function () {
-            Invoice.update({}, $scope.invoice).$promise.then(function (data) {
-                console.log(data);
-                $scope.success = true;
-            }, function (data) {
-                $scope.error = true;
-            });
-        };
     })
 
-    .controller('customerServiceOrderDraftsController', function ($scope, $state, $http, $location, $stateParams, Invoice, ngDialog) {
+    .controller('customerServiceOrderEditController', function ($scope, $state, $stateParams, Invoice) {
+
+        $scope.options = {
+            fields:{
+                inc:{
+                    editable:true
+                },
+                client:{
+                    editable:true
+                },
+                invoiceType:{
+                    editable:true
+                },
+                receivedDate:{
+                    editable:true
+                },
+                carNum:{
+                    editable:true
+                },
+                clientAddress:{
+                    editable:true
+                },
+                remark:{
+                    editable:true
+                },
+                orderCount:{
+                    editable:true
+                }
+            },
+            actions:{
+                update:{
+                    auditStatus:40
+                },
+                draft:{
+                    auditStatus:30
+                }
+            },
+            activeStatus:30,
+            activeInvoiceTypes:[1,3]
+        };
+
+        Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
+            $scope.invoice = invoice;
+        });
+    })
+
+    .controller('customerServiceOrderDraftsController', function ($scope, $state) {
         $scope.searchForm = {
             options: {
                 criteria: {

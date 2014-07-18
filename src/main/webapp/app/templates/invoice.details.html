@@ -107,7 +107,7 @@
                     <input class="input-sm" type="text" placeholder="备注"
                                                 ng-model="invoiceDetail.remark"   ng-if="fields.remark.editable">
                 </td>
-                <td class="align-middle"  ng-if="fields.actions.editable">
+                <td class="align-middle"  ng-if="!readOnly">
                     <div class="btn-group">
                         <button type="button" class="btn btn-xs btn-danger"
                                 ng-click="remove(invoiceDetail.material.materialNum)">

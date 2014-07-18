@@ -3,23 +3,23 @@
  */
 angular.module('newlpApp')
     .directive({
-        "invoiceSearchForm": function () {
+        "invoiceDatatable": function () {
             return {
-                templateUrl: 'templates/invoice.search.form.html',
+                templateUrl: 'templates/invoice.datatable.html',
                 restrict: 'AE',
                 transclude: true,
                 scope: {
                     options: '=options'
                 },
-                controller: function ($scope, $state,  Invoice,ngDialog) {
+                controller: function ($scope, $state, Invoice, ngDialog) {
 
                     /*init actions*/
                     $scope.edit = $scope.options.actions.edit;
                     $scope.view = $scope.options.actions.view;
                     $scope.rowDblClick =
-                        $scope.options.actions.rowDblClick?$scope.options.actions.rowDblClick:
-                        $scope.options.actions.edit?$scope.options.actions.edit:
-                        $scope.options.actions.view?$scope.options.actions.view:undefined
+                        $scope.options.actions.rowDblClick ? $scope.options.actions.rowDblClick :
+                            $scope.options.actions.edit ? $scope.options.actions.edit :
+                                $scope.options.actions.view ? $scope.options.actions.view : undefined
                     ;
 
                     $scope.enableRemove = $scope.options.removeController;
@@ -45,25 +45,40 @@ angular.module('newlpApp')
                     };
 
                     /*init params*/
-                    $scope.pageSizes=[
-                        {name: 20,value:20},
-                        {name: 50,value:50},
-                        {name: 100,value:100}
+                    $scope.pageSizes = [
+                        {name: 20, value: 20},
+                        {name: 50, value: 50},
+                        {name: 100, value: 100}
                     ];
-                    $scope.pageSize =$scope.pageSizes[0];
-                    $scope.page ={};
-                    $scope.page.number=1;
-                    $scope.page.size=$scope.pageSize.value;
-                    $scope.searchTerm = {
-                        auditStatus: $scope.options.criteria.auditStatus
+                    $scope.pageSize = $scope.pageSizes[0];
+                    $scope.page = {};
+                    $scope.page.number = 1;
+                    $scope.page.size = $scope.pageSize.value;
+
+                    $scope.daterangeOptions = {
+                        locale: {
+                            fromLabel:'开始日期',
+                            toLabel:'结束日期',
+                            applyLabel:'确定',
+                            cancelLabel: '取消'
+                        }
                     };
+                    $scope.showDateRange = function (e) {
+                        var datePickerElem = angular.element(e.currentTarget).siblings('.date-picker');
+                        if(datePickerElem.length > 0){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            datePickerElem.trigger('click')
+                        }
+                    };
+
 
                     //default search
                     $scope.queryByAuditStatus = function () {
                         $scope.loading = true;
                         Invoice.queryByAuditStatus({
                                 page: $scope.page.number - 1,
-                                size:$scope.page.size,
+                                size: $scope.page.size,
                                 auditStatus: $scope.options.criteria.auditStatus
                             },
                             function (data) {
@@ -74,21 +89,18 @@ angular.module('newlpApp')
 
                     //criteria search
                     $scope.search = function () {
-                        if (_.isDate($scope.searchTerm.endDateOfReceived)) {
-                            $scope.searchTerm.endDateOfReceived = moment($scope.searchTerm.endDateOfReceived).add('hours', 23).add('minutes', 59).add('seconds', 59).format();
-                        }
 
                         Invoice.search({
-                            page: $scope.page.number - 1,
-                            size:$scope.page.size
+                                page: $scope.page.number - 1,
+                                size: $scope.page.size
                             }, $scope.searchTerm
                         ).$promise.then(function (data) {
-                            $scope.data = data;
-                            $scope.loading = false;
-                        }, function (data) {
-                            $scope.loading = false;
-                            $scope.error = true;
-                        });
+                                $scope.data = data;
+                                $scope.loading = false;
+                            }, function (data) {
+                                $scope.loading = false;
+                                $scope.error = true;
+                            });
                     };
 
                     //handle form action
@@ -115,7 +127,11 @@ angular.module('newlpApp')
 
                         //reset criteria
                         $scope.searchTerm = {
-                            auditStatus: $scope.options.criteria.auditStatus
+                            auditStatus: $scope.options.criteria.auditStatus,
+                            receivedDateRange: {
+                                startDate:  moment().startOf('day').format(),
+                                endDate:  moment().endOf('day').format()
+                            }
                         };
                         $scope.onPageChanged();
                     };
@@ -128,24 +144,29 @@ angular.module('newlpApp')
                 }
             };
         },
-        "invoiceSelectMaterials": function () {
+        "invoiceDetails": function () {
             return {
-                templateUrl: 'templates/invoice.select.materials.html',
+                templateUrl: 'templates/invoice.details.html',
                 restrict: 'AE',
-                transclude: true,
+//                transclude: true,
                 scope: {
-                    invoiceDetails: '=invoiceDetails',
-                    readOnly:'=readOnly',
-                    options:'=options'
+                    invoiceDetails: '=details',
+                    readOnly: '=?readOnly',
+                    options: '=?options'
                 },
-                controller: function ($scope,  Material) {
+                controller: function ($scope, Material) {
 
-                    $scope.fields = $scope.options.fields?$scope.options.fields:{};
-                    $scope.fields.orderCount = $scope.options.fields.orderCount?$scope.options.fields.orderCount:{};
-                    $scope.fields.deliveryCount = $scope.options.fields.deliveryCount?$scope.options.fields.deliveryCount:{};
-                    $scope.fields.orderCount = $scope.options.fields.orderCount?$scope.options.fields.orderCount:{};
-                    $scope.fields.remark = $scope.options.fields.remark?$scope.options.fields.remark:{};
-                    $scope.fields.actions = $scope.options.fields.actions?$scope.options.fields.actions:{};
+
+                    $scope.options = $scope.options ? $scope.options : {};
+                    $scope.options.fields = $scope.options.fields ? $scope.options.fields : {};
+                    $scope.fields = $scope.options.fields ? $scope.options.fields : {};
+                    $scope.fields.orderCount = $scope.options.fields.orderCount ? $scope.options.fields.orderCount : {};
+                    $scope.fields.deliveryCount = $scope.options.fields.deliveryCount ? $scope.options.fields.deliveryCount : {};
+                    $scope.fields.orderCount = $scope.options.fields.orderCount ? $scope.options.fields.orderCount : {};
+                    $scope.fields.remark = $scope.options.fields.remark ? $scope.options.fields.remark : {};
+
+                    $scope.readOnly = $scope.options.readOnly ? $scope.options.readOnly : false;
+//                    $scope.fields.actions = $scope.options.fields.actions?$scope.options.fields.actions:{};
 
 
                     //init temp variables
@@ -160,8 +181,8 @@ angular.module('newlpApp')
 
                         Material.findByNameOrNumLike({
                             page: $scope.currentPage - 1,
-                            searchTerm:$scope.searchTerm
-                        },{}, function (data) {
+                            searchTerm: $scope.searchTerm
+                        }, {}, function (data) {
                             $scope.loading = false;
                             $scope.data = data;
                         });
@@ -174,12 +195,12 @@ angular.module('newlpApp')
 
                         var notExist = true;
                         $scope.invoiceDetails.forEach(function (invoiceDetail) {
-                            if(material.materialNum ==invoiceDetail.material.materialNum){
+                            if (material.materialNum == invoiceDetail.material.materialNum) {
                                 notExist = false;
                             }
                         });
 
-                        if(notExist){
+                        if (notExist) {
                             var invoiceDetail = {};
                             invoiceDetail.orderCount = 1;
                             invoiceDetail.deliveryCount = invoiceDetail.orderCount;
@@ -201,7 +222,7 @@ angular.module('newlpApp')
 
                         var isExist = false;
                         $scope.invoiceDetails.forEach(function (invoiceDetail) {
-                            if(materialNum ==invoiceDetail.material.materialNum){
+                            if (materialNum == invoiceDetail.material.materialNum) {
                                 isExist = true;
                             }
                         });
@@ -216,8 +237,177 @@ angular.module('newlpApp')
                 link: function (scope, element, attrs, ctrl) {
                 }
             };
-        }
+        },
+        "invoiceForm": function () {
+            return {
+                templateUrl: 'templates/invoice.form.html',
+                restrict: 'AE',
+//                transclude: true,
+                scope: {
+                    invoice: '=invoice',
+                    readOnly: '=?readOnly',
+                    options: '=?options'
+                },
+                controller: function ($scope, Invoice) {
 
+                    $scope.options = $scope.options ? $scope.options : {};
+                    $scope.options.fields = $scope.options.fields ? $scope.options.fields : {};
+                    $scope.fields = $scope.options.fields ? $scope.options.fields : {};
+                    $scope.fields.inc = $scope.fields.inc ? $scope.fields.inc : {};
+                    $scope.fields.client = $scope.fields.client ? $scope.fields.client : {};
+                    $scope.fields.invoiceType = $scope.fields.invoiceType ? $scope.fields.invoiceType : {};
+                    $scope.fields.receivedDate = $scope.fields.receivedDate ? $scope.fields.receivedDate : {};
+                    $scope.fields.carNum = $scope.fields.carNum ? $scope.fields.carNum : {};
+                    $scope.fields.clientAddress = $scope.fields.clientAddress ? $scope.fields.clientAddress : {};
+                    $scope.fields.remark = $scope.fields.remark ? $scope.fields.remark : {};
+                    $scope.fields.orderCount = $scope.fields.orderCount ? $scope.fields.orderCount : {};
+
+                    $scope.actions = $scope.options.actions ? $scope.options.actions : {};
+//                    $scope.actions.submit = $scope.options.actions.submit?$scope.options.actions.submit:{};
+//                    $scope.actions.draft = $scope.options.actions.draft?$scope.options.actions.draft:{};
+
+
+                    $scope.invoiceTypes = [
+                        {"invoiceTypeId":1, "name":'销售'},
+                        { "invoiceTypeId":2, "name":'外购'},
+                        {"invoiceTypeId":3, "name":'自用'}
+                    ];
+
+                    if($scope.options.activeInvoiceTypes){
+                        $scope.invoiceTypes = $scope.invoiceTypes.filter(function (invoiceType) {
+                            return $scope.options.activeInvoiceTypes.indexOf(invoiceType.invoiceTypeId) > -1;
+                        });
+                    }
+
+
+                    /*popup datepicker*/
+                    $scope.receivedDateOpen = function ($event) {
+                        $event.preventDefault();
+                        $event.stopPropagation();
+
+                        $scope.receivedDateOpened = true;
+                    };
+
+
+                    $scope.save = function () {
+                        $scope.invoice.auditStatus = $scope.actions.save.auditStatus;
+                        Invoice.save({}, $scope.invoice).$promise.then(function (data) {
+                            console.log(data);
+                            $scope.success = true;
+                        }, function (data) {
+                            $scope.error = true;
+                        });
+                    };
+
+                    $scope.update = function () {
+                        $scope.invoice.auditStatus = $scope.actions.update.auditStatus;
+                        Invoice.update({}, $scope.invoice).$promise.then(function (data) {
+                            console.log(data);
+                            $scope.success = true;
+                        }, function (data) {
+                            $scope.error = true;
+                        });
+                    };
+
+                    $scope.draft = function () {
+                        $scope.invoice.auditStatus = $scope.actions.draft.auditStatus;
+                        if ($scope.invoice.invoiceId) {
+                            Invoice.update({}, $scope.invoice).$promise.then(function (data) {
+                                console.log(data);
+                                $scope.success = true;
+                            }, function (data) {
+                                $scope.error = true;
+                            });
+                        } else {
+                            Invoice.save({}, $scope.invoice).$promise.then(function (data) {
+                                console.log(data);
+                                $scope.success = true;
+                            }, function (data) {
+                                $scope.error = true;
+                            });
+                        }
+                    };
+
+                    $scope.submit = function () {
+                        $scope.invoice.auditStatus = $scope.actions.submit.auditStatus;
+                        Invoice.patch({
+                            invoiceId: $scope.invoice.invoiceId,
+                            auditStatus: $scope.invoice.auditStatus
+                        }).$promise.then(function (data) {
+                                console.log(data);
+                                $scope.success = true;
+                            }, function (data) {
+                                $scope.error = true;
+                            });
+                    };
+
+                    $scope.receive = function () {
+                        $scope.invoice.auditStatus = $scope.actions.receive.auditStatus;
+                        Invoice.patch({
+                            invoiceId: $scope.invoice.invoiceId,
+                            auditStatus: $scope.invoice.auditStatus
+                        }).$promise.then(function (data) {
+                                console.log(data);
+                                $scope.success = true;
+                            }, function (data) {
+                                $scope.error = true;
+                            });
+                    };
+
+                    $scope.adjust = function () {
+                        $scope.invoice.auditStatus = $scope.actions.adjust.auditStatus;
+                        Invoice.patch({
+                            invoiceId: $scope.invoice.invoiceId,
+                            invoiceDetails: $scope.invoice.invoiceDetails,
+                            auditStatus: $scope.invoice.auditStatus
+                        }).$promise.then(function (data) {
+                                console.log(data);
+                                $scope.success = true;
+                            }, function (data) {
+                                $scope.error = true;
+                            });
+                    };
+
+                    $scope.sendBack = function () {
+                        $scope.invoice.auditStatus = $scope.actions.sendBack.auditStatus;
+                        Invoice.patch({
+                            invoiceId: $scope.invoice.invoiceId,
+                            auditStatus: $scope.invoice.auditStatus
+                        }).$promise.then(function (data) {
+                                console.log(data);
+                                $scope.success = true;
+                            }, function (data) {
+                                $scope.error = true;
+                            });
+                    };
+
+//                    //submit
+//                    $scope.submit = function () {
+//
+//                        if ('sendBack' == $scope.submitType) {
+//                            $scope.invoice.auditStatus = $scope.actions.sendBack.auditStatus;
+//                        }
+//                    };
+                },
+                link: function (scope, element, attrs, ctrl) {
+                    scope.$watch(attrs['invoice'],function(){
+                        if(scope.invoice){
+                            scope.success = scope.options.activeStatus != scope.invoice.auditStatus;
+                        }
+                    });
+
+                    scope.$watch('options.actions.sendBack.auditStatus',function(val){
+                        if(scope.options.actions.sendBack && val){
+                            scope.options.actions.sendBack.auditStatus = val;
+                        }
+                    });
+
+                    scope.$watch('receivedDateOpened',function(val){
+                        scope.receivedDateOpened = val;
+                    });
+                }
+            };
+        }
     })
 ;
 

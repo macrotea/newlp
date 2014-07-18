@@ -85,28 +85,11 @@
                 <label class="col-sm-1 control-label no-padding-right"> 单据日期 </label>
 
                 <div class="col-sm-5">
-                    <div class="input-group col-xs-5 pull-left">
-                        <input type="text" class="form-control" datepicker-popup="yyyy-MM-dd"
-                               show-button-bar="false" is-open="startDateOpened"
-                               datepicker-options=" {showWeeks: false, startingDay: 1 }"
-                               ng-required="true" ng-click="startDateOpened = true"
-                               ng-model="searchTerm.startDateOfReceived"/>
-                                <span class="input-group-addon">
-                                <i class="fa fa-calendar bigger-110"></i>
-                                </span>
-                    </div>
-                    <div class="input-group col-xs-2 pull-left center">
-                        <span class="bigger-160">~</span>
-                    </div>
-                    <div class="input-group col-xs-5">
-                        <input type="text" class="form-control" datepicker-popup="yyyy-MM-dd"
-                               show-button-bar="false" is-open="endDateOpened"
-                               datepicker-options=" {showWeeks: false, startingDay: 1 }"
-                               ng-required="true" ng-click="endDateOpened = true"
-                               ng-model="searchTerm.endDateOfReceived"/>
-                                <span class="input-group-addon">
-                                <i class="fa fa-calendar bigger-110"></i>
-                                </span>
+                    <div class="input-group col-xs-12 pull-left">
+                        <input id="daterange" date-range-picker class="form-control date-picker" type="text" ng-model="searchTerm.receivedDateRange" min="'2014-02-23'" max="'2015-02-25'" options="daterangeOptions"/>
+                        <span class="input-group-addon" ng-click="showDateRange($event)">
+                           <i class="fa fa-calendar bigger-110"></i>
+                        </span>
                     </div>
                 </div>
             </div>

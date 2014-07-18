@@ -2,21 +2,7 @@
  * Created by Sean on 6/17/2014.
  */
 angular.module('newlpApp')
-    .controller('depotAddDeliveryController', function ($scope, $state, Material, Invoice) {
-
-        $scope.options = {
-            fields:{
-                orderCount:{
-                    editable:true
-                },
-                deliveryCount:{
-                    editable:true
-                },
-                actions:{
-                    editable:true
-                }
-            }
-        };
+    .controller('depotAddDeliveryController', function ($scope) {
 
         //init
         $scope.invoice = {
@@ -24,41 +10,59 @@ angular.module('newlpApp')
             client: null,
             carNum: '',
             clientAddress: '',
-            receivedDate: new Date(),
+            receivedDate: moment().format('YYYY-MM-DD'),
             remark: '',
-            auditStatus: '50',
+            auditStatus: '0',
             invoiceType: {
                 invoiceTypeId: '1'
             },
             invoiceDetails: []
         };
 
-        //submit
-        $scope.submit = function () {
-            Invoice.save({}, $scope.invoice).$promise.then(function (data) {
-                console.log(data);
-                $scope.success = true;
-            }, function (data) {
-                $scope.error = true;
-            });
+        $scope.options = {
+            fields:{
+                invoiceNum:{
+                    hidden:true
+                },
+                inc:{
+                    editable:true
+                },
+                client:{
+                    editable:true
+                },
+                invoiceType:{
+                    editable:true
+                },
+                receivedDate:{
+                    editable:true
+                },
+                carNum:{
+                    editable:true
+                },
+                clientAddress:{
+                    editable:true
+                },
+                remark:{
+                    editable:true
+                },
+                orderCount:{
+                    editable:true
+                }
+            },
+            actions:{
+                save:{
+                    auditStatus:70
+                },
+                draft:{
+                    auditStatus:50
+                }
+            },
+            activeStatus:0,
+            activeInvoiceTypes:[1,3]
         };
     })
 
-    .controller('depotAddRestockController', function ($scope, $state, Material, Invoice) {
-
-        $scope.options = {
-            fields:{
-                orderCount:{
-                    editable:true
-                },
-                deliveryCount:{
-                    editable:true
-                },
-                actions:{
-                    editable:true
-                }
-            }
-        };
+    .controller('depotAddRestockController', function ($scope) {
 
         //init
         $scope.invoice = {
@@ -66,23 +70,67 @@ angular.module('newlpApp')
             client: null,
             carNum: '',
             clientAddress: '',
-            receivedDate: new Date(),
+            receivedDate: moment().format('YYYY-MM-DD'),
             remark: '',
-            auditStatus: '50',
+            auditStatus: '0',
             invoiceType: {
-                invoiceTypeId: '2'
+                invoiceTypeId: '1'
             },
             invoiceDetails: []
         };
 
-        //submit
-        $scope.submit = function () {
-            Invoice.save({}, $scope.invoice).$promise.then(function (data) {
-                console.log(data);
-                $scope.success = true;
-            }, function (data) {
-                $scope.error = true;
-            });
+        $scope.options = {
+            fields:{
+                invoiceNum:{
+                    hidden:true
+                },
+                inc:{
+                    editable:true
+                },
+                client:{
+                    editable:true
+                },
+                invoiceType:{
+                    editable:true
+                },
+                receivedDate:{
+                    editable:true
+                },
+                carNum:{
+                    editable:true
+                },
+                clientAddress:{
+                    editable:true
+                },
+                remark:{
+                    editable:true
+                },
+                orderCount:{
+                    editable:true
+                }
+            },
+            actions:{
+                save:{
+                    auditStatus:70
+                },
+                draft:{
+                    auditStatus:50
+                }
+            },
+            activeStatus:0,
+            activeInvoiceTypes:[2]
+        };
+
+    })
+
+    .controller('depotViewController', function ($scope, $state, $stateParams, Invoice) {
+        Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
+            $scope.invoice = invoice;
+        });
+
+        $scope.options = {
+            readOnly:true,
+            activeStatus:70
         };
     })
 
@@ -90,54 +138,67 @@ angular.module('newlpApp')
 
         $scope.options = {
             fields:{
+                inc:{
+                    editable:true
+                },
+                client:{
+                    editable:true
+                },
+                invoiceType:{
+                    editable:true
+                },
+                receivedDate:{
+                    editable:true
+                },
+                carNum:{
+                    editable:true
+                },
+                clientAddress:{
+                    editable:true
+                },
+                remark:{
+                    editable:true
+                },
                 orderCount:{
                     editable:true
-                },
-                deliveryCount:{
-                    editable:true
-                },
-                actions:{
-                    editable:true
                 }
-            }
+            },
+            actions:{
+                update:{
+                    auditStatus:70
+                },
+                draft:{
+                    auditStatus:50
+                }
+            },
+            activeStatus:50
         };
 
 
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
-
-            $scope.success = 70 == invoice.auditStatus;
         });
 
 
-        $scope.submit = function () {
-            Invoice.update({}, $scope.invoice).$promise.then(function (data) {
-                console.log(data);
-                $scope.success = true;
-            }, function (data) {
-                $scope.error = true;
-            });
-        };
     })
 
     .controller('depotReceiveController', function ($scope, $state, $stateParams, Material, Invoice) {
 
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
-
-            $scope.success = 60 == invoice.auditStatus;
         });
 
-        $scope.submit = function () {
-            Invoice.patch({
-                invoiceId: $scope.invoice.invoiceId,
-                auditStatus: $scope.invoice.auditStatus
-            }).$promise.then(function (data) {
-                    console.log(data);
-                    $scope.success = true;
-                }, function (data) {
-                    $scope.error = true;
-                });
+        $scope.options = {
+            actions:{
+                receive:{
+                    auditStatus:60
+                },
+                sendBack:{
+                    auditStatus:30
+                }
+            },
+            activeStatus:40,
+            readOnly:true
         };
     })
 
@@ -146,24 +207,28 @@ angular.module('newlpApp')
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
 
-            $scope.success = 70 == invoice.auditStatus || 30 == invoice.auditStatus;
         });
 
-        $scope.submit = function () {
-            Invoice.patch({
-                invoiceId: $scope.invoice.invoiceId,
-                invoiceDetails: $scope.invoice.invoiceDetails,
-                auditStatus: $scope.invoice.auditStatus
-            }).$promise.then(function (data) {
-                    console.log(data);
-                    $scope.success = true;
-                }, function (data) {
-                    $scope.error = true;
-                });
+        $scope.options = {
+            fields:{
+                deliveryCount:{
+                    editable:true
+                }
+            },
+            actions:{
+                adjust:{
+                    auditStatus:70
+                },
+                sendBack:{
+                    auditStatus:30
+                }
+            },
+            activeStatus:60,
+            readOnly:true
         };
     })
 
-    .controller('depotReceivesController', function ($scope, $state, $location, $stateParams, Invoice, ngDialog) {
+    .controller('depotReceivesController', function ($scope, $state) {
         $scope.searchForm = {
             options: {
                 criteria: {
@@ -174,7 +239,7 @@ angular.module('newlpApp')
                         $state.go('home.depot.receive', {invoiceId: invoiceId})
                     }
                 },
-                sendBackController: 'customerServiceConfirmSendBackConfirmCtrl'
+                sendBackController: 'depotSendBackConfirmCtrl'
             }
         };
     })
@@ -191,9 +256,24 @@ angular.module('newlpApp')
         $scope.page ={};
         $scope.page.number=1;
         $scope.page.size=$scope.pageSize.value;
-        $scope.searchTerm = {
-            auditStatus: ';auditStatuses=50,60'
+
+        $scope.daterangeOptions = {
+            locale: {
+                fromLabel:'开始日期',
+                toLabel:'结束日期',
+                applyLabel:'确定',
+                cancelLabel: '取消'
+            }
         };
+        $scope.showDateRange = function (e) {
+            var datePickerElem = angular.element(e.currentTarget).siblings('.date-picker');
+            if(datePickerElem.length > 0){
+                e.preventDefault();
+                e.stopPropagation();
+                datePickerElem.trigger('click')
+            }
+        };
+
         $scope.onPageSizeChange = function () {
             $scope.page.size = $scope.pageSize.value;
             $scope.onPageChanged();
@@ -205,32 +285,12 @@ angular.module('newlpApp')
             Invoice.queryByAuditStatus({
                     page: $scope.page.number - 1,
                     size:$scope.page.size,
-                    auditStatus: ';auditStatuses=50,60'
+                    auditStatus: '50,60'
                 },
                 function (data) {
                     $scope.data = data;
                     $scope.loading = false;
                 });
-
-//            Invoice.queryByAuditStatus({
-//                    page: $scope.currentPage - 1,
-//                    auditStatus: 50
-//                },
-//                function (data) {
-//                    Invoice.queryByAuditStatus({
-//                            page: $scope.currentPage - 1,
-//                            auditStatus: 60
-//                        },
-//                        function (dataTmp) {
-//
-//                            data.content = data.content.concat(dataTmp.content);
-//                            data.page.totalElements = data.page.totalElements + dataTmp.page.totalElements;
-//                            data.page.totalPages = data.page.totalPages > dataTmp.page.totalPages ? data.page.totalPages : dataTmp.page.totalPages;
-//                            $scope.data = data;
-//
-//                            $scope.loading = false;
-//                        });
-//                });
 
         };
 
@@ -287,14 +347,11 @@ angular.module('newlpApp')
 
             //search criteria
             $scope.searchTerm = {
-                num: null,
-                incId: null,
-                clientId: null,
-                carNum: null,
-                startDateOfReceived: null,
-                endDateOfReceived: null,
-                invoiceTypeId: null,
-                auditStatus: 50
+                auditStatus: 50,
+                receivedDateRange: {
+                    startDate:  moment().startOf('day').format(),
+                    endDate:  moment().endOf('day').format()
+                }
             };
             $scope.onPageChanged();
         };

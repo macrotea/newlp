@@ -13,7 +13,7 @@
     </ul>
 </div>
 
-<div class="page-content" ng-controller="customerServiceOrderEditController">
+<div class="page-content" ng-controller="customerServiceOrderReceiveController">
 <!-- setting box goes here if needed -->
 
 <div class="page-header">
@@ -29,154 +29,13 @@
 <div class="row">
 <div class="col-xs-12">
     <!-- page content goes here -->
-    <ul class="wizard-steps">
-        <li data-target="#step1" ng-class="{complete:(invoice.auditStatus>=40),active:(invoice.auditStatus<40)}">
-            <span class="step">1</span>
-            <span class="title">开单</span>
-        </li>
 
-        <li data-target="#step2" ng-class="{complete:(invoice.auditStatus>=60),active:( invoice.auditStatus>=40 && invoice.auditStatus<=50)}">
-            <span class="step">2</span>
-            <span class="title">仓库</span>
-        </li>
+    <!--invoice detail-->
+    <!--=======================================-->
+    <invoice-form invoice="invoice" options="options"></invoice-form>
+    <!--=======================================-->
+    <!--/invoice detail-->
 
-        <li data-target="#step3"  ng-class="{complete:(invoice.auditStatus>=90),active:( invoice.auditStatus>=70 && invoice.auditStatus<=90)}">
-            <span class="step">3</span>
-            <span class="title">打单</span>
-        </li>
-
-        <li data-target="#step4"  ng-class="{complete:(invoice.auditStatus>=90)}">
-            <span class="step">4</span>
-            <span class="title">完成</span>
-        </li>
-    </ul>
-    <hr>
-    <form class="form-horizontal" name="form" novalidate ng-submit="submit()">
-        <fieldset ng-disabled="success">
-        <!--公司-->
-        <div class="form-group">
-            <label class="col-sm-3 control-label no-padding-right"> 公司 </label>
-
-            <div class="col-sm-9">
-                <div class="input-group col-xs-10 col-sm-5">
-                    <inc-select inc="invoice.inc"></inc-select>
-                </div>
-            </div>
-        </div>
-
-        <!--客户-->
-        <div class="form-group">
-            <label class="col-sm-3 control-label no-padding-right"> 客户 </label>
-
-            <div class="col-sm-9">
-                <div class="input-group col-xs-10 col-sm-5">
-                    <select class="form-control" title="选择客户" client-select ng-model="invoice.client" ng-options="client.clientName for client in [invoice.client] track by client.clientId"></select>
-                </div>
-            </div>
-        </div>
-
-        <!--单据类型-->
-        <div class="form-group">
-            <label class="col-sm-3 control-label no-padding-right"> 单据类型 </label>
-
-            <div class="col-sm-9">
-                <div class="input-group col-xs-10 col-sm-5">
-                    <select class="form-control"  ng-model="invoice.invoiceType.invoiceTypeId">
-                        <option value="1">销售</option>
-                        <option value="3">自用</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!--单据日期-->
-        <div class="form-group">
-            <label class="col-sm-3 control-label no-padding-right"> 单据日期 </label>
-            <div class="col-sm-9">
-                <div class="input-group col-xs-10 col-sm-5">
-                    <input type="text" class="form-control" datepicker-popup="yyyy-MM-dd"
-                           show-button-bar="false" is-open="opened" datepicker-options=" {showWeeks: false, startingDay: 1 }"
-                           ng-required="true" ng-click="opened = true"
-                           ng-model="invoice.receivedDate"/>
-                                <span class="input-group-addon">
-                                <i class="fa fa-calendar bigger-110"></i>
-                                </span>
-                </div>
-            </div>
-        </div>
-
-        <!--车号-->
-        <div class="form-group">
-            <label class="col-sm-3 control-label no-padding-right"> 车号 </label>
-
-            <div class="col-sm-9">
-                <div class="input-group col-xs-10 col-sm-5">
-                    <input class="form-control" type="text" ng-model="invoice.carNum">
-                </div>
-            </div>
-        </div>
-
-        <!--联系地址-->
-        <div class="form-group">
-            <label class="col-sm-3 control-label no-padding-right"> 联系地址 </label>
-
-            <div class="col-sm-9">
-                <div class="input-group col-xs-10 col-sm-5">
-                    <input class="form-control" type="text" ng-model="invoice.clientAddress">
-                </div>
-            </div>
-        </div>
-
-        <!--备注信息-->
-        <div class="form-group">
-            <label class="col-sm-3 control-label no-padding-right">备注信息</label>
-
-            <div class="col-sm-9">
-                <div class="input-group col-xs-10 col-sm-5">
-                    <input class="form-control" type="text" ng-model="invoice.remark">
-                </div>
-            </div>
-        </div>
-
-            <!--invoice materials select-->
-            <!--=======================================-->
-            <h3 class="header smaller lighter blue">选择物料</h3>
-            <invoice-select-materials invoice-details="invoice.invoiceDetails"  options="options"></invoice-select-materials>
-            <!--=======================================-->
-            <!--/invoice materials select-->
-
-        <div class="alert alert-success" ng-if="success">
-            <!--<button type="button" class="close" data-dismiss="alert">-->
-            <!--<i class="ace-icon fa fa-times"></i>-->
-            <!--</button>-->
-            <strong>
-                <i class="ace-icon fa fa-check"></i>
-                订单<span ng-if="invoice.auditStatus==40">提交</span><span ng-if="invoice.auditStatus==30">保存</span>成功!
-            </strong>
-            <br>
-        </div>
-        <div class="alert alert-danger" ng-if="error">
-            <button type="button" class="close" data-dismiss="alert">
-                <i class="ace-icon fa fa-times"></i>
-            </button>
-            <strong>
-                <i class="ace-icon fa fa-check"></i>
-                订单提交出错，请联系管理员!
-            </strong>
-            <br>
-        </div>
-        <div class="clearfix form-actions">
-            <div class="col-md-offset-3 col-md-9">
-
-                <button class="btn btn-info" type="submit" ng-click="invoice.auditStatus = 40">
-                    <i class="ace-icon fa fa-check bigger-110"></i>
-                    提交
-                </button>
-
-            </div>
-        </div>
-        </fieldset>
-    </form>
 </div>
 <!-- /.col -->
 </div>

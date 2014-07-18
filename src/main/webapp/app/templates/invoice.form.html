@@ -1,0 +1,234 @@
+<ul class="wizard-steps">
+    <li data-target="#step1"
+        ng-class="{complete:(invoice.auditStatus>=40),active:(invoice.auditStatus<40)}">
+        <span class="step">1</span>
+        <span class="title">开单</span>
+    </li>
+
+    <li data-target="#step2"
+        ng-class="{complete:(invoice.auditStatus>=60),active:( invoice.auditStatus>=40 && invoice.auditStatus<=50)}">
+        <span class="step">2</span>
+        <span class="title">仓库</span>
+    </li>
+
+    <li data-target="#step3"
+        ng-class="{complete:(invoice.auditStatus>=90),active:( invoice.auditStatus>=70 && invoice.auditStatus<=90)}">
+        <span class="step">3</span>
+        <span class="title">打单</span>
+    </li>
+
+    <li data-target="#step4" ng-class="{complete:(invoice.auditStatus>=90)}">
+        <span class="step">4</span>
+        <span class="title">完成</span>
+    </li>
+</ul>
+<hr>
+<form class="form-horizontal" name="form" novalidate>
+    <fieldset ng-disabled="success">
+
+        <!--单号-->
+        <div class="form-group" ng-if="!fields.invoiceNum.hidden">
+            <label class="col-sm-3 control-label no-padding-right"> 单号 </label>
+
+            <div class="col-sm-9">
+                <div class="input-group col-xs-10 col-sm-5" ng-if="!fields.invoiceNum.editable">
+                    <p class="form-control-static" ng-bind="invoice.invoiceNum"></p>
+                </div>
+                <div class="input-group col-xs-10 col-sm-5" ng-if="fields.invoiceNum.editable">
+                    <p class="form-control-static green middle bolder" ng-bind="invoice.invoiceNum"></p>
+                </div>
+            </div>
+        </div>
+
+        <!--公司-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right"> 公司 </label>
+
+            <div class="col-sm-9">
+                <div class="input-group col-xs-10 col-sm-5" ng-if="!fields.inc.editable">
+                    <p class="form-control-static" ng-bind="invoice.inc.incName"></p>
+                </div>
+                <div class="input-group col-xs-10 col-sm-5" ng-if="fields.inc.editable">
+                    <inc-select inc="invoice.inc"></inc-select>
+                </div>
+            </div>
+        </div>
+
+        <!--客户-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right"> 客户 </label>
+
+            <div class="col-sm-9">
+                <div class="input-group col-xs-10 col-sm-5"  ng-if="!fields.client.editable">
+                    <p class="form-control-static" ng-bind="invoice.client.clientName"></p>
+                </div>
+                <div class="input-group col-xs-10 col-sm-5" ng-if="fields.client.editable">
+                    <select class="form-control" title="选择客户" client-select ng-model="invoice.client"
+                            ng-options="client.clientName for client in [invoice.client] track by client.clientId"></select>
+                </div>
+            </div>
+        </div>
+
+        <!--单据类型-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right"> 单据类型 </label>
+
+            <div class="col-sm-9">
+                <div class="input-group col-xs-10 col-sm-5"  ng-if="!fields.invoiceType.editable">
+                    <p class="form-control-static" ng-bind="invoice.invoiceType.name"></p>
+                </div>
+                <div class="input-group col-xs-10 col-sm-5"  ng-if="fields.invoiceType.editable">
+                    <select class="form-control" ng-model="invoice.invoiceType" ng-options="invoiceType.name for invoiceType in invoiceTypes track by invoiceType.invoiceTypeId">
+                        <!--<option value="1">销售</option>-->
+                        <!--<option value="2" ng-if="activeInvoiceTypes.indexOf(2) > -1">外购</option>-->
+                        <!--<option value="3">自用</option>-->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!--单据日期-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right"> 单据日期 </label>
+
+            <div class="col-sm-9">
+                <div class="input-group col-xs-10 col-sm-5" ng-if="!fields.receivedDate.editable">
+                    <p class="form-control-static" ng-bind="invoice.receivedDate | date: 'yyyy-MM-dd'"></p>
+                </div>
+                <div class="input-group col-xs-10 col-sm-5" ng-if="fields.receivedDate.editable">
+                    <datepicker ng-model="invoice.receivedDate" language="cn" date-format="YYYY-MM-DD">
+                    <!--<input type="text" class="form-control" datepicker-popup="yyyy-MM-dd"-->
+                           <!--show-button-bar="false" is-open="receivedDateOpened"-->
+                           <!--datepicker-options=" {showWeeks: false, startingDay: 1 }"-->
+                           <!--ng-required="true" ng-click="receivedDateOpen($event)"-->
+                           <!--ng-model="invoice.receivedDate"/>-->
+                                <!--<span class="input-group-addon" ng-click="receivedDateOpen($event)">-->
+                                <!--<i class="fa fa-calendar bigger-110"></i>-->
+                                <!--</span>-->
+                </div>
+            </div>
+        </div>
+
+        <!--车号-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right"> 车号 </label>
+
+            <div class="col-sm-9">
+                <div class="input-group col-xs-10 col-sm-5" ng-if="!fields.carNum.editable">
+                    <p class="form-control-static" ng-bind="invoice.carNum"></p>
+                </div>
+                <div class="input-group col-xs-10 col-sm-5" ng-if="fields.carNum.editable">
+                    <input class="form-control" type="text" ng-model="invoice.carNum">
+                </div>
+            </div>
+        </div>
+
+        <!--联系地址-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right"> 联系地址 </label>
+
+            <div class="col-sm-9">
+                <div class="input-group col-xs-10 col-sm-5" ng-if="!fields.clientAddress.editable">
+                    <p class="form-control-static" ng-bind="invoice.clientAddress"></p>
+                </div>
+                <div class="input-group col-xs-10 col-sm-5" ng-if="fields.clientAddress.editable">
+                    <input class="form-control" type="text" ng-model="invoice.clientAddress">
+                </div>
+            </div>
+        </div>
+
+        <!--备注信息-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right">备注信息</label>
+
+            <div class="col-sm-9">
+                <div class="input-group col-xs-10 col-sm-5" ng-if="!fields.remark.editable">
+                    <p class="form-control-static" ng-bind="invoice.remark"></p>
+                </div>
+                <div class="input-group col-xs-10 col-sm-5" ng-if="fields.remark.editable">
+                    <input class="form-control" type="text" ng-model="invoice.remark">
+                </div>
+            </div>
+        </div>
+
+
+        <!--invoice materials select-->
+        <!--=======================================-->
+        <h3 class="header smaller lighter blue">选择物料</h3>
+        <invoice-details details="invoice.invoiceDetails"  options="options"></invoice-details>
+        <!--=======================================-->
+        <!--/invoice materials select-->
+
+        <div class="alert alert-success" ng-if="success">
+            <strong>
+                <i class="ace-icon fa fa-check"></i>
+                <span ng-if="actions.submit && invoice.auditStatus==actions.submit.auditStatus">订单提交成功!</span>
+                <span ng-if="actions.save && invoice.auditStatus==actions.save.auditStatus">订单提交成功!</span>
+                <span ng-if="actions.update && invoice.auditStatus==actions.update.auditStatus">订单提交成功!</span>
+                <span ng-if="actions.receive && invoice.auditStatus==actions.receive.auditStatus">订单接收成功!</span>
+                <span ng-if="actions.adjust && invoice.auditStatus==actions.adjust.auditStatus">订单接收成功!</span>
+                <span ng-if="actions.draft && invoice.auditStatus==actions.draft.auditStatus">订单保存成功!</span>
+                <span ng-if="actions.sendBack && invoice.auditStatus==actions.sendBack.auditStatus">订单退回成功!</span>
+            </strong>
+            <br>
+        </div>
+        <div class="alert alert-danger" ng-if="error">
+            <button type="button" class="close" data-dismiss="alert">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <strong>
+                <i class="ace-icon fa fa-check"></i>
+                订单提交出错，请联系管理员!
+            </strong>
+            <br>
+        </div>
+<span ng-bind="submitType"></span>
+
+        <div class="clearfix form-actions">
+            <div class="col-md-offset-3 col-md-9">
+
+                <button class="btn btn-info" type="submit" ng-click="submit()" ng-if="actions.submit">
+                    <i class="ace-icon fa fa-check bigger-110"></i>
+                    提交
+                </button>
+
+                &nbsp; &nbsp; &nbsp;
+                <button class="btn btn-info" type="submit" ng-click="save()" ng-if="actions.save">
+                    <i class="ace-icon fa fa-check bigger-110"></i>
+                    提交
+                </button>
+
+                &nbsp; &nbsp; &nbsp;
+                <button class="btn btn-info" type="submit" ng-click="update()" ng-if="actions.update">
+                    <i class="ace-icon fa fa-check bigger-110"></i>
+                    提交
+                </button>
+
+                &nbsp; &nbsp; &nbsp;
+                <button class="btn btn-info" type="submit" ng-click="adjust()" ng-if="actions.adjust">
+                    <i class="ace-icon fa fa-check bigger-110"></i>
+                    提交
+                </button>
+
+                &nbsp; &nbsp; &nbsp;
+                <button class="btn btn-info" type="submit" ng-click="receive()" ng-if="actions.receive">
+                    <i class="ace-icon fa fa-check bigger-110"></i>
+                    接收
+                </button>
+
+                &nbsp; &nbsp; &nbsp;
+                <button class="btn" type="submit" ng-click="draft()" ng-if="actions.draft">
+                    <i class="ace-icon fa fa-undo bigger-110"></i>
+                    保存
+                </button>
+
+                &nbsp; &nbsp; &nbsp;
+                <button class="btn btn-danger" type="submit" ng-click="sendBack()" ng-if="actions.sendBack">
+                    <i class="ace-icon fa fa-undo bigger-110"></i>
+                    退回
+                </button>
+
+            </div>
+        </div>
+    </fieldset>
+</form>

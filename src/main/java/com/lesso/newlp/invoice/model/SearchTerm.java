@@ -2,9 +2,9 @@ package com.lesso.newlp.invoice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.lesso.newlp.core.modal.DateRange;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by Sean on 6/27/2014.
@@ -17,8 +17,7 @@ public class SearchTerm implements Serializable{
     Long incId;                     //公司ID
     Long clientId;               //客户ID
     String carNum;                   //车号
-    Date startDateOfReceived;   //交货日期
-    Date endDateOfReceived;
+    DateRange receivedDateRange; //交货日期
     Integer invoiceTypeId;
     Integer auditStatus;
 
@@ -54,22 +53,6 @@ public class SearchTerm implements Serializable{
         this.carNum = carNum;
     }
 
-    public Date getStartDateOfReceived() {
-        return startDateOfReceived;
-    }
-
-    public void setStartDateOfReceived(Date startDateOfReceived) {
-        this.startDateOfReceived = startDateOfReceived;
-    }
-
-    public Date getEndDateOfReceived() {
-        return endDateOfReceived;
-    }
-
-    public void setEndDateOfReceived(Date endDateOfReceived) {
-        this.endDateOfReceived = endDateOfReceived;
-    }
-
     public Integer getInvoiceTypeId() {
         return invoiceTypeId;
     }
@@ -84,5 +67,13 @@ public class SearchTerm implements Serializable{
 
     public void setAuditStatus(Integer auditStatus) {
         this.auditStatus = auditStatus;
+    }
+
+    public DateRange getReceivedDateRange() {
+        return receivedDateRange;
+    }
+
+    public void setReceivedDateRange(DateRange receivedDateRange) {
+        this.receivedDateRange = receivedDateRange;
     }
 }

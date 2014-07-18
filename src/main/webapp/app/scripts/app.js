@@ -11,6 +11,10 @@ angular
         'ui.router',
         'ui.bootstrap',
         'ngDialog',
+        'ng-bootstrap3-datepicker',
+//        'ngBootstrap',
+        'daterangepicker',
+//        'dateRangePicker',
 //        'datatables',
 //        'ngTable',
         'LocalStorageModule'

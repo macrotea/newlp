@@ -114,48 +114,23 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceEntity findById(Long invoiceId) throws Exception {
 
-        List<InvoiceDetailEntity> list = jdbcDaoSupport.getJdbcTemplate().query("SELECT * ,j.remark as incDetailRemark,j.active as incDetailActive,m.name as materName,m.unit as materUnit,m.price as materPrice FROM INV_INVOICE i\n" +
-                "LEFT JOIN INV_INVOICE_TYPE t ON i.invoiceType_invoiceTypeId=t.invoiceTypeId \n" +
-                "LEFT JOIN INV_INVOICE_DETAIL j ON i.invoiceId=j.invoice_invoiceId \n" +
-                "LEFT JOIN PM_INC inc on i.inc_incId = inc.incId \n" +
-                "left join PM_CLIENT incClient on i.client_clientId = incClient.clientId\n" +
-                "left join MAT_MATERIAL m ON j.material_materialNum = m.materialNum \n" +
-                "WHERE i.invoiceId = ? and i.active = 1", new Object[]{invoiceId}, new RowMapper<InvoiceDetailEntity>() {
+
+        List<InvoiceDetailEntity> list = jdbcDaoSupport.getJdbcTemplate().query("SELECT\n" +
+                "\tj.*,\n" +
+                "\tj.remark AS incDetailRemark,\n" +
+                "\tj.active AS incDetailActive,\n" +
+                "\tm.name AS materName,\n" +
+                "\tm.unit AS materUnit,\n" +
+                "\tm.price AS materPrice\n" +
+                "FROM\n" +
+                "\tINV_INVOICE_DETAIL j\n" +
+                "LEFT JOIN INV_INVOICE i ON j.invoice_invoiceId = i.invoiceId\n" +
+                "LEFT JOIN MAT_MATERIAL m ON j.material_materialNum = m.materialNum\n" +
+                "WHERE\n" +
+                "\tj.invoice_invoiceId = ?\n" +
+                "AND j.active = 1 ", new Object[]{invoiceId}, new RowMapper<InvoiceDetailEntity>() {
             @Override
             public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
-                InvoiceEntity invoice = new InvoiceEntity();
-                invoice.setInvoiceId(rs.getLong("invoiceId"));
-                invoice.setInvoiceNum(rs.getString("invoiceNum"));
-                invoice.setCarNum(rs.getString("carNum"));
-                invoice.setSubmitDate(rs.getDate("submitDate"));
-                invoice.setClientAddress(rs.getString("clientAddress"));
-                invoice.setCreatedDate(rs.getDate("createdDate"));
-                invoice.setDeliveryDate(rs.getDate("deliveryDate"));
-                invoice.setRemark(rs.getString("remark"));
-                invoice.setReceivedDate(rs.getDate("receivedDate"));
-                invoice.setAuditStatus(rs.getInt("auditStatus"));
-                invoice.setActive(rs.getBoolean("active"));
-
-                IncEntity incEntity = new IncEntity();
-                incEntity.setIncId(rs.getLong("incId"));
-                incEntity.setIncName(rs.getString("incName"));
-                incEntity.setIncShortName(rs.getString("incShortName"));
-                invoice.setInc(incEntity);
-
-                ClientEntity clientEntity = new ClientEntity();
-                clientEntity.setClientId(rs.getLong("clientId"));
-                clientEntity.setClientName(rs.getString("clientName"));
-                clientEntity.setClientNum(rs.getString("clientNum"));
-                invoice.setClient(clientEntity);
-
-                InvoiceTypeEntity invoiceTypeEntity = new InvoiceTypeEntity();
-                invoiceTypeEntity.setInvoiceTypeId(rs.getLong("invoiceTypeId"));
-                invoiceTypeEntity.setType(rs.getInt("type"));
-                invoiceTypeEntity.setName(rs.getString("name"));
-                invoiceTypeEntity.setActive(rs.getBoolean("active"));
-                invoice.setInvoiceType(invoiceTypeEntity);
-
-                invoice.setInvoiceDetails(new HashSet<InvoiceDetailEntity>());
 
                 InvoiceDetailEntity invoiceDetailEntity = new InvoiceDetailEntity();
                 invoiceDetailEntity.setInvoiceDetailId(rs.getLong("invoiceDetailId"));
@@ -172,7 +147,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 invoiceDetailEntity.setPrice(rs.getBigDecimal("price"));
 
                 MaterialEntity materialEntity = new MaterialEntity();
-                materialEntity.setMaterialNum(rs.getString("materialNum"));
+                materialEntity.setMaterialNum(rs.getString("material_materialNum"));
                 materialEntity.setName(rs.getString("materName"));
                 materialEntity.setUnit(rs.getString("materUnit"));
                 materialEntity.setAuxiliaryUnitOne(rs.getString("auxiliaryUnitOne"));
@@ -181,12 +156,11 @@ public class InvoiceServiceImpl implements InvoiceService {
                 materialEntity.setConversionRateTwo(rs.getDouble("conversionRateTwo"));
                 materialEntity.setPrice(rs.getBigDecimal("materPrice"));
                 invoiceDetailEntity.setMaterial(materialEntity);
-                invoiceDetailEntity.setInvoice(invoice);
 
                 return invoiceDetailEntity;
             }
         });
-        InvoiceEntity invoiceEntity = jdbcDaoSupport.getJdbcTemplate().queryForObject("SELECT\n" +
+        InvoiceEntity invoice = jdbcDaoSupport.getJdbcTemplate().queryForObject("SELECT\n" +
                 "\t*\n" +
                 "\n" +
                 "FROM\n" +
@@ -197,7 +171,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "WHERE\n" +
                 "  \n" +
                 "\ti.invoiceId = ?\n" +
-                " AND i.active = 1\n" +
+                " AND i.active =1 \n" +
                 "\n", new Object[]{invoiceId}, new RowMapper<InvoiceEntity>() {
             @Override
             public InvoiceEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -236,15 +210,15 @@ public class InvoiceServiceImpl implements InvoiceService {
                 return invoice;
             }
         });
-        if (list != null) {
+        if (list.size() != 0) {
             Set<InvoiceDetailEntity> set = new HashSet<InvoiceDetailEntity>();
             set.addAll(list);
-            invoiceEntity.setInvoiceDetails(set);
+            invoice.setInvoiceDetails(set);
         }
-        return invoiceEntity;
+
+        return invoice;
 //        return  invoiceRepository.findOne(invoiceId);
     }
-
 
     /**
      *更新订单
@@ -354,7 +328,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "\t\tSELECT\n" +
                 "      ROW_NUMBER () OVER (ORDER BY i.invoiceId DESC) AS rowNum,\n" +
                 "\t\t\ti.invoiceId,\n" +
-//                "\t\t\ti.num,\n" +
+                "\t\t\ti.invoiceNum,\n" +
                 "\t\t\ti.auditStatus,\n" +
                 "      t.invoiceTypeId,\n" +
                 "\t\t\tt.name,\n" +
@@ -379,7 +353,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
                 InvoiceEntity invoice = new InvoiceEntity();
                 invoice.setInvoiceId(rs.getLong("invoiceId"));
-//                invoice.setNum(rs.getString("num"));
+                invoice.setInvoiceNum(rs.getString("invoiceNum"));
                 invoice.setCarNum(rs.getString("carNum"));
 //                invoice.setSubmitDate(rs.getDate("submitDate"));
 //                invoice.setClientAddress(rs.getString("clientAddress"));
@@ -502,13 +476,13 @@ public class InvoiceServiceImpl implements InvoiceService {
             sql+=" and i.client_clientId=?";
             objList.add(searchTerm.getClientId());
         }
-        if(searchTerm.getStartDateOfReceived()!=null){
+        if( null != searchTerm.getReceivedDateRange() && searchTerm.getReceivedDateRange().getStartDate()!=null){
             sql+=" and i.receivedDate>=?";
-            objList.add(new DateTime(searchTerm.getStartDateOfReceived()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+            objList.add(new DateTime(searchTerm.getReceivedDateRange().getStartDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
         }
-        if(searchTerm.getEndDateOfReceived()!=null){
+        if( null != searchTerm.getReceivedDateRange() && searchTerm.getReceivedDateRange().getEndDate()!=null){
             sql+=" and i.receivedDate<=?";
-            objList.add(new DateTime(searchTerm.getEndDateOfReceived()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+            objList.add(new DateTime(searchTerm.getReceivedDateRange().getEndDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
         }
         long dbCount=jdbcDaoSupport.getJdbcTemplate().queryForObject(countsql+sql,objList.toArray(),Long.class);
         int srart =pageable.getPageNumber()*pageable.getPageSize()+1;
@@ -553,23 +527,25 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Integer getPreAuditStatusByInvoiceId(Long invoiceId) {
-        final Integer[] preAuditStatus = {null};
+         Integer preAuditStatus = 50;
 
         InvoiceEntity invoiceEntity = invoiceRepository.findOne(invoiceId);
         Integer currentAuditStatus = invoiceEntity.getAuditStatus();
         List<OperationLogEntity> logEntities = logRepository.findByInvoiceIdAndAuditStatus(invoiceId, currentAuditStatus);
+
         for (OperationLogEntity e : logEntities) {
-            Matcher m = Pattern.compile("(\\d+)\\s+to\\s+\\d+").matcher(e.getDescription());
+            Matcher m = Pattern.compile("\\d+").matcher(e.getDescription());
             if (m.find()) {
-                Integer n = Integer.parseInt(m.group(1));
-                if(n < currentAuditStatus){
-                    preAuditStatus[0] = n;
+                Integer n = Integer.parseInt(m.group());
+                /* status less than 50 means created by customer-service- order*/
+                if(n < 50){
+                    preAuditStatus = 60;
                     break;
                 }
             }
         }
 
-        return preAuditStatus[0];
+        return preAuditStatus;
 
     }
 }

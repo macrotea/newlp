@@ -7,6 +7,11 @@ angular.module('newlpApp')
         Invoice.get({invoiceId: $stateParams.invoiceId}).$promise.then(function (invoice) {
             $scope.invoice = invoice;
         });
+
+        $scope.options = {
+            readOnly:true,
+            activeStatus:90
+        };
     })
 
     .controller('customerServiceConfirmReceivesController', function ($scope, $state) {
@@ -33,16 +38,21 @@ angular.module('newlpApp')
             $scope.invoice = invoice;
         });
 
-        $scope.submit = function () {
-            Invoice.patch({
-                invoiceId: $scope.invoice.invoiceId,
-                auditStatus: $scope.invoice.auditStatus
-            }).$promise.then(function (data) {
-                    console.log(data);
-                    $scope.success = true;
-                }, function (data) {
-                    $scope.error = true;
-                });
+        Invoice.getPreAuditStatusByInvoiceId({invoiceId: $stateParams.invoiceId},function(data) {
+            $scope.options.actions.sendBack.auditStatus = data.auditStatus;
+        });
+
+        $scope.options = {
+            actions:{
+                receive:{
+                    auditStatus:80
+                },
+                sendBack:{
+                    auditStatus:60
+                }
+            },
+            activeStatus:70,
+            readOnly:true
         };
     })
 
@@ -52,17 +62,23 @@ angular.module('newlpApp')
             $scope.invoice = invoice;
         });
 
-        $scope.submit = function () {
-            Invoice.patch({
-                invoiceId: $scope.invoice.invoiceId,
-                auditStatus: $scope.invoice.auditStatus
-            }).$promise.then(function (data) {
-                    console.log(data);
-                    $scope.success = true;
-                }, function (data) {
-                    $scope.error = true;
-                });
+        Invoice.getPreAuditStatusByInvoiceId({invoiceId: $stateParams.invoiceId},function(data) {
+            $scope.options.actions.sendBack.auditStatus = data.auditStatus;
+        });
+
+        $scope.options = {
+            actions:{
+                submit:{
+                    auditStatus:90
+                },
+                sendBack:{
+                    auditStatus:60
+                }
+            },
+            activeStatus:80,
+            readOnly:true
         };
+
     })
 
 
@@ -76,7 +92,8 @@ angular.module('newlpApp')
                     edit:function (invoiceId) {
                         $state.go('home.customer_service.confirm.edit', {invoiceId: invoiceId});
                     }
-                }
+                },
+                sendBackController: 'customerServiceConfirmSendBackConfirmCtrl'
             }
         };
     })
