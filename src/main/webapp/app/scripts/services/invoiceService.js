@@ -27,15 +27,13 @@ angular.module('newlpApp')
                 url: '/api/v1/invoices/search/auditStatus/:auditStatus',
                 method: 'GET',
                 params: {
-                    auditStatus: '@auditStatus',
-                    size:5
+                    auditStatus: '@auditStatus'
                 }
             },
             search: {
                 url: '/api/v1/invoices/search',
                 method: 'POST',
                 params: {
-                    size:5
                 },
                 isArray: false,
                 headers: {

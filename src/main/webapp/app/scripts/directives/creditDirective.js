@@ -26,13 +26,17 @@ angular.module('newlpApp')
                     $scope.pageSizes = [
                         {name: 20, value: 20},
                         {name: 50, value: 50},
-                        {name: 100, value: 100}
+                        {name: 100, value: 100},
+                        {name: 5,value:5}
                     ];
                     $scope.pageSize = $scope.pageSizes[0];
                     $scope.page = {};
                     $scope.page.number = 1;
                     $scope.page.size = $scope.pageSize.value;
+
+                    /*temp vars*/
                     var tmpSeqForNewCredit = 0;
+                    var tmpCreditIds = [];
 
 
                     $scope.daterangeOptions = {
@@ -108,7 +112,6 @@ angular.module('newlpApp')
                             Credit.save({}, creditUpdated).$promise.then(function (data) {
                                 credit.editable = false;/*hide edit*/
                                 credit.creditId=data.creditId - 0.00001;
-                                tmpSeqForNewCredit = tmpSeqForNewCredit -0.00001;
                                 data.validDateRange = {
                                     startDate: data.validDate,
                                     endDate:data.expiryDate
@@ -125,7 +128,25 @@ angular.module('newlpApp')
                     };
 
                     $scope.edit = function (credit) {
-                        var tmpCreditId = credit.creditId - 0.00001;
+
+                        if(!Math.round(credit.creditId)){
+                            return ;
+                        }
+
+                        var tmpCreditId = credit.creditId -0.00001;
+                        
+                        if(tmpCreditIds.indexOf(tmpCreditId) < 0){
+                            var obj = angular.copy(credit);
+                            obj.creditId = tmpCreditId;
+                            obj.editable =false;
+                            obj.validDateRange={
+                                startDate:obj.validDate,
+                                endDate:obj.expiryDate
+                            };
+                            $scope.data.content.push(obj);
+                            tmpCreditIds.push(tmpCreditId);
+                        }
+
                         toggleEditable(tmpCreditId);
                     };
 
@@ -135,7 +156,9 @@ angular.module('newlpApp')
 
                     $scope.add = function () {
                         var currentDate = moment().format();
-                        $scope.data.content[$scope.data.content.length] = {
+                        tmpSeqForNewCredit = tmpSeqForNewCredit -0.00001;
+
+                        var credit = {
                             'creditId':tmpSeqForNewCredit,
                             "type": 0,
                             "amount": 0,
@@ -154,6 +177,8 @@ angular.module('newlpApp')
                             },
                             editable: true
                         };
+
+                        $scope.data.content.push(credit);
                     };
 
                     $scope.remove = function (creditId) {
@@ -188,18 +213,18 @@ angular.module('newlpApp')
                         ).$promise.then(function (data) {
                                 $scope.data = data;
 
-                                var i =0;
-                                var len = $scope.data.content.length;
-                                for (; i < len; i++) {
-                                    var obj = angular.copy($scope.data.content[i]);
-                                    obj.creditId = obj.creditId -0.00001;
-                                    obj.editable =false;
-                                    obj.validDateRange={
-                                        startDate:obj.validDate,
-                                        endDate:obj.expiryDate
-                                    };
-                                    $scope.data.content.push(obj);
-                                }
+//                                var i =0;
+//                                var len = $scope.data.content.length;
+//                                for (; i < len; i++) {
+//                                    var obj = angular.copy($scope.data.content[i]);
+//                                    obj.creditId = obj.creditId -0.00001;
+//                                    obj.editable =false;
+//                                    obj.validDateRange={
+//                                        startDate:obj.validDate,
+//                                        endDate:obj.expiryDate
+//                                    };
+//                                    $scope.data.content.push(obj);
+//                                }
 
                                 $scope.loading = false;
                             }, function (data) {

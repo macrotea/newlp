@@ -22,7 +22,6 @@ angular.module('newlpApp')
                 url: '/api/v1/credits/search',
                 method: 'POST',
                 params: {
-                    size:5
                 },
                 isArray: false,
                 headers: {

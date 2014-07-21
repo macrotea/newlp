@@ -48,7 +48,8 @@ angular.module('newlpApp')
                     $scope.pageSizes = [
                         {name: 20, value: 20},
                         {name: 50, value: 50},
-                        {name: 100, value: 100}
+                        {name: 100, value: 100},
+                        {name: 5,value:5}
                     ];
                     $scope.pageSize = $scope.pageSizes[0];
                     $scope.page = {};

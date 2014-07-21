@@ -147,7 +147,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="credit in data.content | orderBy:'-creditId' | filter:searchText  track by credit.creditId"
+        <tr ng-repeat="credit in data.content | filter:searchText | orderBy:'-creditId'   track by credit.creditId"
             ng-class="{'animate-show':credit.editable != undefined}" ng-dblclick="edit(credit)"
             ng-show="credit.editable == undefined || credit.editable " ng-if="!loading" >
             <td ng-if='undefined  == credit.editable' ng-bind="credit.creditId"></td>

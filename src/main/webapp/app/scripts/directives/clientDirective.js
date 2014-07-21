@@ -24,7 +24,7 @@ angular.module('newlpApp')
 
                                 $scope.searchTerm = '';
                                 $scope.selected = [];
-                                client ? $scope.selected.push(client) : '';
+                                client &&  client.clientId ? $scope.selected.push(client) : '';
 
                                 $scope.searchTermChange = function (searchTerm) {
                                     $scope.searchTerm = searchTerm;
