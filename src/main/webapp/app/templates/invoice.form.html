@@ -146,7 +146,7 @@
                     <p class="form-control-static" ng-bind="invoice.remark"></p>
                 </div>
                 <div class="input-group col-xs-10 col-sm-5" ng-if="fields.remark.editable">
-                    <input class="form-control" type="text" ng-model="invoice.remark">
+                    <textarea class="autosize-transition form-control" rows="3" ng-model="invoice.remark"></textarea>
                 </div>
             </div>
         </div>
