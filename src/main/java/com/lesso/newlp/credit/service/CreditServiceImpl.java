@@ -112,11 +112,11 @@ public class CreditServiceImpl implements CreditService {
             objList.add(new DateTime(searchTerm.getInsertDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
         }
         if(null != searchTerm.getValidDateRange() && null != searchTerm.getValidDateRange().getStartDate()){
-            sql+=" and i.validDate = ?";
+            sql+=" and i.validDate >= ?";
             objList.add(new DateTime(searchTerm.getValidDateRange().getStartDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
         }
         if(null != searchTerm.getValidDateRange() && null != searchTerm.getValidDateRange().getEndDate()){
-            sql+=" and i.expiryDate = ?";
+            sql+=" and i.validDate <= ?";
             objList.add(new DateTime(searchTerm.getValidDateRange().getEndDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
         }
         if(searchTerm.getDescription()!=null){
