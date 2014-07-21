@@ -129,7 +129,7 @@ angular.module('newlpApp')
 
                     $scope.edit = function (credit) {
 
-                        if(!Math.round(credit.creditId)){
+                        if(!Math.round(credit.creditId) || (typeof credit.creditId== "number" && isFinite(credit.creditId) && credit.creditId%1 != 0)){
                             return ;
                         }
 
