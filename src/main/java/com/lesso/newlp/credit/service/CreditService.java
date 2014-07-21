@@ -20,4 +20,5 @@ public interface CreditService {
 
     Page<CreditEntity> search(SearchTerm searchTerm, Pageable pageable);
 
+    CreditEntity patch(Long creditId, CreditEntity credit);
 }

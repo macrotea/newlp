@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Sean on 7/3/2014.
@@ -67,8 +68,7 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public CreditEntity update(CreditEntity creditEntity) {
-        jdbcDaoSupport.getJdbcTemplate().update("update CRE_CREDIT set amount=?,percent_=?,creditAmount=?,description=?,type=?,client_clientId=?",
-                new  Object[]{creditEntity.getAmount(),creditEntity.getPercent(),creditEntity.getCreditAmount(),creditEntity.getDescription(),creditEntity.getType(),creditEntity.getClient().getClientId()});
+        creditEntity = creditRepository.saveAndFlush(creditEntity);
         return  creditEntity;
     }
 
@@ -111,13 +111,13 @@ public class CreditServiceImpl implements CreditService {
             sql+=" and i.insertDate = ?";
             objList.add(new DateTime(searchTerm.getInsertDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
         }
-        if(searchTerm.getValidDate()!=null){
+        if(null != searchTerm.getValidDateRange() && null != searchTerm.getValidDateRange().getStartDate()){
             sql+=" and i.validDate = ?";
-            objList.add(new DateTime(searchTerm.getValidDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+            objList.add(new DateTime(searchTerm.getValidDateRange().getStartDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
         }
-        if(searchTerm.getExpiryDate()!=null){
+        if(null != searchTerm.getValidDateRange() && null != searchTerm.getValidDateRange().getEndDate()){
             sql+=" and i.expiryDate = ?";
-            objList.add(new DateTime(searchTerm.getExpiryDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+            objList.add(new DateTime(searchTerm.getValidDateRange().getEndDate()).toString("yyyy-MM-dd HH:mm:ss.SSS"));
         }
         if(searchTerm.getDescription()!=null){
             sql+=" and i.description = ?";
@@ -154,5 +154,46 @@ public class CreditServiceImpl implements CreditService {
         long dbCount=jdbcDaoSupport.getJdbcTemplate().queryForObject("SELECT count(DISTINCT a.rowNum) FROM( "+sql+" )a",objList.toArray(), Long.class);
         return new PageImpl<CreditEntity>(creditEntityList,pageable,dbCount);
 
+    }
+
+    @Override
+    public CreditEntity patch(Long creditId, CreditEntity credit) {
+        CreditEntity creditEntity = creditRepository.findOne(creditId);
+
+        if (!Objects.isNull(credit.getClient())) {
+            creditEntity.setClient(credit.getClient());
+        }
+
+        if (!Objects.isNull(credit.getValidDate())) {
+            creditEntity.setValidDate(credit.getValidDate());
+        }
+
+        if (!Objects.isNull(credit.getExpiryDate())) {
+            creditEntity.setExpiryDate(credit.getExpiryDate());
+        }
+
+        if (!Objects.isNull(credit.getType())) {
+            creditEntity.setType(credit.getType());
+        }
+
+        if (!Objects.isNull(credit.getDescription())) {
+            creditEntity.setDescription(credit.getDescription());
+        }
+
+        if (!Objects.isNull(credit.getAmount())) {
+            creditEntity.setAmount(credit.getAmount());
+        }
+
+        if (!Objects.isNull(credit.getPercent())) {
+            creditEntity.setPercent(credit.getPercent());
+        }
+
+        if (!Objects.isNull(credit.getCreditAmount())) {
+            creditEntity.setCreditAmount(credit.getCreditAmount());
+        }
+
+        credit = creditRepository.save(creditEntity);
+
+        return credit;
     }
 }

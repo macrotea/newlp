@@ -5,7 +5,7 @@ angular.module('newlpApp')
     .directive({
         "creditManagementForm": function () {
             return {
-                templateUrl: 'templates/credit.management.form.html',
+                templateUrl: 'templates/credit.datatable.html',
                 restrict: 'AE',
                 scope: {
                     options: '=options'
@@ -32,42 +32,30 @@ angular.module('newlpApp')
                     $scope.page = {};
                     $scope.page.number = 1;
                     $scope.page.size = $scope.pageSize.value;
-                    $scope.searchTerm = {
-                        auditStatus: $scope.options.criteria.auditStatus
-                    };
+                    var tmpSeqForNewCredit = 0;
 
-                    //default search
-                    $scope.queryAll = function () {
-                        $scope.loading = true;
-                        Credit.queryAll({
-                                page: $scope.page.number - 1,
-                                size: $scope.page.size
-                            },
-                            function (data) {
-                                $scope.data = data;
-                                $scope.originalContent = angular.copy(data.content);
-                                $scope.loading = false;
-                            });
-                    };
 
-                    //criteria search
-                    $scope.search = function () {
-                        if (_.isDate($scope.searchTerm.expiryDate)) {
-                            $scope.searchTerm.expiryDate = moment($scope.searchTerm.expiryDate).add('hours', 23).add('minutes', 59).add('seconds', 59).format();
+                    $scope.daterangeOptions = {
+                        locale: {
+                            fromLabel:'开始日期',
+                            toLabel:'结束日期',
+                            applyLabel:'确定',
+                            cancelLabel: '取消'
                         }
+                    };
+                    $scope.showDateRange = function (e) {
+                        var datePickerElem = angular.element(e.currentTarget).siblings('.date-picker');
+                        if(datePickerElem.length > 0){
+                            e.preventDefault();
+                            e.stopPropagation();
+                            datePickerElem.trigger('click')
+                        }
+                    };
 
-                        Credit.search({
-                                page: $scope.page.number - 1,
-                                size: $scope.page.size
-                            }, $scope.searchTerm
-                        ).$promise.then(function (data) {
-                                $scope.data = data;
-                                $scope.originalContent = angular.copy(data.content);
-                                $scope.loading = false;
-                            }, function (data) {
-                                $scope.loading = false;
-                                $scope.error = true;
-                            });
+
+                    $scope.onPageSizeChange = function () {
+                        $scope.page.size = $scope.pageSize.value;
+                        $scope.onPageChanged();
                     };
 
                     //handle form action
@@ -83,60 +71,83 @@ angular.module('newlpApp')
                         }
                     };
 
-                    var rollback = function (credit, $index) {
-                        $scope.originalContent.forEach(function (o) {
-                            if (o.creditId == credit.creditId) {
-                                for (var i = 0; i < $scope.data.content.length; ++i) {
-                                    if (o.creditId == $scope.data.content[i].creditId) {
-                                        $scope.data.content[i] = angular.copy(o);
-                                    }
+                    $scope.save = function (credit) {
+
+                        var creditUpdated = angular.copy(credit);
+                        creditUpdated.creditId = Math.round(credit.creditId);
+                        creditUpdated.validDate= credit.validDateRange.startDate;
+                        creditUpdated.expiryDate=credit.validDateRange.endDate;
+
+                        if(Math.round(credit.creditId)){
+
+                            /*find creditTmp idx*/
+                            var idx = undefined;
+                            for (var i = 0; i < $scope.data.content.length; i++) {
+                                var obj = $scope.data.content[i];
+                                if(obj.creditId == creditUpdated.creditId){
+                                    idx = i;
+                                    break;
                                 }
                             }
-                        });
-                    };
 
-                    $scope.update = function (credit, $index) {
-                        if (credit.creditId) {
-                            Credit.patch({
-                                creditId: credit.creditId
-                            }, credit).$promise.then(function (data) {
-                                    console.log(data);
+                            /*update credit*/
+                            Credit.update({
+                                creditId: creditUpdated.creditId
+                            }, creditUpdated).$promise.then(function (data) {
+                                    credit.editable = false;/*hide edit*/
+                                    data.validDateRange = credit.validDateRange;
+                                    $scope.data.content[idx] = data;
                                     $scope.success = true;
                                 }, function (data) {
-                                    rollback(credit.creditId);
                                     $scope.error = true;
                                 });
-                        } else {
-                            Credit.save({}, credit).$promise.then(function (data) {
-                                console.log(data);
-                                $scope.data.content[$index] = data;
+                        }else{
+
+                            /*save credit*/
+                            creditUpdated.creditId = undefined;
+                            Credit.save({}, creditUpdated).$promise.then(function (data) {
+                                credit.editable = false;/*hide edit*/
+                                credit.creditId=data.creditId - 0.00001;
+                                tmpSeqForNewCredit = tmpSeqForNewCredit -0.00001;
+                                data.validDateRange = {
+                                    startDate: data.validDate,
+                                    endDate:data.expiryDate
+                                };
+                                $scope.data.content.push(data);
+                                ++$scope.data.page.totalElements;
+
                                 $scope.success = true;
                             }, function (data) {
-                                rollback(credit.creditId);
                                 $scope.error = true;
                             });
                         }
 
                     };
 
-                    $scope.cancel = function (credit, $index) {
-                        if (credit.creditId) {
-                            rollback(credit, $index);
-                        } else {
-                           $scope.data.content.splice($index,1);
-                        }
+                    $scope.edit = function (credit) {
+                        var tmpCreditId = credit.creditId - 0.00001;
+                        toggleEditable(tmpCreditId);
+                    };
+
+                    $scope.cancel = function(credit){
+                        toggleEditable(credit.creditId);
                     };
 
                     $scope.add = function () {
-
+                        var currentDate = moment().format();
                         $scope.data.content[$scope.data.content.length] = {
+                            'creditId':tmpSeqForNewCredit,
                             "type": 0,
                             "amount": 0,
                             "percent": 0.1,
                             "creditAmount": 0,
-                            "insertDate": moment().format(),
-                            "validDate": moment().format(),
-                            "expiryDate": moment().format(),
+                            "insertDate": currentDate,
+                            "validDate": currentDate,
+                            "expiryDate": currentDate,
+                            validDateRange:{
+                                startDate: currentDate,
+                                endDate:currentDate
+                            },
                             "description": '',
                             "client": {
                                 "clientId": undefined
@@ -156,10 +167,47 @@ angular.module('newlpApp')
                     };
 
 
-                    $scope.onPageSizeChange = function () {
-                        $scope.page.size = $scope.pageSize.value;
-                        $scope.onPageChanged();
+                    var toggleEditable = function (creditId) {
+                        for (var i = 0; i < $scope.data.content.length; i++) {
+                            var obj = $scope.data.content[i];
+                            if(obj.creditId == creditId){
+                                obj.editable = !obj.editable;
+                                break;
+                            }
+                        }
                     };
+
+
+                    //criteria search
+                    $scope.search = function () {
+
+                        Credit.search({
+                                page: $scope.page.number - 1,
+                                size: $scope.page.size
+                            }, $scope.searchTerm
+                        ).$promise.then(function (data) {
+                                $scope.data = data;
+
+                                var i =0;
+                                var len = $scope.data.content.length;
+                                for (; i < len; i++) {
+                                    var obj = angular.copy($scope.data.content[i]);
+                                    obj.creditId = obj.creditId -0.00001;
+                                    obj.editable =false;
+                                    obj.validDateRange={
+                                        startDate:obj.validDate,
+                                        endDate:obj.expiryDate
+                                    };
+                                    $scope.data.content.push(obj);
+                                }
+
+                                $scope.loading = false;
+                            }, function (data) {
+                                $scope.loading = false;
+                                $scope.error = true;
+                            });
+                    };
+
 
                     //reset
                     $scope.reset = function () {

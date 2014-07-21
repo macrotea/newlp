@@ -261,22 +261,10 @@ angular
                 url: '/credit'
             })
             .state('home.credit.management', {
-                abstract: true,
-                url: '/management'
-            })
-            .state('home.credit.management.balance', {
-                url: '/balance',
+                url: '/management',
                 views: {
                     '@home': {
-                        templateUrl: 'views/credit.management.balance.html'
-                    }
-                }
-            })
-            .state('home.credit.management.temp', {
-                url: '/temp',
-                views: {
-                    '@home': {
-                        templateUrl: 'views/credit.management.temp.html'
+                        templateUrl: 'views/credit.management.html'
                     }
                 }
             })

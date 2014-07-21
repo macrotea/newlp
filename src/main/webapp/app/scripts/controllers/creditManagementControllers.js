@@ -21,6 +21,7 @@ angular.module('newlpApp')
                     return credit.creditId != $scope.$parent.creditIdToRemove;
                 });
                 $scope.$parent.creditIdToRemove = undefined;
+                --$scope.$parent.data.page.totalElements;
                 $scope.closeThisDialog();
             });
         };

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
+import java.math.BigDecimal;
 
 /**
  * Created by Sean on 6/19/2014.
@@ -48,6 +48,15 @@ public class CreditController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<CreditEntity> add(@RequestBody CreditEntity credit, BindingResult result) {
+
+        credit.setCreditId(null);
+        if(0 == credit.getType()){
+            credit.setCreditAmount(credit.getAmount().multiply(new BigDecimal(credit.getPercent())));
+        }else{
+            credit.setAmount(null);
+            credit.setPercent(null);
+        }
+
         credit = creditService.save(credit);
         return new ResponseEntity<>(credit, HttpStatus.OK);
     }
@@ -61,6 +70,16 @@ public class CreditController {
 
     @RequestMapping(value = "/{creditId}", method = RequestMethod.PUT)
     public ResponseEntity<CreditEntity> update(@RequestBody CreditEntity credit, @PathVariable("creditId") Long creditId) throws InvocationTargetException, IllegalAccessException {
+
+
+        credit.setCreditId(creditId);
+        if(0 == credit.getType()){
+            credit.setCreditAmount(credit.getAmount().multiply(new BigDecimal(credit.getPercent())));
+        }else{
+            credit.setAmount(null);
+            credit.setPercent(null);
+        }
+
         credit = creditService.update(credit);
         return new ResponseEntity<>(credit, HttpStatus.OK);
     }
@@ -68,41 +87,14 @@ public class CreditController {
     @RequestMapping(value = "/{creditId}", method = RequestMethod.PATCH)
     public ResponseEntity<CreditEntity> patch(@RequestBody CreditEntity credit, @PathVariable("creditId") Long creditId) throws InvocationTargetException, IllegalAccessException {
 
-        CreditEntity creditEntity = creditRepository.findOne(creditId);
-
-        if (!Objects.isNull(credit.getClient())) {
-            creditEntity.setClient(credit.getClient());
+        if(0 == credit.getType()){
+            credit.setCreditAmount(credit.getAmount().multiply(new BigDecimal(credit.getPercent())));
+        }else{
+            credit.setAmount(null);
+            credit.setPercent(null);
         }
 
-        if (!Objects.isNull(credit.getValidDate())) {
-            creditEntity.setValidDate(credit.getValidDate());
-        }
-
-        if (!Objects.isNull(credit.getExpiryDate())) {
-            creditEntity.setExpiryDate(credit.getExpiryDate());
-        }
-
-        if (!Objects.isNull(credit.getType())) {
-            creditEntity.setType(credit.getType());
-        }
-
-        if (!Objects.isNull(credit.getDescription())) {
-            creditEntity.setDescription(credit.getDescription());
-        }
-
-        if (!Objects.isNull(credit.getAmount())) {
-            creditEntity.setAmount(credit.getAmount());
-        }
-
-        if (!Objects.isNull(credit.getPercent())) {
-            creditEntity.setPercent(credit.getPercent());
-        }
-
-        if (!Objects.isNull(credit.getCreditAmount())) {
-            creditEntity.setCreditAmount(credit.getCreditAmount());
-        }
-
-        credit = creditRepository.save(creditEntity);
+         credit = creditService.patch(creditId,credit);
 
         return new ResponseEntity<>(credit, HttpStatus.OK);
     }

@@ -1,6 +1,7 @@
 package com.lesso.newlp.credit.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.lesso.newlp.core.modal.DateRange;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -20,8 +21,7 @@ public class SearchTerm implements Serializable{
     Double percent;                                   //百分比
     BigDecimal creditAmount;                //信用金额
     Date insertDate;
-    Date validDate;
-    Date expiryDate;
+    DateRange validDateRange; //交货日期
     String description;
 
     public Long getClientId() {
@@ -88,27 +88,19 @@ public class SearchTerm implements Serializable{
         this.insertDate = insertDate;
     }
 
-    public Date getValidDate() {
-        return validDate;
-    }
-
-    public void setValidDate(Date validDate) {
-        this.validDate = validDate;
-    }
-
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Date expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public DateRange getValidDateRange() {
+        return validDateRange;
+    }
+
+    public void setValidDateRange(DateRange validDateRange) {
+        this.validDateRange = validDateRange;
     }
 }
