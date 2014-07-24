@@ -77,31 +77,61 @@ angular.module('newlpApp')
                     //default search
                     $scope.queryByAuditStatus = function () {
                         $scope.loading = true;
-                        Invoice.queryByAuditStatus({
-                                page: $scope.page.number - 1,
-                                size: $scope.page.size,
-                                auditStatus: $scope.options.criteria.auditStatus
-                            },
-                            function (data) {
-                                $scope.data = data;
-                                $scope.loading = false;
-                            });
+
+                        if($scope.options.criteria.auditedStatus){
+                            Invoice.queryByOriginalAuditStatus({
+                                    page: $scope.page.number - 1,
+                                    size: $scope.page.size,
+                                    auditedStatus: $scope.options.criteria.auditedStatus
+                                },
+                                function (data) {
+                                    $scope.data = data;
+                                    $scope.loading = false;
+                                });
+                        }else{
+                            Invoice.queryByAuditStatus({
+                                    page: $scope.page.number - 1,
+                                    size: $scope.page.size,
+                                    auditStatus: $scope.options.criteria.auditStatus
+                                },
+                                function (data) {
+                                    $scope.data = data;
+                                    $scope.loading = false;
+                                });
+                        }
+
+
                     };
 
                     //criteria search
                     $scope.search = function () {
+                        if($scope.options.criteria.auditedStatus) {
+                            Invoice.searchByOriginalAuditStatus({
+                                    page: $scope.page.number - 1,
+                                    size: $scope.page.size,
+                                    auditedStatus:$scope.options.criteria.auditedStatus
+                                }, $scope.searchTerm
+                            ).$promise.then(function (data) {
+                                    $scope.data = data;
+                                    $scope.loading = false;
+                                }, function (data) {
+                                    $scope.loading = false;
+                                    $scope.error = true;
+                                });
+                        }else{
+                            Invoice.search({
+                                    page: $scope.page.number - 1,
+                                    size: $scope.page.size
+                                }, $scope.searchTerm
+                            ).$promise.then(function (data) {
+                                    $scope.data = data;
+                                    $scope.loading = false;
+                                }, function (data) {
+                                    $scope.loading = false;
+                                    $scope.error = true;
+                                });
+                        }
 
-                        Invoice.search({
-                                page: $scope.page.number - 1,
-                                size: $scope.page.size
-                            }, $scope.searchTerm
-                        ).$promise.then(function (data) {
-                                $scope.data = data;
-                                $scope.loading = false;
-                            }, function (data) {
-                                $scope.loading = false;
-                                $scope.error = true;
-                            });
                     };
 
                     //handle form action
@@ -160,6 +190,7 @@ angular.module('newlpApp')
 
                     $scope.options = $scope.options ? $scope.options : {};
                     $scope.options.fields = $scope.options.fields ? $scope.options.fields : {};
+                    $scope.options.actions = $scope.options.actions ? $scope.options.actions : {};
                     $scope.fields = $scope.options.fields ? $scope.options.fields : {};
                     $scope.fields.orderCount = $scope.options.fields.orderCount ? $scope.options.fields.orderCount : {};
                     $scope.fields.deliveryCount = $scope.options.fields.deliveryCount ? $scope.options.fields.deliveryCount : {};
@@ -182,6 +213,7 @@ angular.module('newlpApp')
 
                         Material.findByNameOrNumLike({
                             page: $scope.currentPage - 1,
+                            size: 10,
                             searchTerm: $scope.searchTerm
                         }, {}, function (data) {
                             $scope.loading = false;
@@ -201,7 +233,7 @@ angular.module('newlpApp')
                             }
                         });
 
-                        if (notExist) {
+                        if (notExist && 20 > $scope.invoiceDetails.length) {
                             var invoiceDetail = {};
                             invoiceDetail.orderCount = 1;
                             invoiceDetail.deliveryCount = invoiceDetail.orderCount;
@@ -253,6 +285,7 @@ angular.module('newlpApp')
 
                     $scope.options = $scope.options ? $scope.options : {};
                     $scope.options.fields = $scope.options.fields ? $scope.options.fields : {};
+                    $scope.options.actions = $scope.options.actions ? $scope.options.actions : {};
                     $scope.fields = $scope.options.fields ? $scope.options.fields : {};
                     $scope.fields.inc = $scope.fields.inc ? $scope.fields.inc : {};
                     $scope.fields.client = $scope.fields.client ? $scope.fields.client : {};
@@ -386,7 +419,7 @@ angular.module('newlpApp')
                 link: function (scope, element, attrs, ctrl) {
                     scope.$watch(attrs['invoice'],function(){
                         if(scope.invoice){
-                            scope.success = scope.options.activeStatus != scope.invoice.auditStatus;
+                            scope.success = scope.options.activeStatus &&  scope.options.activeStatus != scope.invoice.auditStatus;
                         }
                     });
 
@@ -403,5 +436,24 @@ angular.module('newlpApp')
             };
         }
     })
+
+    .directive('carnum', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elm, attrs, ctrl) {
+                ctrl.$parsers.unshift(function(viewValue) {
+                    if (/^[\u4e00-\u9fa5]{1}[A-Z]{1}[A-Z_0-9]{5}$/.test(viewValue)) {
+                        // it is valid
+                        ctrl.$setValidity('carNum', true);
+                        return viewValue;
+                    } else {
+                        // it is invalid, return undefined (no model update)
+                        ctrl.$setValidity('carNum', false);
+                        return undefined;
+                    }
+                });
+            }
+        };
+    });
 ;
 

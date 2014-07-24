@@ -1,5 +1,6 @@
 package com.lesso.newlp.api.v1.invoice.controller;
 
+import com.lesso.newlp.auth.model.CurrentUser;
 import com.lesso.newlp.invoice.entity.InvoiceEntity;
 import com.lesso.newlp.invoice.model.SearchTerm;
 import com.lesso.newlp.invoice.repository.InvoiceRepository;
@@ -18,13 +19,11 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
@@ -67,7 +66,7 @@ public class InvoiceController {
     @SuppressWarnings("unchecked")
     public ResponseEntity<PagedResources<InvoiceEntity>> get(Model model, Pageable pageable, PagedResourcesAssembler assembler) {
         Page<InvoiceEntity> invoiceEntities = invoiceRepository.findAll(pageable);
-        return new ResponseEntity<>(assembler.toResource(invoiceEntities), HttpStatus.OK);
+        return new ResponseEntity<PagedResources<InvoiceEntity>>(assembler.toResource(invoiceEntities), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -106,28 +105,49 @@ public class InvoiceController {
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @SuppressWarnings("unchecked")
-    public ResponseEntity<PagedResources<InvoiceEntity>> search(Model model, Pageable pageable, PagedResourcesAssembler assembler, @RequestBody SearchTerm searchTerm) {
-        Page<InvoiceEntity> invoiceEntities = invoiceService.search(searchTerm, pageable);
-//        Page<InvoiceEntity> invoiceEntities = invoiceRepository.queryByAuditStatus(auditStatus, pageable);
+    public ResponseEntity<PagedResources<InvoiceEntity>> search(Model model,@CurrentUser User user , Pageable pageable, PagedResourcesAssembler assembler, @RequestBody(required = false) SearchTerm searchTerm, Integer auditedStatus ) {
+        Page<InvoiceEntity> invoiceEntities;
+        if(null == auditedStatus){
+             invoiceEntities = invoiceService.search(searchTerm, pageable, user.getUsername());
+        }else{
+            invoiceEntities = invoiceService.searchByOriginalAuditStatus(searchTerm,auditedStatus, pageable, user.getUsername());
+        }
         return new ResponseEntity<PagedResources<InvoiceEntity>>(assembler.toResource(invoiceEntities), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/search/auditStatus/{auditStatuses}", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
-    public ResponseEntity<PagedResources<InvoiceEntity>> searchByAuditStatus(Model model, Pageable pageable, PagedResourcesAssembler assembler, @PathVariable("auditStatuses") String[] auditStatuses) {
+    public ResponseEntity<PagedResources<InvoiceEntity>> searchByAuditStatus(Model model,@CurrentUser User user, Pageable pageable, PagedResourcesAssembler assembler, @PathVariable("auditStatuses") String[] auditStatuses,Integer auditedStatus) {
 
 
         Page<InvoiceEntity> invoiceEntities;
-        final long[] total = {0};
-        List<InvoiceEntity> invoices = new ArrayList<InvoiceEntity>();
 
-        for (String auditStatus : auditStatuses) {
-            invoiceEntities = invoiceService.queryByAuditStatus(Integer.valueOf(auditStatus), pageable);
-            invoices.addAll(invoiceEntities.getContent());
-            total[0] += invoiceEntities.getTotalElements();
+        if(null == auditedStatus){
+            final long[] total = {0};
+            List<InvoiceEntity> invoices = new ArrayList<InvoiceEntity>();
+
+            for (String auditStatus : auditStatuses) {
+                invoiceEntities = invoiceService.queryByAuditStatus(Integer.valueOf(auditStatus), user.getUsername(),pageable);
+                invoices.addAll(invoiceEntities.getContent());
+                total[0] += invoiceEntities.getTotalElements();
+            }
+
+            invoiceEntities = new PageImpl(invoices, pageable, total[0]);
+
+        }else{
+            invoiceEntities = invoiceService.searchByOriginalAuditStatuses(auditedStatus, user.getUsername(), pageable);
         }
 
-        invoiceEntities = new PageImpl(invoices, pageable, total[0]);
+
+        return new ResponseEntity<PagedResources<InvoiceEntity>>(assembler.toResource(invoiceEntities), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/search/audited/auditStatus/{auditedStatus}", method = RequestMethod.GET)
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<PagedResources<InvoiceEntity>> searchByOriginalAuditStatus(Model model,@CurrentUser User user, Pageable pageable, PagedResourcesAssembler assembler,@PathVariable("auditedStatus") Integer auditedStatus) {
+
+
+        Page<InvoiceEntity> invoiceEntities = invoiceService.searchByOriginalAuditStatuses(auditedStatus, user.getUsername(), pageable);
 
         return new ResponseEntity<PagedResources<InvoiceEntity>>(assembler.toResource(invoiceEntities), HttpStatus.OK);
     }

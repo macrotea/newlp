@@ -78,11 +78,16 @@ public class CreditServiceImpl implements CreditService {
     }
 
     @Override
-    public Page<CreditEntity> search(SearchTerm searchTerm, Pageable pageable) {
-        String sql = "select *, ROW_NUMBER () OVER (ORDER BY i.creditId DESC) AS rowNum from CRE_CREDIT i\n" +
+    public Page<CreditEntity> search(SearchTerm searchTerm, Pageable pageable, String memberId) {
+        String sql = "select i.creditId,i.active,p.clientId,p.clientName,p.clientNum,i.validDate,i.expiryDate,i.insertDate,i.type,i.description, \n" +
+                "i.amount,i.percent_,i.creditAmount,\n" +
+                "ROW_NUMBER () OVER (ORDER BY i.creditId DESC) AS rowNum from CRE_CREDIT i\n" +
                 "left join PM_CLIENT p on i.client_clientId = p.clientId\n" +
-                "where i.active =1 ";
+                "left join PM_CLIENT_MEMBER_REL clim on clim.client_clientId = i.client_clientId where i.active =1 and clim.member_memberId = ?";
         List<Object> objList=new ArrayList<Object>();
+
+        objList.add(memberId);
+
         if(searchTerm.getClientId() !=null){
             sql+=" and i.client_clientId = ?";
             objList.add(searchTerm.getClientId());

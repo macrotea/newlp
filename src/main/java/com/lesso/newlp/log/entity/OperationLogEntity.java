@@ -17,9 +17,11 @@ public class OperationLogEntity extends AbstractTimestampEntity implements Seria
     Long operationLogId;
     Date operationDate;
     String entity;
+    String type;
     Long relId;
     Long incId;
     String memberId;
+    @Column(columnDefinition = "TEXT")
     String description;
 
     public Long getOperationLogId() {
@@ -44,6 +46,14 @@ public class OperationLogEntity extends AbstractTimestampEntity implements Seria
 
     public void setEntity(String entity) {
         this.entity = entity;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getMemberId() {

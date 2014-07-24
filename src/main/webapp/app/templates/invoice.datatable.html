@@ -114,105 +114,110 @@
                 </div>
             </div>
 
-            <table class="table table-striped table-bordered table-hover dataTable">
-                <thead>
-                <tr role="row">
-                    <th>单据类型</th>
-                    <th>单号</th>
-                    <th>公司</th>
-                    <th>客户</th>
-                    <th>
-                        <i class="ace-icon fa fa-clock-o bigger-110 hidden-480"></i>
-                        单据日期
-                    </th>
-                    <th>车号</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover dataTable">
+                    <thead>
+                    <tr role="row">
+                        <th>单据类型</th>
+                        <th>单号</th>
+                        <th>公司</th>
+                        <th>客户</th>
+                        <th>
+                            <i class="ace-icon fa fa-clock-o bigger-110 hidden-480"></i>
+                            单据日期
+                        </th>
+                        <th>车号</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
 
-                <tbody>
-                <tr ng-repeat="invoice in data.content | filter:searchText track by invoice.invoiceId " ng-dblclick="rowDblClick(invoice.invoiceId)"  ng-if="!loading">
-                    <td>
+                    <tbody>
+                    <tr ng-repeat="invoice in data.content | filter:searchText track by invoice.invoiceId " ng-dblclick="rowDblClick(invoice.invoiceId)"  ng-if="!loading">
+                        <td>
                         <span class="label label-sm label-success arrowed arrowed-righ"
                               ng-if="invoice.invoiceType.type ==0" ng-bind="invoice.invoiceType.name"></span>
                         <span class="label label-sm label-info arrowed arrowed-in" ng-if="invoice.invoiceType.type ==1"
                               ng-bind="invoice.invoiceType.name"></span>
-                    </td>
-                    <td ng-bind="invoice.invoiceNum"></td>
-                    <td ng-bind="invoice.inc.incName">/td>
-                    <td ng-bind="invoice.client.clientName">/td>
-                    <td ng-bind="invoice.receivedDate | date:'yyyy-MM-dd'">/td>
-                    <td ng-bind="invoice.carNum">/td>
-                    <td>
-                        <div class="hidden-sm hidden-xs action-buttons">
-                            <a class="green" title="修改" href="javascript:;"  ng-click="edit(invoice.invoiceId)" ng-if="edit">
-                                <i class="ace-icon fa fa-pencil bigger-130"></i>
-                            </a>
+                        </td>
+                        <td ng-bind="invoice.invoiceNum"></td>
+                        <td ng-bind="invoice.inc.incName">/td>
+                        <td ng-bind="invoice.client.clientName">/td>
+                        <td ng-bind="invoice.receivedDate | date:'yyyy-MM-dd'">/td>
+                        <td ng-bind="invoice.carNum">/td>
+                        <td>
+                            <div class="hidden-sm hidden-xs action-buttons">
+                                <a class="green" title="修改" href="javascript:;"  ng-click="edit(invoice.invoiceId)" ng-if="edit">
+                                    <i class="ace-icon fa fa-pencil bigger-130"></i>
+                                </a>
 
-                            <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)" ng-if="enableSendBack">
-                                <i class="ace-icon fa fa-reply bigger-130"></i>
-                            </a>
+                                <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)" ng-if="enableSendBack">
+                                    <i class="ace-icon fa fa-reply bigger-130"></i>
+                                </a>
 
-                            <a class="red" href="javascript:;" title="删除" ng-click="remove(invoice.invoiceId)" ng-if="enableRemove">
-                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
-                            </a>
+                                <a class="red" href="javascript:;" title="删除" ng-click="remove(invoice.invoiceId)" ng-if="enableRemove">
+                                    <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                                </a>
 
-                            <a class="blue" href="javascript:;" title="查看" ng-click="view(invoice.invoiceId)" ng-if="view">
-                                <i class="ace-icon fa fa-search-plus bigger-130"></i>
-                            </a>
-                        </div>
+                                <a class="blue" href="javascript:;" title="查看" ng-click="view(invoice.invoiceId)" ng-if="view">
+                                    <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                                </a>
+                            </div>
 
-                        <div class="hidden-md hidden-lg">
-                            <div class="inline position-relative">
-                                <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown"
-                                        data-position="auto">
-                                    <i class="ace-icon fa fa-caret-down icon-only bigger-120"></i>
-                                </button>
+                            <div class="hidden-md hidden-lg">
+                                <div class="inline position-relative">
+                                    <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown"
+                                            data-position="auto">
+                                        <i class="ace-icon fa fa-caret-down icon-only bigger-120"></i>
+                                    </button>
 
-                                <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
-                                    <li ng-if="edit">
-                                        <a  class="tooltip-success" title="修改"  href="javascript:;"  ng-click="edit(invoice.invoiceId)">
+                                    <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+                                        <li ng-if="edit">
+                                            <a  class="tooltip-success" title="修改"  href="javascript:;"  ng-click="edit(invoice.invoiceId)">
 																			<span class="green">
 																				<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>
 																			</span>
-                                        </a>
-                                    </li>
+                                            </a>
+                                        </li>
 
-                                    <li ng-if="sendBack">
-                                        <a class="tooltip-error" title="退回" href="javascript:;" ng-click="sendBack(invoice.invoiceId)">
+                                        <li ng-if="sendBack">
+                                            <a class="tooltip-error" title="退回" href="javascript:;" ng-click="sendBack(invoice.invoiceId)">
 																			<span class="red">
 																				<i class="ace-icon fa fa-reply bigger-120"></i>
 																			</span>
-                                        </a>
-                                    </li>
+                                            </a>
+                                        </li>
 
-                                    <li ng-if="remove">
-                                        <a class="tooltip-error" title="删除" href="javascript:;" ng-click="remove(invoice.invoiceId)">
+                                        <li ng-if="remove">
+                                            <a class="tooltip-error" title="删除" href="javascript:;" ng-click="remove(invoice.invoiceId)">
 																			<span class="red">
 																				<i class="ace-icon fa fa-trash-o bigger-120"></i>
 																			</span>
-                                        </a>
-                                    </li>
+                                            </a>
+                                        </li>
 
-                                    <li ng-if="remove">
-                                        <a class="tooltip-error" title="查看" href="javascript:;" ng-click="view(invoice.invoiceId)">
+                                        <li ng-if="remove">
+                                            <a class="tooltip-error" title="查看" href="javascript:;" ng-click="view(invoice.invoiceId)">
 																			<span class="blue">
 																				<i class="ace-icon fa fa-search-plus bigger-120"></i>
 																			</span>
-                                        </a>
-                                    </li>
-                                </ul>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="center" ng-if="loading">
-                    <td colspan="7">
-                        <i class="fa fa-spinner fa-spin bigger-210"></i>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                        </td>
+                    </tr>
+                    <tr class="center" ng-if="loading">
+                        <td colspan="7">
+                            <i class="fa fa-spinner fa-spin bigger-210"></i>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+
             <div class="row">
                 <div class="col-xs-6">
                     <div class="dataTables_info" id="sample-table-2_info">总共 <span

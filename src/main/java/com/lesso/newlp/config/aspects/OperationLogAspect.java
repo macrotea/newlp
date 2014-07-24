@@ -1,9 +1,11 @@
 package com.lesso.newlp.config.aspects;
 
+import com.alibaba.fastjson.JSON;
 import com.lesso.newlp.invoice.entity.InvoiceEntity;
 import com.lesso.newlp.invoice.repository.InvoiceRepository;
 import com.lesso.newlp.invoice.service.InvoiceService;
 import com.lesso.newlp.log.entity.OperationLogEntity;
+import com.lesso.newlp.log.model.Modified;
 import com.lesso.newlp.log.repository.LogRepository;
 import com.lesso.newlp.pm.repository.IncRepository;
 import org.aspectj.lang.JoinPoint;
@@ -17,7 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Aspect
@@ -50,12 +54,21 @@ public class OperationLogAspect {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
+        logEntity.setType("CREATE");
         logEntity.setMemberId(user.getUsername());
-        logEntity.setDescription("创建订单;");
+
+        List<Modified> modifieds = new ArrayList<>();
+        Modified modified  = new Modified();
+        modified.setName("auditStatus");
+        modified.setOriginalVal("0");
+        modified.setModifiedVal(String.valueOf(invoiceEntity.getAuditStatus()));
+        modifieds.add(modified);
+
+        logEntity.setDescription(JSON.toJSONString(modifieds));
         logEntity.setIncId(invoiceEntity.getInc().getIncId());
         logEntity.setRelId(invoiceEntity.getInvoiceId());
         logEntity.setOperationDate(new Date());
-        logRepository.save(logEntity);
+        logRepository.saveAndFlush(logEntity);
 
         logger.debug("******");
 
@@ -75,9 +88,14 @@ public class OperationLogAspect {
         logger.debug("Around after is running!");
         logger.debug("******");
 
-        StringBuilder description  = new StringBuilder("更新订单;");
-        if (!Objects.isNull(invoiceUpdated.getAuditStatus())) {
-            description.append("订单状态:").append(invoiceEntity.getAuditStatus()).append("  to ").append(invoiceUpdated.getAuditStatus()).append(";");
+        List<Modified> modifieds = new ArrayList<>();
+
+        if (!Objects.isNull(invoiceUpdated.getAuditStatus()) && !invoiceEntity.getAuditStatus().equals(invoiceUpdated.getAuditStatus())) {
+            Modified modified = new Modified();
+            modified.setName("auditStatus");
+            modified.setOriginalVal(String.valueOf(invoiceEntity.getAuditStatus()));
+            modified.setModifiedVal(String.valueOf(invoiceUpdated.getAuditStatus()));
+            modifieds.add(modified);
         }
 
         if (!Objects.isNull(invoiceUpdated.getInvoiceDetails())) {
@@ -85,7 +103,19 @@ public class OperationLogAspect {
             invoiceEntity.getInvoiceDetails().forEach(a -> finalInvoice.getInvoiceDetails().forEach(b -> {
                 if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
                     if(!a.getDeliveryCount().equals(b.getDeliveryCount())){
-                        description.append("订单明细:").append(a.getInvoiceDetailId()).append(a.getDeliveryCount()).append("  to ").append(b.getDeliveryCount()).append(";");
+                        Modified modified = new Modified();
+                        modified.setName("deliveryCount");
+                        modified.setOriginalVal(String.valueOf(a.getDeliveryCount()));
+                        modified.setModifiedVal(String.valueOf(b.getDeliveryCount()));
+                        modifieds.add(modified);
+                    }
+
+                    if(!a.getOrderCount().equals(b.getOrderCount())){
+                        Modified modified = new Modified();
+                        modified.setName("orderCount");
+                        modified.setOriginalVal(String.valueOf(a.getOrderCount()));
+                        modified.setModifiedVal(String.valueOf(b.getOrderCount()));
+                        modifieds.add(modified);
                     }
                 }
             }));
@@ -94,12 +124,13 @@ public class OperationLogAspect {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
+        logEntity.setType("UPDATE");
         logEntity.setMemberId(user.getUsername());
-        logEntity.setDescription(description.toString());
+        logEntity.setDescription(JSON.toJSONString(modifieds));
         logEntity.setIncId(invoiceEntity.getInc().getIncId());
         logEntity.setRelId(invoiceEntity.getInvoiceId());
         logEntity.setOperationDate(new Date());
-        logRepository.save(logEntity);
+        logRepository.saveAndFlush(logEntity);
         return retVal;
     }
 
@@ -119,9 +150,16 @@ public class OperationLogAspect {
         logger.debug("Around after is running!");
         logger.debug("******");
 
-        StringBuilder description  = new StringBuilder("更新订单;");
+
+        List<Modified> modifieds = new ArrayList<>();
+//        StringBuilder description  = new StringBuilder("更新订单;");
         if (!Objects.isNull(invoiceUpdated.getAuditStatus())) {
-            description.append("订单状态:").append(invoiceEntity.getAuditStatus()).append("  to ").append(invoiceUpdated.getAuditStatus()).append(";");
+            Modified modified = new Modified();
+            modified.setName("auditStatus");
+            modified.setOriginalVal(String.valueOf(invoiceEntity.getAuditStatus()));
+            modified.setModifiedVal(String.valueOf(invoiceUpdated.getAuditStatus()));
+            modifieds.add(modified);
+//            description.append("订单状态:").append(invoiceEntity.getAuditStatus()).append("  to ").append(invoiceUpdated.getAuditStatus()).append(";");
         }
 
         if (!Objects.isNull(invoiceUpdated.getInvoiceDetails())) {
@@ -129,7 +167,19 @@ public class OperationLogAspect {
             invoiceEntity.getInvoiceDetails().forEach(a -> finalInvoice.getInvoiceDetails().forEach(b -> {
                 if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
                     if(!a.getDeliveryCount().equals(b.getDeliveryCount())){
-                        description.append("实发数量:").append(a.getInvoiceDetailId()).append(a.getDeliveryCount()).append("  to ").append(b.getDeliveryCount()).append(";");
+                        Modified modified = new Modified();
+                        modified.setName("deliveryCount");
+                        modified.setOriginalVal(String.valueOf(a.getDeliveryCount()));
+                        modified.setModifiedVal(String.valueOf(b.getDeliveryCount()));
+                        modifieds.add(modified);
+                    }
+
+                    if(!a.getOrderCount().equals(b.getOrderCount())){
+                        Modified modified = new Modified();
+                        modified.setName("orderCount");
+                        modified.setOriginalVal(String.valueOf(a.getOrderCount()));
+                        modified.setModifiedVal(String.valueOf(b.getOrderCount()));
+                        modifieds.add(modified);
                     }
                 }
             }));
@@ -138,12 +188,13 @@ public class OperationLogAspect {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
+        logEntity.setType("UPDATE");
         logEntity.setMemberId(user.getUsername());
-        logEntity.setDescription(description.toString());
+        logEntity.setDescription(JSON.toJSONString(modifieds));
         logEntity.setIncId(invoiceEntity.getInc().getIncId());
         logEntity.setRelId(invoiceEntity.getInvoiceId());
         logEntity.setOperationDate(new Date());
-        logRepository.save(logEntity);
+        logRepository.saveAndFlush(logEntity);
         return retVal;
     }
 
@@ -165,12 +216,13 @@ public class OperationLogAspect {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
+        logEntity.setType("DELETE");
         logEntity.setMemberId(user.getUsername());
-        logEntity.setDescription("删除订单");
+//        logEntity.setDescription("删除订单");
         logEntity.setIncId(invoiceEntity.getInc().getIncId());
         logEntity.setRelId(invoiceEntity.getInvoiceId());
         logEntity.setOperationDate(new Date());
-        logRepository.save(logEntity);
+        logRepository.saveAndFlush(logEntity);
         return retVal;
     }
 }

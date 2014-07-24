@@ -1,5 +1,6 @@
 package com.lesso.newlp.api.v1.credit.controller;
 
+import com.lesso.newlp.auth.model.CurrentUser;
 import com.lesso.newlp.credit.entity.CreditEntity;
 import com.lesso.newlp.credit.model.SearchTerm;
 import com.lesso.newlp.credit.repository.CreditRepository;
@@ -12,6 +13,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -107,8 +109,8 @@ public class CreditController {
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @SuppressWarnings("unchecked")
-    public ResponseEntity<PagedResources<CreditEntity>> search(Model model, Pageable pageable, PagedResourcesAssembler assembler, @RequestBody SearchTerm searchTerm) {
-        Page<CreditEntity> creditEntities = creditService.search(searchTerm, pageable);
+    public ResponseEntity<PagedResources<CreditEntity>> search(Model model,@CurrentUser User user, Pageable pageable, PagedResourcesAssembler assembler, @RequestBody SearchTerm searchTerm) {
+        Page<CreditEntity> creditEntities = creditService.search(searchTerm, pageable, user.getUsername());
         return new ResponseEntity<>(assembler.toResource(creditEntities), HttpStatus.OK);
     }
 

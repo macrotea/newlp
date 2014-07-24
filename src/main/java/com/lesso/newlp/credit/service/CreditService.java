@@ -18,7 +18,7 @@ public interface CreditService {
 
     void delete(Long creditId);
 
-    Page<CreditEntity> search(SearchTerm searchTerm, Pageable pageable);
+    Page<CreditEntity> search(SearchTerm searchTerm, Pageable pageable, String memberId);
 
     CreditEntity patch(Long creditId, CreditEntity credit);
 }

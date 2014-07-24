@@ -62,10 +62,16 @@
                 <div class="input-group col-xs-10 col-sm-5"  ng-if="!fields.client.editable">
                     <p class="form-control-static" ng-bind="invoice.client.clientName"></p>
                 </div>
-                <div class="input-group col-xs-10 col-sm-5" ng-if="fields.client.editable">
-                    <select class="form-control" title="选择客户" client-select ng-model="invoice.client"
-                            ng-options="client.clientName for client in [invoice.client] track by client.clientId"></select>
+                <div class="input-group col-xs-10 col-sm-5 pull-left" ng-if="fields.client.editable">
+                    <select class="form-control" title="选择客户" name="invoiceClient" required
+                            client-select ng-model="invoice.client" ng-options="client.clientName for client in [invoice.client] track by client.clientId" >
+                    </select>
                 </div>
+
+                <span class="help-inline col-xs-12 col-sm-7" ng-if="form.invoiceClient.$invalid">
+                    <span class="middle red" ng-if="form.invoiceClient.$error.required">必填！</span>
+                </span>
+
             </div>
         </div>
 
@@ -78,12 +84,13 @@
                     <p class="form-control-static" ng-bind="invoice.invoiceType.name"></p>
                 </div>
                 <div class="input-group col-xs-10 col-sm-5"  ng-if="fields.invoiceType.editable">
-                    <select class="form-control" ng-model="invoice.invoiceType" ng-options="invoiceType.name for invoiceType in invoiceTypes track by invoiceType.invoiceTypeId">
-                        <!--<option value="1">销售</option>-->
-                        <!--<option value="2" ng-if="activeInvoiceTypes.indexOf(2) > -1">外购</option>-->
-                        <!--<option value="3">自用</option>-->
+                    <select class="form-control" name="invoiceType" required ng-model="invoice.invoiceType" ng-options="invoiceType.name for invoiceType in invoiceTypes track by invoiceType.invoiceTypeId">
                     </select>
                 </div>
+
+                <!--<span class="help-inline col-xs-12 col-sm-7" ng-if="form.invoiceType.$invalid">-->
+                    <!--<span class="middle red" ng-if="form.invoiceType.$error.required">必填！</span>-->
+                <!--</span>-->
             </div>
         </div>
 
@@ -96,16 +103,12 @@
                     <p class="form-control-static" ng-bind="invoice.receivedDate | date: 'yyyy-MM-dd'"></p>
                 </div>
                 <div class="input-group col-xs-10 col-sm-5" ng-if="fields.receivedDate.editable">
-                    <datepicker ng-model="invoice.receivedDate" language="cn" date-format="YYYY-MM-DD">
-                    <!--<input type="text" class="form-control" datepicker-popup="yyyy-MM-dd"-->
-                           <!--show-button-bar="false" is-open="receivedDateOpened"-->
-                           <!--datepicker-options=" {showWeeks: false, startingDay: 1 }"-->
-                           <!--ng-required="true" ng-click="receivedDateOpen($event)"-->
-                           <!--ng-model="invoice.receivedDate"/>-->
-                                <!--<span class="input-group-addon" ng-click="receivedDateOpen($event)">-->
-                                <!--<i class="fa fa-calendar bigger-110"></i>-->
-                                <!--</span>-->
+                    <datepicker ng-model="invoice.receivedDate" name="invoiceReceivedDate" required language="cn" date-format="YYYY-MM-DD"></datepicker>
                 </div>
+
+                <!--<span class="help-inline col-xs-12 col-sm-7" ng-if="form.invoiceReceivedDate.$invalid">-->
+                    <!--<span class="middle red" ng-if="form.invoiceReceivedDate.$error.required">必填！</span>-->
+                <!--</span>-->
             </div>
         </div>
 
@@ -117,9 +120,14 @@
                 <div class="input-group col-xs-10 col-sm-5" ng-if="!fields.carNum.editable">
                     <p class="form-control-static" ng-bind="invoice.carNum"></p>
                 </div>
-                <div class="input-group col-xs-10 col-sm-5" ng-if="fields.carNum.editable">
-                    <input class="form-control" type="text" ng-model="invoice.carNum">
+                <div class="input-group col-xs-10 col-sm-5 pull-left" ng-if="fields.carNum.editable">
+                    <input class="form-control" type="text" name="invoiceCarNum" ng-model="invoice.carNum" required carnum>
                 </div>
+
+                <span class="help-inline col-xs-12 col-sm-7" ng-if="form.invoiceCarNum.$invalid">
+                    <span class="middle red" ng-if="form.invoiceCarNum.$error.required">必填！</span>
+                    <span class="middle red" ng-if="form.invoiceCarNum.$error.carNum">请输入正确的车号！</span>
+                </span>
             </div>
         </div>
 
@@ -186,43 +194,43 @@
         <div class="clearfix form-actions">
             <div class="col-md-offset-3 col-md-9">
 
-                <button class="btn btn-info" type="submit" ng-click="submit()" ng-if="actions.submit">
+                <button class="btn btn-info" type="submit" ng-click="submit()" ng-if="actions.submit" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     提交
                 </button>
 
                 &nbsp; &nbsp; &nbsp;
-                <button class="btn btn-info" type="submit" ng-click="save()" ng-if="actions.save">
+                <button class="btn btn-info" type="submit" ng-click="save()" ng-if="actions.save" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     提交
                 </button>
 
                 &nbsp; &nbsp; &nbsp;
-                <button class="btn btn-info" type="submit" ng-click="update()" ng-if="actions.update">
+                <button class="btn btn-info" type="submit" ng-click="update()" ng-if="actions.update" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     提交
                 </button>
 
                 &nbsp; &nbsp; &nbsp;
-                <button class="btn btn-info" type="submit" ng-click="adjust()" ng-if="actions.adjust">
+                <button class="btn btn-info" type="submit" ng-click="adjust()" ng-if="actions.adjust" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     提交
                 </button>
 
                 &nbsp; &nbsp; &nbsp;
-                <button class="btn btn-info" type="submit" ng-click="receive()" ng-if="actions.receive">
+                <button class="btn btn-info" type="submit" ng-click="receive()" ng-if="actions.receive" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     接收
                 </button>
 
                 &nbsp; &nbsp; &nbsp;
-                <button class="btn" type="submit" ng-click="draft()" ng-if="actions.draft">
+                <button class="btn" type="submit" ng-click="draft()" ng-if="actions.draft" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-undo bigger-110"></i>
                     保存
                 </button>
 
                 &nbsp; &nbsp; &nbsp;
-                <button class="btn btn-danger" type="submit" ng-click="sendBack()" ng-if="actions.sendBack">
+                <button class="btn btn-danger" type="submit" ng-click="sendBack()" ng-if="actions.sendBack" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-undo bigger-110"></i>
                     退回
                 </button>

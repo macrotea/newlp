@@ -14,7 +14,7 @@ angular.module('newlpApp')
             remark: '',
             auditStatus: '0',
             invoiceType: {
-                invoiceTypeId: '1'
+                invoiceTypeId: 1
             },
             invoiceDetails: []
         };
@@ -68,8 +68,7 @@ angular.module('newlpApp')
         });
 
         $scope.options = {
-            readOnly:true,
-            activeStatus:40
+            readOnly:true
         };
     })
 
@@ -200,7 +199,7 @@ angular.module('newlpApp')
         $scope.searchForm = {
             options: {
                 criteria: {
-                    auditStatus: 40
+                    auditedStatus:40
                 },
                 actions: {
                     view: function (invoiceId) {

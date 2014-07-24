@@ -161,9 +161,9 @@ angular.module('newlpApp')
                         var credit = {
                             'creditId':tmpSeqForNewCredit,
                             "type": 0,
-                            "amount": 0,
-                            "percent": 0.1,
-                            "creditAmount": 0,
+//                            "amount": 0,
+//                            "percent": 0.1,
+//                            "creditAmount": 0,
                             "insertDate": currentDate,
                             "validDate": currentDate,
                             "expiryDate": currentDate,
@@ -172,9 +172,9 @@ angular.module('newlpApp')
                                 endDate:currentDate
                             },
                             "description": '',
-                            "client": {
-                                "clientId": undefined
-                            },
+//                            "client": {
+//                                "clientId": undefined
+//                            },
                             editable: true
                         };
 

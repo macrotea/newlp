@@ -30,7 +30,24 @@ angular.module('newlpApp')
                     auditStatus: '@auditStatus'
                 }
             },
+            queryByOriginalAuditStatus: {
+                url: '/api/v1/invoices/search/audited/auditStatus/:auditedStatus',
+                method: 'GET',
+                params: {
+                    auditedStatus: '@auditedStatus'
+                }
+            },
             search: {
+                url: '/api/v1/invoices/search',
+                method: 'POST',
+                params: {
+                },
+                isArray: false,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            },
+            searchByOriginalAuditStatus: {
                 url: '/api/v1/invoices/search',
                 method: 'POST',
                 params: {

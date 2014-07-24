@@ -9,8 +9,7 @@ angular.module('newlpApp')
         });
 
         $scope.options = {
-            readOnly:true,
-            activeStatus:90
+            readOnly:true
         };
     })
 
