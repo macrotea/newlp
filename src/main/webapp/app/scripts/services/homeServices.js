@@ -9,6 +9,7 @@ angular.module('newlpApp')
             getPanels: {
                 url:'/api/v1/home/panels',
                 method: 'GET',
+                isArray:true,
                 params:{
                 }
             }

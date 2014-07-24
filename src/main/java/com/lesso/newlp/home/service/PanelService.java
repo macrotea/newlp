@@ -3,7 +3,6 @@ package com.lesso.newlp.home.service;
 import com.lesso.newlp.home.entity.PanelEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.User;
 
 import java.util.List;
 
@@ -16,9 +15,11 @@ import java.util.List;
 public interface PanelService {
 
 
-    List<PanelEntity> getPanels(User user);
+    List<PanelEntity> getPanels(String username);
 
     String getName();
 
     Page<PanelEntity> findByMemberId(String username, Pageable pageable);
+
+    List<PanelEntity> findByMemberId(String username);
 }

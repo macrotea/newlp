@@ -25,9 +25,15 @@ body {
   max-height: 0;
 }
 .dataTables_wrapper input[type=text],
+.dataTables_wrapper input[type=number],
 .dataTables_wrapper select,
 .dataTables_wrapper textarea,
 .dataTables_wrapper .form-control-static {
   margin-bottom: 0 !important;
   margin: 0 4px;
+}
+@media only screen and (max-width: 991px) {
+  .navbar .navbar-toggle {
+    display: block;
+  }
 }

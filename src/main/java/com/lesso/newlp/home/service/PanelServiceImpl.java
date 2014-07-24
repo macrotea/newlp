@@ -4,7 +4,6 @@ import com.lesso.newlp.home.entity.PanelEntity;
 import com.lesso.newlp.home.repository.PanelRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -22,7 +21,7 @@ public class PanelServiceImpl implements PanelService {
 
 
     @Override
-    public List<PanelEntity> getPanels(User user) {
+    public List<PanelEntity> getPanels(String username) {
 
         return null;
     }
@@ -36,5 +35,10 @@ public class PanelServiceImpl implements PanelService {
 //    @Cacheable(value = "panelCache",key="#username + 'findByMemberId'")
     public Page<PanelEntity> findByMemberId(String username, Pageable pageable) {
         return panelRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<PanelEntity> findByMemberId(String username) {
+        return panelRepository.findAll();
     }
 }

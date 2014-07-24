@@ -124,14 +124,6 @@ angular
                     }
                 }
             })
-            .state('home.customer_service.confirm.adjust', {
-                url: '/{invoiceId:[0-9]{1,10}}/adjust',
-                views: {
-                    '@home': {
-                        templateUrl: 'views/customer_service.confirm.adjust.html'
-                    }
-                }
-            })
             .state('home.customer_service.confirm.view', {
                 url: '/{invoiceId:[0-9]{1,10}}',
                 views: {

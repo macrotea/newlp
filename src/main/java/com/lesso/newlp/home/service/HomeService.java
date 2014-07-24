@@ -1,7 +1,6 @@
 package com.lesso.newlp.home.service;
 
-import com.lesso.newlp.home.dto.PanelDTO;
-import org.springframework.security.core.userdetails.User;
+import com.lesso.newlp.home.entity.PanelEntity;
 
 import java.util.List;
 
@@ -12,6 +11,6 @@ import java.util.List;
  */
 public interface HomeService {
 
-    List<PanelDTO> getPanels(User user);
+    List<PanelEntity> queryPanels(String username);
 
 }

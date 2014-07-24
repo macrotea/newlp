@@ -20,7 +20,9 @@ angular
         'LocalStorageModule'
 
     ])
-    .config(function ($httpProvider) {
+    .config(function ($httpProvider,$locationProvider) {
+
+//        $locationProvider.html5Mode(true);
 
         var publicStates =['login','logout'];
         var sessionTimeoutCtrl = ['$scope','$modalInstance','$state',function ($scope, $modalInstance,$state) {

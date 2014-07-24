@@ -4,6 +4,12 @@
         <div id="navbar-container" class="navbar-container">
 
             <!-- toggle buttons are here or inside brand container -->
+            <button type="button" class="navbar-toggle menu-toggler pull-left hidden-md" id="menu-toggler" ng-click="toggleSidebar()">
+                <span class="sr-only">Toggle sidebar</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
 
             <div class="navbar-header pull-left">
                 <!-- brand text here -->
@@ -81,8 +87,8 @@
             </p>
 
         </div>
-        <div class="sidebar responsive" id="sidebar" ng-init="collapseSidebar=false"
-             ng-class="{'menu-min':collapseSidebar}">
+        <div class="sidebar responsive" id="sidebar"
+             ng-class="{'menu-min':minimizeSidebar,'display':collapseSidebar}">
             <!-- sidebar goes here -->
             <div class="sidebar-shortcuts" id="sidebar-shortcuts">
 
@@ -112,6 +118,7 @@
                         <span class="menu-text">
                           {{panel.name}}{{'active'| includedByState}}
                         </span>
+                        <span class="badge" ng-if="panel.count > 0">{{panel.count}} </span>
                         <b class="arrow fa fa-angle-down"></b>
                         <!-- arrow down icon if there's a submenu -->
                     </a>
@@ -119,10 +126,10 @@
                     <b class="arrow"></b>
                     <!-- optional arrow for minimized menu & hover submenu -->
                     <ul class="submenu" ng-class="{'show':panel.isOpen}">
-                        <li ng-repeat="pane in panel.panes" ui-sref-active="active">
+                        <li ng-repeat="pane in panel.panes | orderBy:'order'" ui-sref-active="active">
                             <a ui-sref="{{pane.state}}">
                                 <i class="menu-icon fa fa-caret-right"></i>
-                                <span class="menu-text">{{pane.name}}</span>
+                                <span class="menu-text">{{pane.name}}</span><span class="badge" ng-if="pane.count > 0">{{pane.count}} </span>
                             </a>
                         </li>
                     </ul>
@@ -130,7 +137,7 @@
             </ul>
 
             <div id="sidebar-collapse" class="sidebar-toggle sidebar-collapse"
-                 ng-click="collapseSidebar=!collapseSidebar">
+                 ng-click="minimizeSidebar=!minimizeSidebar">
                 <i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left"
                    data-icon2="ace-icon fa fa-angle-double-right"></i>
             </div>
