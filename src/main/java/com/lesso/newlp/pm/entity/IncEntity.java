@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Created by Sean on 6/23/2014.
  */
-@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property="@UUID")
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="incId")
 @Entity
 @Table(name = "PM_INC",  schema = "DBO",catalog = "NEWLP")
 public class IncEntity implements Serializable {

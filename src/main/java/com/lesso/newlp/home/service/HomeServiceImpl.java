@@ -57,12 +57,12 @@ public class HomeServiceImpl implements HomeService {
                         pane.setCount(count);
                         panel.setCount(panel.getCount() + count);
                         break;
-                    case "CUSTOMER_SERVICE_ORDER_SUBMITTED":
-                        auditStatuses.add(40);
-                        count = invoiceService.queryCountByOriginalAuditStatus(40, username);
-                        pane.setCount(count);
-                        panel.setCount(panel.getCount() + count);
-                        break;
+//                    case "CUSTOMER_SERVICE_ORDER_SUBMITTED":
+//                        auditStatuses.add(40);
+//                        count = invoiceService.queryCountByOriginalAuditStatus(40, username);
+//                        pane.setCount(count);
+//                        panel.setCount(panel.getCount() + count);
+//                        break;
                     case "DEPOT_RECEIVES":
                         auditStatuses.add(40);
                         count = invoiceService.queryCountByAuditStatus(auditStatuses,username);
@@ -76,12 +76,12 @@ public class HomeServiceImpl implements HomeService {
                         pane.setCount(count);
                         panel.setCount(panel.getCount() + count);
                         break;
-                    case "DEPOT_AUDIT_AUDITED":
-                        auditStatuses.add(70);
-                        count = invoiceService.queryCountByOriginalAuditStatus(70, username);
-                        pane.setCount(count);
-                        panel.setCount(panel.getCount() + count);
-                        break;
+//                    case "DEPOT_AUDIT_AUDITED":
+//                        auditStatuses.add(70);
+//                        count = invoiceService.queryCountByOriginalAuditStatus(70, username);
+//                        pane.setCount(count);
+//                        panel.setCount(panel.getCount() + count);
+//                        break;
                     case "CUSTOMER_SERVICE_CONFIRM_RECEIVES":
                         auditStatuses.add(70);
                         count = invoiceService.queryCountByAuditStatus(auditStatuses,username);
@@ -94,12 +94,12 @@ public class HomeServiceImpl implements HomeService {
                         pane.setCount(count);
                         panel.setCount(panel.getCount() + count);
                         break;
-                    case "CUSTOMER_SERVICE_CONFIRM_AUDITED":
-                        auditStatuses.add(90);
-                        count = invoiceService.queryCountByOriginalAuditStatus(90, username);
-                        pane.setCount(count);
-                        panel.setCount(panel.getCount() + count);
-                        break;
+//                    case "CUSTOMER_SERVICE_CONFIRM_AUDITED":
+//                        auditStatuses.add(90);
+//                        count = invoiceService.queryCountByOriginalAuditStatus(90, username);
+//                        pane.setCount(count);
+//                        panel.setCount(panel.getCount() + count);
+//                        break;
                 }
 
             }

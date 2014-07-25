@@ -1,8 +1,8 @@
 package com.lesso.newlp.invoice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.log.entity.OperationLogEntity;
 import com.lesso.newlp.pm.entity.ClientEntity;
 import com.lesso.newlp.pm.entity.IncEntity;
 import org.hibernate.annotations.LazyCollection;
@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by Sean on 6/17/2014.
  */
-@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID",scope = InvoiceEntity.class)
+//@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID",scope = InvoiceEntity.class)
 @Entity
 @Table(name = "INV_INVOICE", schema = "DBO",catalog = "NEWLP")
 public class InvoiceEntity extends AbstractTimestampEntity implements Serializable {
@@ -61,6 +61,10 @@ public class InvoiceEntity extends AbstractTimestampEntity implements Serializab
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<InvoiceDetailEntity> invoiceDetails;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "invoice")
+    Set<OperationLogEntity> logs;
 
     public Long getInvoiceId() {
         return invoiceId;
@@ -180,5 +184,13 @@ public class InvoiceEntity extends AbstractTimestampEntity implements Serializab
 
     public void setClient(ClientEntity client) {
         this.client = client;
+    }
+
+    public Set<OperationLogEntity> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(Set<OperationLogEntity> logs) {
+        this.logs = logs;
     }
 }

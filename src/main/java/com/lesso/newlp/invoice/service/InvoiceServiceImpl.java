@@ -15,6 +15,7 @@ import com.lesso.newlp.material.entity.MaterialEntity;
 import com.lesso.newlp.material.repository.MaterialTypeRepository;
 import com.lesso.newlp.pm.entity.ClientEntity;
 import com.lesso.newlp.pm.entity.IncEntity;
+import com.lesso.newlp.pm.repository.MemberRepository;
 import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -54,6 +55,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Resource
     MaterialTypeRepository materialTypeRepository;
+
+    @Resource
+    MemberRepository memberRepository;
 
     @Resource
     LogRepository logRepository;
@@ -332,119 +336,19 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public Page<InvoiceEntity> queryByAuditStatus(Integer auditStatus,String memberId, Pageable pageable) {
 
-        List<InvoiceDetailEntity> list = jdbcDaoSupport.getJdbcTemplate().query("SELECT\n" +
-                "\t*\n" +
-                "FROM\n" +
-                "\t(\n" +
-                "\t\tSELECT\n" +
-                "      ROW_NUMBER () OVER (ORDER BY i.invoiceId DESC) AS rowNum,\n" +
-                "\t\t\ti.invoiceId,\n" +
-                "\t\t\ti.invoiceNum,\n" +
-                "\t\t\ti.auditStatus,\n" +
-                "      t.invoiceTypeId,\n" +
-                "\t\t\tt.name,\n" +
-                "\t\t\tt.type,\n" +
-                "\t\t\tinc.incId,\n" +
-                "\t\t\tinc.incName,\n" +
-                "\t\t\tincClient.clientId,\n" +
-                "\t\t\tincClient.clientName,\n" +
-                "\t\t\ti.receivedDate,\n" +
-                "\t\t\ti.carNum\n" +
-                "\t\tFROM\n" +
-                "\t\t\tINV_INVOICE i\n" +
-                "\t\tLEFT JOIN INV_INVOICE_TYPE t ON i.invoiceType_invoiceTypeId = t.invoiceTypeId\n" +
-                "\t\tLEFT JOIN PM_INC inc ON i.inc_incId = inc.incId\n" +
-                "\t\tLEFT JOIN PM_CLIENT incClient ON i.client_clientId = incClient.clientId\n" +
-                "left join PM_INC_MEMBER_REL incm\n" +
-                "on incm.inc_incId = i.inc_incId\n" +
-                "left join PM_CLIENT_MEMBER_REL clim\n" +
-                "on clim.client_clientId = i.client_clientId" +
-                "\t\t\n" +
-                "\t\tWHERE\n" +
-                "\t\t\ti.auditStatus = ? and i.active =1 and  incm.member_memberId = ? and clim.member_memberId = ?\n" +
-                "\t) a\n" +
-                "WHERE a.rowNum > " + pageable.getPageNumber() * pageable.getPageSize() + " AND a.rowNum <" + ((pageable.getPageNumber() + 1) * pageable.getPageSize() + 1), new Object[]{auditStatus,memberId,memberId}, new RowMapper<InvoiceDetailEntity>() {
-            @Override
-            public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
-                InvoiceEntity invoice = new InvoiceEntity();
-                invoice.setInvoiceId(rs.getLong("invoiceId"));
-                invoice.setInvoiceNum(rs.getString("invoiceNum"));
-                invoice.setCarNum(rs.getString("carNum"));
-                invoice.setReceivedDate(rs.getDate("receivedDate"));
-                invoice.setAuditStatus(rs.getInt("auditStatus"));
+        Page<InvoiceEntity> page = invoiceRepository.findByAuditStatus(auditStatus,memberId,pageable);
 
-                IncEntity incEntity = new IncEntity();
-                incEntity.setIncId(rs.getLong("incId"));
-                incEntity.setIncName(rs.getString("incName"));
-                invoice.setInc(incEntity);
-
-                ClientEntity clientEntity = new ClientEntity();
-                clientEntity.setClientId(rs.getLong("clientId"));
-                clientEntity.setClientName(rs.getString("clientName"));
-                invoice.setClient(clientEntity);
-
-                InvoiceTypeEntity invoiceTypeEntity = new InvoiceTypeEntity();
-                invoiceTypeEntity.setInvoiceTypeId(rs.getLong("invoiceTypeId"));
-                invoiceTypeEntity.setType(rs.getInt("type"));
-                invoiceTypeEntity.setName(rs.getString("name"));
-                invoice.setInvoiceType(invoiceTypeEntity);
-
-                invoice.setInvoiceDetails(new HashSet<InvoiceDetailEntity>());
-                InvoiceDetailEntity invoiceDetailEntity = new InvoiceDetailEntity();
-                MaterialEntity materialEntity = new MaterialEntity();
-                invoiceDetailEntity.setMaterial(materialEntity);
-                invoiceDetailEntity.setInvoice(invoice);
-                return invoiceDetailEntity;
-            }
-        });
-
-        HashMap hashMap = new HashMap();
-        List<InvoiceEntity> invoiceEntityList = new ArrayList<InvoiceEntity>();
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                if (hashMap.containsKey(list.get(i).getInvoice().getInvoiceId())) {
-                    InvoiceEntity invoiceEntity1 = (InvoiceEntity) hashMap.get(list.get(i).getInvoice().getInvoiceId());
-                    Set<InvoiceDetailEntity> set1 = invoiceEntity1.getInvoiceDetails();
-                    set1.add(list.get(i));
-                } else {
-                    hashMap.put(list.get(i).getInvoice().getInvoiceId(), list.get(i).getInvoice());
-                    Set<InvoiceDetailEntity> set2 = list.get(i).getInvoice().getInvoiceDetails();
-                    set2.add(list.get(i));
-                    list.get(i).getInvoice().setInvoiceDetails(set2);
-                    invoiceEntityList.add(list.get(i).getInvoice());
-                }
-            }
-        }
-
-        long total = jdbcDaoSupport.getJdbcTemplate().queryForObject(
-                "SELECT count(DISTINCT rowNum) FROM (\n" +
-                        "SELECT\n" +
-                        "ROW_NUMBER () OVER (ORDER BY invoiceId DESC) AS rowNum,*\n" +
-                        "FROM\n" +
-                        "INV_INVOICE\n" +
-                        ") i\n" +
-                        "LEFT JOIN INV_INVOICE_TYPE t ON i.invoiceType_invoiceTypeId=t.invoiceTypeId\n" +
-//                        "LEFT JOIN INV_INVOICE_DETAIL j ON i.invoiceId=j.invoice_invoiceId\n" +
-                        "LEFT JOIN PM_INC inc on i.inc_incId = inc.incId\n" +
-                        "left join PM_CLIENT incClient on i.client_clientId = incClient.clientId\n" +
-                        "left join PM_INC_MEMBER_REL incm\n" +
-                        "on incm.inc_incId = i.inc_incId\n" +
-                        "left join PM_CLIENT_MEMBER_REL clim\n" +
-                        "on clim.client_clientId = i.client_clientId\n" +
-//                        "left join MAT_MATERIAL m ON j.material_materialNum = m.materialNum \n" +
-                        "WHERE i.auditStatus=? and i.active =1  and  incm.member_memberId = ? and clim.member_memberId = ?", new Object[]{auditStatus,memberId,memberId}, Long.class);
-
-        return new PageImpl<InvoiceEntity>(invoiceEntityList, pageable, total);
+        return page;
     }
 
     @Override
     public int queryCountByOriginalAuditStatus(int auditedStatus, String username) {
-        String sql = "select count(inv.invoiceId) from INV_INVOICE inv\n" +
+        String sql = "select count(DISTINCT inv.invoiceId) from INV_INVOICE inv\n" +
                 "left join PM_INC_MEMBER_REL incm\n" +
                 "on incm.inc_incId = inv.inc_incId\n" +
                 "left join PM_CLIENT_MEMBER_REL clim\n" +
                 "on clim.client_clientId = inv.client_clientId\n" +
-                "left join LOG_OPERATION log on log.relId = inv.invoiceId " +
+                "left join LOG_OPERATION log on log.invoice_invoiceId = inv.invoiceId " +
                 "where incm.member_memberId = :memberId and clim.member_memberId = :memberId and inv.active = 1 and inv.auditStatus >= :auditedStatus and (\n" +
                 "log.description like '%\"modifiedVal\":\""+auditedStatus+"\",\"name\":\"auditStatus\",\"originalVal\":\"0\"%' or \n" +
                 "log.description like '%\"modifiedVal\":\""+auditedStatus+"\",\"name\":\"auditStatus\",\"originalVal\":\""+(auditedStatus - 10)+"\"%'\n" +
@@ -463,116 +367,68 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public Page<InvoiceEntity> searchByOriginalAuditStatuses(Integer auditedStatus, String memberId, Pageable pageable) {
 
+        Page<InvoiceEntity> page = invoiceRepository.findByAuditedStatus(auditedStatus,memberId,pageable);
 
-        String sql = " (\n" +
-                "log.description like '%\"modifiedVal\":\""+auditedStatus+"\",\"name\":\"auditStatus\",\"originalVal\":\"0\"%' or \n" +
-                "log.description like '%\"modifiedVal\":\""+auditedStatus+"\",\"name\":\"auditStatus\",\"originalVal\":\""+(auditedStatus - 10)+"\"%'\n" +
-                ") ";
 
-        List<InvoiceDetailEntity> list = jdbcDaoSupport.getJdbcTemplate().query("SELECT\n" +
-                "\t*\n" +
-                "FROM\n" +
-                "\t(\n" +
-                "\t\tSELECT\n" +
-                "      ROW_NUMBER () OVER (ORDER BY i.invoiceId DESC) AS rowNum,\n" +
-                "\t\t\ti.invoiceId,\n" +
-                "\t\t\ti.invoiceNum,\n" +
-                "\t\t\ti.auditStatus,\n" +
-                "      t.invoiceTypeId,\n" +
-                "\t\t\tt.name,\n" +
-                "\t\t\tt.type,\n" +
-                "\t\t\tinc.incId,\n" +
-                "\t\t\tinc.incName,\n" +
-                "\t\t\tincClient.clientId,\n" +
-                "\t\t\tincClient.clientName,\n" +
-                "\t\t\ti.receivedDate,\n" +
-                "\t\t\ti.carNum\n" +
-                "\t\tFROM\n" +
-                "\t\t\tINV_INVOICE i\n" +
-                "\t\tLEFT JOIN INV_INVOICE_TYPE t ON i.invoiceType_invoiceTypeId = t.invoiceTypeId\n" +
-                "\t\tLEFT JOIN PM_INC inc ON i.inc_incId = inc.incId\n" +
-                "\t\tLEFT JOIN PM_CLIENT incClient ON i.client_clientId = incClient.clientId\n" +
-                "\t\tleft join PM_INC_MEMBER_REL incm\n" +
-                "\t\ton incm.inc_incId = i.inc_incId\n" +
-                "\t\tleft join PM_CLIENT_MEMBER_REL clim\n" +
-                "\t\ton clim.client_clientId = i.client_clientId\t\t\n" +
-                "\t\tleft join LOG_OPERATION log on log.relId = i.invoiceId\n" +
-                "\t\tWHERE\n" +
-                "\t\t\t"+sql+" and i.auditStatus >= ? and i.active =1 and  incm.member_memberId = ? and clim.member_memberId = ?\n" +
-                "\t) a " +
-                "WHERE a.rowNum > " + pageable.getPageNumber() * pageable.getPageSize() + " AND a.rowNum <" + ((pageable.getPageNumber() + 1) * pageable.getPageSize() + 1), new Object[]{auditedStatus,memberId,memberId}, new RowMapper<InvoiceDetailEntity>() {
-            @Override
-            public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
-                InvoiceEntity invoice = new InvoiceEntity();
-                invoice.setInvoiceId(rs.getLong("invoiceId"));
-                invoice.setInvoiceNum(rs.getString("invoiceNum"));
-                invoice.setCarNum(rs.getString("carNum"));
-                invoice.setReceivedDate(rs.getDate("receivedDate"));
-                invoice.setAuditStatus(rs.getInt("auditStatus"));
-
-                IncEntity incEntity = new IncEntity();
-                incEntity.setIncId(rs.getLong("incId"));
-                incEntity.setIncName(rs.getString("incName"));
-                invoice.setInc(incEntity);
-
-                ClientEntity clientEntity = new ClientEntity();
-                clientEntity.setClientId(rs.getLong("clientId"));
-                clientEntity.setClientName(rs.getString("clientName"));
-                invoice.setClient(clientEntity);
-
-                InvoiceTypeEntity invoiceTypeEntity = new InvoiceTypeEntity();
-                invoiceTypeEntity.setInvoiceTypeId(rs.getLong("invoiceTypeId"));
-                invoiceTypeEntity.setType(rs.getInt("type"));
-                invoiceTypeEntity.setName(rs.getString("name"));
-                invoice.setInvoiceType(invoiceTypeEntity);
-
-                invoice.setInvoiceDetails(new HashSet<InvoiceDetailEntity>());
-                InvoiceDetailEntity invoiceDetailEntity = new InvoiceDetailEntity();
-                MaterialEntity materialEntity = new MaterialEntity();
-                invoiceDetailEntity.setMaterial(materialEntity);
-                invoiceDetailEntity.setInvoice(invoice);
-                return invoiceDetailEntity;
-            }
-        });
-
-        HashMap hashMap = new HashMap();
-        List<InvoiceEntity> invoiceEntityList = new ArrayList<InvoiceEntity>();
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                if (hashMap.containsKey(list.get(i).getInvoice().getInvoiceId())) {
-                    InvoiceEntity invoiceEntity1 = (InvoiceEntity) hashMap.get(list.get(i).getInvoice().getInvoiceId());
-                    Set<InvoiceDetailEntity> set1 = invoiceEntity1.getInvoiceDetails();
-                    set1.add(list.get(i));
-                } else {
-                    hashMap.put(list.get(i).getInvoice().getInvoiceId(), list.get(i).getInvoice());
-                    Set<InvoiceDetailEntity> set2 = list.get(i).getInvoice().getInvoiceDetails();
-                    set2.add(list.get(i));
-                    list.get(i).getInvoice().setInvoiceDetails(set2);
-                    invoiceEntityList.add(list.get(i).getInvoice());
-                }
-            }
-        }
-
-        long total = jdbcDaoSupport.getJdbcTemplate().queryForObject(
-                "SELECT count(DISTINCT rowNum) FROM (\n" +
-                        "SELECT\n" +
-                        "ROW_NUMBER () OVER (ORDER BY invoiceId DESC) AS rowNum,*\n" +
-                        "FROM\n" +
-                        "INV_INVOICE\n" +
-                        ") i\n" +
-                        "LEFT JOIN INV_INVOICE_TYPE t ON i.invoiceType_invoiceTypeId=t.invoiceTypeId\n" +
-//                        "LEFT JOIN INV_INVOICE_DETAIL j ON i.invoiceId=j.invoice_invoiceId\n" +
-                        "LEFT JOIN PM_INC inc on i.inc_incId = inc.incId\n" +
-                        "left join PM_CLIENT incClient on i.client_clientId = incClient.clientId\n" +
-                        "left join PM_INC_MEMBER_REL incm\n" +
-                        "on incm.inc_incId = i.inc_incId\n" +
-                        "left join PM_CLIENT_MEMBER_REL clim\n" +
-                        "on clim.client_clientId = i.client_clientId\n" +
-                        "left join LOG_OPERATION log on log.relId = i.invoiceId " +
-//                        "left join MAT_MATERIAL m ON j.material_materialNum = m.materialNum \n" +
-                        "WHERE "+sql+" and i.auditStatus >= ? and i.active =1  and  incm.member_memberId = ? and clim.member_memberId = ?", new Object[]{auditedStatus,memberId,memberId}, Long.class);
-
-        return new PageImpl<InvoiceEntity>(invoiceEntityList, pageable, total);
+//        String sql = "select " +
+//                " distinct inv.invoiceId, " +
+//                "invt.type, " +
+//                "invt.name, " +
+//                "inv.invoiceNum, " +
+//                "inc.incName, " +
+//                "cli.clientName, " +
+//                "inv.receivedDate, " +
+//                "inv.carNum " +
+//                " from INV_INVOICE inv " +
+//                "left join INV_INVOICE_TYPE invt " +
+//                "on invt.invoiceTypeId = inv.invoiceType_invoiceTypeId " +
+//                "left join pm_inc inc " +
+//                "on inc.incId = inv.inc_incId " +
+//                "left join pm_client cli " +
+//                "on cli.clientId = inv.client_clientId " +
+//                "left join PM_INC_MEMBER_REL incm " +
+//                "on incm.inc_incId = inv.inc_incId " +
+//                "left join PM_CLIENT_MEMBER_REL clim " +
+//                "on clim.client_clientId = inv.client_clientId " +
+//                "left join LOG_OPERATION log on log.invoice_invoiceId = inv.invoiceId " +
+//                "where incm.member_memberId = :memberId and clim.member_memberId = :memberId and inv.active = 1 and inv.auditStatus >= :auditedStatus and ( " +
+//                "log.description like '%\"modifiedVal\":\""+auditedStatus+"\",\"name\":\"auditStatus\",\"originalVal\":\"0\"%' or  " +
+//                "log.description like '%\"modifiedVal\":\""+auditedStatus+"\",\"name\":\"auditStatus\",\"originalVal\":\""+(auditedStatus - 10)+"\"%' " +
+//                ") ";
+//
+//        MapSqlParameterSource parameters = new MapSqlParameterSource();
+//        parameters.addValue("memberId",memberId);
+//        parameters.addValue("auditedStatus",auditedStatus);
+//
+//        List<InvoiceEntity> list = namedParameterJdbcTemplate.query(sql, parameters, new RowMapper<InvoiceEntity>() {
+//            @Override
+//            public InvoiceEntity mapRow(ResultSet resultSet, int i) throws SQLException {
+//                IncEntity incEntity = new IncEntity();
+//                incEntity.setIncName(resultSet.getString("incName"));
+//
+//                ClientEntity clientEntity = new ClientEntity();
+//                clientEntity.setClientName(resultSet.getString("clientName"));
+//
+//                InvoiceTypeEntity invoiceTypeEntity = new InvoiceTypeEntity();
+//                invoiceTypeEntity.setType(resultSet.getInt("type"));
+//                invoiceTypeEntity.setName(resultSet.getString("name"));
+//
+//
+//                InvoiceEntity invoiceEntity = new InvoiceEntity();
+//                invoiceEntity.setInvoiceId(resultSet.getLong("invoiceId"));
+//                invoiceEntity.setInvoiceNum(resultSet.getString("invoiceNum"));
+//                invoiceEntity.setReceivedDate(resultSet.getDate("receivedDate"));
+//                invoiceEntity.setCarNum(resultSet.getString("carNum"));
+//                invoiceEntity.setInvoiceType(invoiceTypeEntity);
+//                invoiceEntity.setClient(clientEntity);
+//                invoiceEntity.setInc(incEntity);
+//                return invoiceEntity;
+//            }
+//        });
+//
+//        Integer total = ((InvoiceService)AopContext.currentProxy()).queryCountByOriginalAuditStatus(auditedStatus,memberId);
+//        return new PageImpl<InvoiceEntity>(list, pageable, total);
+        return page;
     }
 
 
@@ -585,14 +441,14 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "log.description like '%\"modifiedVal\":\""+auditedStatus+"\",\"name\":\"auditStatus\",\"originalVal\":\""+(auditedStatus - 10)+"\"%'\n" +
                 ") ";
 
-        String countsql="select count(invoiceID) ";
-        String selsql="select i.*,t.name,t.type,t.invoiceTypeId,p.incId,p.incName,c.clientId,c.clientName,ROW_NUMBER() OVER (ORDER BY i.invoiceId desc) as rownum ";
+        String countsql="select count(DISTINCT invoiceID) ";
+        String selsql="select DISTINCT i.invoiceId,i.invoiceNum,i.receivedDate,t.name,t.type,t.invoiceTypeId,p.incId,p.incName,c.clientId,c.clientName,DENSE_RANK() OVER (ORDER BY i.invoiceId desc) as rownum ";
         String sql=" from  INV_INVOICE i " +
                 "LEFT JOIN INV_INVOICE_TYPE t on i.invoiceType_invoiceTypeId=t.invoiceTypeId " +
                 "LEFT JOIN PM_INC p on i.inc_incId =p.incId " +
                 "left join PM_INC_MEMBER_REL incm on incm.inc_incId = i.inc_incId\n" +
                 "left join PM_CLIENT_MEMBER_REL clim on clim.client_clientId = i.client_clientId " +
-                "left join LOG_OPERATION log on log.relId = i.invoiceId " +
+                "left join LOG_OPERATION log on log.invoice_invoiceId = i.invoiceId " +
                 "LEFT JOIN PM_CLIENT c on c.clientId=i.client_clientId where 1=1 and i.active =1 and incm.member_memberId = ? and clim.member_memberId = ? and i.auditStatus >= ? and "+logSql;
         List<Object> objList=new ArrayList<Object>();
 
@@ -638,15 +494,15 @@ public class InvoiceServiceImpl implements InvoiceService {
                 InvoiceEntity invoiceEntity=new InvoiceEntity();
                 invoiceEntity.setInvoiceId(rs.getLong("invoiceId"));
                 invoiceEntity.setInvoiceNum(rs.getString("invoiceNum"));
-                invoiceEntity.setCarNum(rs.getString("carNum"));
-                invoiceEntity.setSubmitDate(rs.getDate("submitDate"));
-                invoiceEntity.setClientAddress(rs.getString("clientAddress"));
-                invoiceEntity.setCreatedDate(rs.getDate("createdDate"));
-                invoiceEntity.setDeliveryDate(rs.getDate("deliveryDate"));
-                invoiceEntity.setRemark(rs.getString("remark"));
+//                invoiceEntity.setCarNum(rs.getString("carNum"));
+//                invoiceEntity.setSubmitDate(rs.getDate("submitDate"));
+//                invoiceEntity.setClientAddress(rs.getString("clientAddress"));
+//                invoiceEntity.setCreatedDate(rs.getDate("createdDate"));
+//                invoiceEntity.setDeliveryDate(rs.getDate("deliveryDate"));
+//                invoiceEntity.setRemark(rs.getString("remark"));
                 invoiceEntity.setReceivedDate(rs.getDate("receivedDate"));
-                invoiceEntity.setAuditStatus(rs.getInt("auditStatus"));
-                invoiceEntity.setActive(rs.getBoolean("active"));
+//                invoiceEntity.setAuditStatus(rs.getInt("auditStatus"));
+//                invoiceEntity.setActive(rs.getBoolean("active"));
 
                 InvoiceTypeEntity invoiceTypeEntity=new InvoiceTypeEntity();
                 invoiceTypeEntity.setInvoiceTypeId(rs.getLong("invoiceTypeId"));
@@ -759,7 +615,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public Integer getPreAuditStatusByInvoiceId(Long invoiceId) {
          Integer preAuditStatus = 50;
 
-        String sql = "select log.description from LOG_OPERATION log where log.entity = 'invoice' and log.type = 'CREATE' and log.relId = :invoiceId";
+        String sql = "select log.description from LOG_OPERATION log where log.entity = 'invoice' and log.type = 'CREATE' and log.invoice_invoiceId = :invoiceId";
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("invoiceId",invoiceId);
