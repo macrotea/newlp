@@ -3,16 +3,33 @@
  */
 angular.module('newlpApp')
     .directive({
-        "clientSelect": function () {
+        "clientSelect": function ($compile) {
             return {
-//                templateUrl: 'templates/client.select.html',
+                templateUrl: 'templates/client.select.html',
                 restrict: 'AE',
                 transclude: true,
                 scope: {
-                    client: '=ngModel',
+                    client: '=client',
                     clientId: '=?clientId'
                 },
-                controller: function ($scope, $modal) {
+                controller: function ($scope, $modal, Client,currentUser) {
+
+
+//                    Client.findByMemberId({memberId: currentUser.getUsername()}, {}, function (data) {
+//                        var clients = data._embedded.clients;
+//                        $scope.clients =clients;
+//                        $scope.client = clients[0];
+//                            sessionStorage.setItem('incs',JSON.stringify(incs));
+//                    });
+
+                    $scope.$watch('client', function (val) {
+                        if(undefined != val){
+                            $scope.clients = [];
+                            $scope.clients.push($scope.client);
+                            $scope.client = $scope.clients[0]
+                        }
+                    });
+
 
                     $scope.open = function () {
 
@@ -24,7 +41,7 @@ angular.module('newlpApp')
 
                                 $scope.searchTerm = '';
                                 $scope.selected = [];
-                                client &&  client.clientId ? $scope.selected.push(client) : '';
+                                client && client.clientId ? $scope.selected.push(client) : '';
 
                                 $scope.searchTermChange = function (searchTerm) {
                                     $scope.searchTerm = searchTerm;
@@ -67,8 +84,10 @@ angular.module('newlpApp')
 
                         /*return selected result of modal*/
                         modalInstance.result.then(function (selected) {
+                            $scope.clients = selected;
                             $scope.client = selected[0];
-                            $scope.clientId = selected[0]? selected[0].clientId:null;
+                            $scope.clientId = selected[0] ? selected[0].clientId : null;
+
                         }, function () {
                             console.info('Modal dismissed at: ' + new Date());
                         });
@@ -77,9 +96,13 @@ angular.module('newlpApp')
                 },
                 link: function (scope, element, attrs, ctrl) {
                     element[0].onclick = function ($event) {
-                        $event.preventDefault();
-                        $event.stopPropagation();
+//                        $event.preventDefault();
+//                        $event.stopPropagation();
                         scope.open();
+                    };
+
+                    if (element.attr('required')){
+                        scope.required = true;
                     }
                 }
             };

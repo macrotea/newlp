@@ -49,7 +49,10 @@
                     <p class="form-control-static" ng-bind="invoice.inc.incName"></p>
                 </div>
                 <div class="input-group col-xs-10 col-sm-5" ng-if="fields.inc.editable">
-                    <inc-select inc="invoice.inc"></inc-select>
+                    <div inc-select inc="invoice.inc"></div>
+                    <!--<select class="form-control" inc-select ng-model="invoice.inc" ng-options="inc.incName for inc in [invoice.inc] track by inc.incId" >-->
+                        <!--<option ng-disabled="true"></option>-->
+                    <!--</select>-->
                 </div>
             </div>
         </div>
@@ -63,9 +66,10 @@
                     <p class="form-control-static" ng-bind="invoice.client.clientName"></p>
                 </div>
                 <div class="input-group col-xs-10 col-sm-5 pull-left" ng-if="fields.client.editable">
-                    <select class="form-control" title="选择客户" name="invoiceClient" required
-                            client-select ng-model="invoice.client" ng-options="client.clientName for client in [invoice.client] track by client.clientId" >
-                    </select>
+                    <div client-select client="invoice.client" required></div>
+                    <!--<select class="form-control" title="选择客户" name="invoiceClient" required-->
+                            <!--client-select ng-model="invoice.client" ng-options="client.clientName for client in [invoice.client] track by client.clientId">-->
+                    <!--</select>-->
                 </div>
 
                 <span class="help-inline col-xs-12 col-sm-7" ng-if="form.invoiceClient.$invalid">
@@ -121,7 +125,7 @@
                     <p class="form-control-static" ng-bind="invoice.carNum"></p>
                 </div>
                 <div class="input-group col-xs-10 col-sm-5 pull-left" ng-if="fields.carNum.editable">
-                    <input class="form-control" type="text" name="invoiceCarNum" ng-model="invoice.carNum" required carnum>
+                    <input class="form-control" type="text" name="invoiceCarNum" ng-model="invoice.carNum" required carnum placeholder="示例：粤A12345">
                 </div>
 
                 <span class="help-inline col-xs-12 col-sm-7" ng-if="form.invoiceCarNum.$invalid">
@@ -163,7 +167,7 @@
         <!--invoice materials select-->
         <!--=======================================-->
         <h3 class="header smaller lighter blue">选择物料</h3>
-        <invoice-details details="invoice.invoiceDetails"  options="options"></invoice-details>
+        <div invoice-details details="invoice.invoiceDetails"  options="options"></div>
         <!--=======================================-->
         <!--/invoice materials select-->
 

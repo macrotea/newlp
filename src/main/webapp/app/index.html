@@ -6,6 +6,25 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
+
+
+      <!--[if lte IE 9]>
+            <meta http-equiv="X-UA-Compatible" content="IE=8">
+      <![endif]-->
+
+      <!--[if lte IE 8]>
+      <script>
+          document.createElement('ng-include');
+          document.createElement('ng-pluralize');
+          document.createElement('ng-view');
+
+          // Optionally these for CSS
+          document.createElement('ng:include');
+          document.createElement('ng:pluralize');
+          document.createElement('ng:view');
+      </script>
+      <![endif]-->
+
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
@@ -74,11 +93,14 @@
     <script src="bower_components/angular-bootstrap3-datepicker/dist/angular-bootstrap3-datepicker.min.js"></script>
     <script src="bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
     <script src="bower_components/angular-daterangepicker/js/angular-daterangepicker.js"></script>
+    <script src="bower_components/respond/dest/respond.src.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <!--plugins-->
+    <!--<script src="bower_components/respond/dest/respond.matchmedia.addListener.min.js"></script>-->
+
     <script src="scripts/plugins/ui-bootstrap-custom-tpls-0.11.0.js"></script>
     <script src="scripts/plugins/sockjs.min.js"></script>
     <script src="scripts/plugins/stomp.min.js"></script>

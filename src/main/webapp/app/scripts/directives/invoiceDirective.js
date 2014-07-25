@@ -73,6 +73,14 @@ angular.module('newlpApp')
                         }
                     };
 
+                    $scope.fixIE = function(){
+                        //check if IE so the other browsers don't get this ugly hack.
+                        var selectLists = document.querySelectorAll(".selectList");
+                        for(var x = 0;x  < selectLists.length; x++){
+                            selectLists[x].parentNode.insertBefore(selectLists[x], selectLists[x]);
+                        }
+                    };
+
 
                     //default search
                     $scope.queryByAuditStatus = function () {

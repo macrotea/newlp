@@ -1,2 +1,3 @@
-<select class="form-control" title="选择客户" client-select client-id="searchTerm.clientId" ng-model="searchTerm.client"
-        ng-options="client.clientName for client in [searchTerm.client] track by client.clientId"> </select>
+<select class="form-control" name="invoiceClient" ng-model="client" ng-options="client.clientName for client in clients track by client.clientId" ng-required="required">
+    <option ng-disabled="true"></option>
+</select>

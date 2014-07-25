@@ -33,12 +33,15 @@
 
 
             <div class="form-group">
-                <!--公司-->
-                <label class="col-sm-1 control-label no-padding-right"> 公司 </label>
+                <!--单据日期-->
+                <label class="col-sm-1 control-label no-padding-right"> 单据日期 </label>
 
                 <div class="col-sm-5">
-                    <div class="input-group col-xs-12">
-                        <inc-select inc="invoice.inc"></inc-select>
+                    <div class="input-group col-xs-12 pull-left">
+                        <input id="daterange" date-range-picker class="form-control date-picker" type="text" ng-model="searchTerm.receivedDateRange" min="'2014-02-23'" max="'2015-02-25'" options="daterangeOptions"/>
+                        <span class="input-group-addon" ng-click="showDateRange($event)">
+                           <i class="fa fa-calendar bigger-110"></i>
+                        </span>
                     </div>
                 </div>
 
@@ -47,11 +50,7 @@
 
                 <div class="col-sm-5">
                     <div class="input-group col-xs-12">
-                        <!--<client-select client="invoice.client" client-id="searchTerm.clientId"></client-select>-->
-                        <select class="form-control" title="选择客户" client-select client-id="searchTerm.clientId"
-                                ng-model="searchTerm.client"
-                                ng-options="client.clientName for client in [searchTerm.client] track by client.clientId">
-                        </select>
+                        <div client-select client="searchTerm.client" client-id="searchTerm.clientId"></div>
                     </div>
                 </div>
             </div>
@@ -76,20 +75,6 @@
                 <div class="col-sm-5">
                     <div class="input-group col-xs-12">
                         <input class="form-control" type="text" ng-model="searchTerm.num">
-                    </div>
-                </div>
-            </div>
-
-            <!--单据日期-->
-            <div class="form-group">
-                <label class="col-sm-1 control-label no-padding-right"> 单据日期 </label>
-
-                <div class="col-sm-5">
-                    <div class="input-group col-xs-12 pull-left">
-                        <input id="daterange" date-range-picker class="form-control date-picker" type="text" ng-model="searchTerm.receivedDateRange" min="'2014-02-23'" max="'2015-02-25'" options="daterangeOptions"/>
-                        <span class="input-group-addon" ng-click="showDateRange($event)">
-                           <i class="fa fa-calendar bigger-110"></i>
-                        </span>
                     </div>
                 </div>
             </div>
