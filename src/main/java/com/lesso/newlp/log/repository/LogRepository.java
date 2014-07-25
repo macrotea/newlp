@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface LogRepository extends JpaRepository<OperationLogEntity,Long> {
 
-    @Query("from OperationLogEntity  o where o.relId = :invoiceId and o.entity = 'invoice'")
+    @Query("from OperationLogEntity  o where o.invoice.invoiceId = :invoiceId and o.entity = 'invoice'")
     List<OperationLogEntity> findByInvoiceId(@Param("invoiceId") Long invoiceId);
 
 

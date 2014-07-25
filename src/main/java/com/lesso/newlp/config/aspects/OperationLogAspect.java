@@ -7,7 +7,9 @@ import com.lesso.newlp.invoice.service.InvoiceService;
 import com.lesso.newlp.log.entity.OperationLogEntity;
 import com.lesso.newlp.log.model.Modified;
 import com.lesso.newlp.log.repository.LogRepository;
+import com.lesso.newlp.pm.entity.MemberEntity;
 import com.lesso.newlp.pm.repository.IncRepository;
+import com.lesso.newlp.pm.repository.MemberRepository;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -40,6 +42,9 @@ public class OperationLogAspect {
     InvoiceRepository invoiceRepository;
 
     @Resource
+    MemberRepository memberRepository;
+
+    @Resource
     InvoiceService invoiceService;
 
 
@@ -55,7 +60,6 @@ public class OperationLogAspect {
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
         logEntity.setType("CREATE");
-        logEntity.setMemberId(user.getUsername());
 
         List<Modified> modifieds = new ArrayList<>();
         Modified modified  = new Modified();
@@ -65,8 +69,10 @@ public class OperationLogAspect {
         modifieds.add(modified);
 
         logEntity.setDescription(JSON.toJSONString(modifieds));
-        logEntity.setIncId(invoiceEntity.getInc().getIncId());
-        logEntity.setRelId(invoiceEntity.getInvoiceId());
+        MemberEntity memberEntity = memberRepository.findOne(user.getUsername());
+        logEntity.setMember(memberEntity);
+        logEntity.setInc(invoiceEntity.getInc());
+        logEntity.setInvoice(invoiceEntity);
         logEntity.setOperationDate(new Date());
         logRepository.saveAndFlush(logEntity);
 
@@ -125,10 +131,11 @@ public class OperationLogAspect {
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
         logEntity.setType("UPDATE");
-        logEntity.setMemberId(user.getUsername());
         logEntity.setDescription(JSON.toJSONString(modifieds));
-        logEntity.setIncId(invoiceEntity.getInc().getIncId());
-        logEntity.setRelId(invoiceEntity.getInvoiceId());
+        MemberEntity memberEntity = memberRepository.findOne(user.getUsername());
+        logEntity.setMember(memberEntity);
+        logEntity.setInc(invoiceEntity.getInc());
+        logEntity.setInvoice(invoiceEntity);
         logEntity.setOperationDate(new Date());
         logRepository.saveAndFlush(logEntity);
         return retVal;
@@ -189,10 +196,11 @@ public class OperationLogAspect {
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
         logEntity.setType("UPDATE");
-        logEntity.setMemberId(user.getUsername());
         logEntity.setDescription(JSON.toJSONString(modifieds));
-        logEntity.setIncId(invoiceEntity.getInc().getIncId());
-        logEntity.setRelId(invoiceEntity.getInvoiceId());
+        MemberEntity memberEntity = memberRepository.findOne(user.getUsername());
+        logEntity.setMember(memberEntity);
+        logEntity.setInc(invoiceEntity.getInc());
+        logEntity.setInvoice(invoiceEntity);
         logEntity.setOperationDate(new Date());
         logRepository.saveAndFlush(logEntity);
         return retVal;
@@ -217,10 +225,11 @@ public class OperationLogAspect {
         OperationLogEntity logEntity = new OperationLogEntity();
         logEntity.setEntity("invoice");
         logEntity.setType("DELETE");
-        logEntity.setMemberId(user.getUsername());
 //        logEntity.setDescription("删除订单");
-        logEntity.setIncId(invoiceEntity.getInc().getIncId());
-        logEntity.setRelId(invoiceEntity.getInvoiceId());
+        MemberEntity memberEntity = memberRepository.findOne(user.getUsername());
+        logEntity.setMember(memberEntity);
+        logEntity.setInc(invoiceEntity.getInc());
+        logEntity.setInvoice(invoiceEntity);
         logEntity.setOperationDate(new Date());
         logRepository.saveAndFlush(logEntity);
         return retVal;

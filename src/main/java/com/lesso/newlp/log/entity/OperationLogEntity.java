@@ -1,6 +1,9 @@
 package com.lesso.newlp.log.entity;
 
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.invoice.entity.InvoiceEntity;
+import com.lesso.newlp.pm.entity.IncEntity;
+import com.lesso.newlp.pm.entity.MemberEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,11 +21,18 @@ public class OperationLogEntity extends AbstractTimestampEntity implements Seria
     Date operationDate;
     String entity;
     String type;
-    Long relId;
-    Long incId;
-    String memberId;
     @Column(columnDefinition = "TEXT")
     String description;
+
+    @ManyToOne
+    IncEntity inc;
+
+    @ManyToOne
+    InvoiceEntity invoice;
+
+    @ManyToOne
+    MemberEntity member;
+
 
     public Long getOperationLogId() {
         return operationLogId;
@@ -56,20 +66,20 @@ public class OperationLogEntity extends AbstractTimestampEntity implements Seria
         this.type = type;
     }
 
-    public String getMemberId() {
-        return memberId;
+    public InvoiceEntity getInvoice() {
+        return invoice;
     }
 
-    public void setMemberId(String memberId) {
-        this.memberId = memberId;
+    public void setInvoice(InvoiceEntity invoice) {
+        this.invoice = invoice;
     }
 
-    public Long getRelId() {
-        return relId;
+    public MemberEntity getMember() {
+        return member;
     }
 
-    public void setRelId(Long relId) {
-        this.relId = relId;
+    public void setMember(MemberEntity member) {
+        this.member = member;
     }
 
     public String getDescription() {
@@ -80,11 +90,12 @@ public class OperationLogEntity extends AbstractTimestampEntity implements Seria
         this.description = description;
     }
 
-    public Long getIncId() {
-        return incId;
+    public IncEntity getInc() {
+        return inc;
     }
 
-    public void setIncId(Long incId) {
-        this.incId = incId;
+    public void setInc(IncEntity inc) {
+        this.inc = inc;
     }
+
 }
