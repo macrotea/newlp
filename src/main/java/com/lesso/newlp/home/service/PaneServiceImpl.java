@@ -20,4 +20,6 @@ public class PaneServiceImpl implements PaneService {
     public PaneEntity save(PaneEntity paneEntity) {
         return paneRepository.saveAndFlush(paneEntity);
     }
+
+
 }

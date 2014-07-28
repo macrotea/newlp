@@ -2,6 +2,10 @@ package com.lesso.newlp.home.repository;
 
 import com.lesso.newlp.home.entity.PaneEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Set;
 
 /**
  * User: Sean
@@ -10,4 +14,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface PaneRepository extends JpaRepository<PaneEntity,String> {
 
+    @Query("select pane from PaneEntity  pane where pane.panel.panelId = :panelId")
+    Set<PaneEntity> findByPanelId(@Param("panelId") String panelId);
 }

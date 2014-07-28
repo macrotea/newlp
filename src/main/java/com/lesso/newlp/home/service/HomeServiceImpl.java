@@ -37,7 +37,8 @@ public class HomeServiceImpl implements HomeService {
     public List<PanelEntity> queryPanels(String username){
 
 //        List<PanelDTO> panelDTOs = mapperFacade.mapAsList(panelService.queryPanels(username), PanelDTO.class);
-        List<PanelEntity> panelEntities = mapperFacade.mapAsList(panelService.findByMemberId(username), PanelEntity.class);
+//        List<PanelEntity> panelEntities = mapperFacade.mapAsList(panelService.findByMemberId(username), PanelEntity.class);
+        List<PanelEntity> panelEntities = panelService.findByMemberId(username);
 
         int count = 0;
         for(PanelEntity panel : panelEntities){

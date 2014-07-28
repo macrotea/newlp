@@ -3,6 +3,7 @@ package com.lesso.newlp.pm.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.home.entity.PanelEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -36,6 +37,13 @@ public class GroupEntity extends AbstractTimestampEntity implements Serializable
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<MemberEntity> members = new HashSet<MemberEntity>();
 
+
+    @ManyToMany()
+    @JoinTable(name = "PM_GROUP_PANEL_REL",
+            joinColumns = {@JoinColumn(name = "group_groupId")},
+            inverseJoinColumns = {@JoinColumn(name = "panel_panelId")})
+    @LazyCollection(LazyCollectionOption.FALSE)
+    Set<PanelEntity> panels = new HashSet<PanelEntity>();
 
     public String getGroupId() {
         return groupId;

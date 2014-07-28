@@ -3,6 +3,7 @@ package com.lesso.newlp.home.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.lesso.newlp.pm.entity.GroupEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -35,6 +36,10 @@ public class PanelEntity implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     @OrderBy("order ASC")
     Set<PaneEntity> panes = new HashSet<>();
+
+    @ManyToMany(mappedBy="panels")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    Set<GroupEntity> groups = new HashSet<GroupEntity>();
 
     public String getPanelId() {
         return panelId;
@@ -90,5 +95,13 @@ public class PanelEntity implements Serializable {
 
     public void setOrder(Integer order) {
         this.order = order;
+    }
+
+    public Set<GroupEntity> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<GroupEntity> groups) {
+        this.groups = groups;
     }
 }

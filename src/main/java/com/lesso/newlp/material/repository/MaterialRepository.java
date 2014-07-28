@@ -14,7 +14,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(collectionResourceRel = "materials", path = "materials")
 public interface MaterialRepository extends JpaRepository<MaterialEntity,String> {
 
-    @Query("select m from MaterialEntity m where (m.name like %:searchTerm% or m.materialNum like %:searchTerm% ) and m.active is true")
+    @Query("select m from MaterialEntity m where (m.name like '%'||:searchTerm||'%' or m.materialNum like '%'||:searchTerm||'%' ) and m.active = true")
     Page<MaterialEntity> findByNameOrNumLike(@Param("searchTerm") String searchTerm, Pageable pageable);
 
     @Query("select m from MaterialEntity m where m.name = :name")
