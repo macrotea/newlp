@@ -145,14 +145,13 @@ angular.module('newlpApp')
                     //handle form action
                     $scope.submit = function () {
                         $scope.loading = true;
-                        if ($scope.action == 'RESET') {
-                            $scope.reset();
-                        }
+                        $scope.onPageChanged = $scope.search;
+                        $scope.onPageChanged();
+                    };
 
-                        if ($scope.action == 'SUBMIT') {
-                            $scope.onPageChanged = $scope.search;
-                            $scope.onPageChanged();
-                        }
+                    $scope.rest = function(){
+                        $scope.loading = true;
+                        $scope.reset();
                     };
 
                     $scope.onPageSizeChange = function () {
@@ -245,7 +244,7 @@ angular.module('newlpApp')
                             var invoiceDetail = {};
                             invoiceDetail.orderCount = 1;
                             invoiceDetail.deliveryCount = invoiceDetail.orderCount;
-                            invoiceDetail.remark = '明细备注';
+                            invoiceDetail.remark = undefined;
                             invoiceDetail.unit = material.unit;
                             invoiceDetail.auxiliaryUnitOne = material.auxiliaryUnitOne;
                             invoiceDetail.auxiliaryUnitTwo = material.auxiliaryUnitTwo;

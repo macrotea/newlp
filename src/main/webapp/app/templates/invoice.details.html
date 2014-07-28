@@ -62,6 +62,7 @@
                 <thead>
                 <tr>
                     <th>物料编码</th>
+                    <th>物料名称</th>
                     <th>订单数量</th>
                     <th>实发数量</th>
                     <th>主计量单位</th>
@@ -76,9 +77,10 @@
                 <tbody>
                 <tr ng-repeat="invoiceDetail in invoiceDetails">
                     <td class="align-middle" ng-bind="invoiceDetail.material.materialNum"></td>
+                    <td class="align-middle" ng-bind="invoiceDetail.material.name"></td>
                     <td class="align-middle">
                         <span class="align-middle" ng-bind="invoiceDetail.orderCount" ng-if="!fields.orderCount.editable" ></span>
-                        <div class="ace-spinner touch-spinner" style="width: 120px;"  ng-if="fields.orderCount.editable" >
+                        <div class="ace-spinner touch-spinner" style="width: 80px;"  ng-if="fields.orderCount.editable" >
                             <div class="input-group">
                                 <input type="number" min="0" class="input-mini spinner-input form-control"
                                        ng-model="invoiceDetail.orderCount" ng-change="invoiceDetail.deliveryCount=invoiceDetail.orderCount">
@@ -118,8 +120,8 @@
                     </td>
                 </tr>
                 <tr ng-if=" invoiceDetails == undefined ||  invoiceDetails.length == 0">
-                    <td colspan="10"  ng-if="!readOnly">无</td>
-                    <td colspan="9"  ng-if="readOnly">无</td>
+                    <td colspan="11"  ng-if="!readOnly">无</td>
+                    <td colspan="10"  ng-if="readOnly">无</td>
                 </tr>
                 </tbody>
             </table>

@@ -331,14 +331,12 @@ angular.module('newlpApp')
 
         //handle Criteria Query Form action
         $scope.submit = function () {
-            if ($scope.action == 'RESET') {
-                $scope.reset();
-            }
-
-            if ($scope.action == 'SUBMIT') {
                 $scope.onPageChanged = $scope.search;
                 $scope.onPageChanged();
-            }
+        };
+
+        $scope.rest = function(){
+            $scope.reset();
         };
 
         //reset

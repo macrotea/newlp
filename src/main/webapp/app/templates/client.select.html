@@ -1,3 +1,6 @@
-<select class="form-control" name="invoiceClient" ng-model="client" ng-options="client.clientName for client in clients track by client.clientId" ng-required="required">
-    <option ng-disabled="true"></option>
-</select>
+<div class="chosen-group" data-template="templates/client.select.modal.html" bs-modal="modal">
+    <span class="chosen-group-container" data-title="选择">
+        <span class="chosen-group-name" data-title="{{client.clientName || '请选择客户'}}">
+        </span>
+    </span>
+</div>

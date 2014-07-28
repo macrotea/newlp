@@ -284,4 +284,5 @@ angular
 
         $rootScope.currentUser = {};
         $rootScope.currentUser.username = currentUser.getUsername();
+
     });

@@ -65,14 +65,13 @@ angular.module('newlpApp')
                     //handle form action
                     $scope.submit = function () {
                         $scope.loading = true;
-                        if ($scope.action == 'RESET') {
-                            $scope.reset();
-                        }
+                        $scope.onPageChanged = $scope.search;
+                        $scope.onPageChanged();
+                    };
 
-                        if ($scope.action == 'SUBMIT') {
-                            $scope.onPageChanged = $scope.search;
-                            $scope.onPageChanged();
-                        }
+                    $scope.rest = function(){
+                        $scope.loading = true;
+                        $scope.reset();
                     };
 
                     $scope.save = function (credit) {

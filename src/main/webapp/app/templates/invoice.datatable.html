@@ -1,6 +1,6 @@
 <!--Invoice Criteria BEGINS
 ===========================================-->
-<form class="form-horizontal" name="form" novalidate ng-submit="submit()">
+<form class="form-horizontal" name="form" novalidate>
     <fieldset>
         <div class="col-sm-10 col-sm-offset-1">
 
@@ -67,13 +67,13 @@
             <!--搜索-->
             <div class="form-group">
                 <div class="col-sm-5 col-lg-offset-1">
-                    <button class="btn btn-info" type="submit" ng-click="action = 'SUBMIT'">
+                    <button class="btn btn-info" type="submit" ng-click="submit()">
                         <i class="ace-icon fa fa-check bigger-110"></i>
                         搜索
                     </button>
 
                     &nbsp; &nbsp; &nbsp;
-                    <button class="btn" type="submit" ng-click="action = 'RESET'">
+                    <button class="btn" type="submit" ng-click="rest()">
                         <i class="ace-icon fa fa-undo bigger-110"></i>
                         重置
                     </button>

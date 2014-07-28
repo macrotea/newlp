@@ -10,8 +10,9 @@ angular
         /*pulgins*/
         'ui.router',
         'ui.bootstrap',
+        'mgcrea.ngStrap',
         'ngDialog',
-        'ng-bootstrap3-datepicker',
+//        'ng-bootstrap3-datepicker',
 //        'ngBootstrap',
         'daterangepicker',
 //        'dateRangePicker',
@@ -20,24 +21,13 @@ angular
         'LocalStorageModule'
 
     ])
-    .config(function ($httpProvider,$locationProvider) {
+    .config(function ($httpProvider, $locationProvider) {
 
 //        $locationProvider.html5Mode(true);
 
-        var publicStates =['login','logout'];
-        var sessionTimeoutCtrl = ['$scope','$modalInstance','$state',function ($scope, $modalInstance,$state) {
+        var publicStates = ['login', 'logout'];
 
-            $scope.goToLoginPage = function () {
-                $modalInstance.close("");
-                $state.go('login');
-            };
-
-            $scope.cancel = function () {
-                $modalInstance.dismiss('cancel');
-            };
-
-        }];
-        var modalInstance;
+        var sessionTimeoutModal;
 
         var inteceptor = ['$rootScope', '$q', function ($rootScope, $q) {
             return {
@@ -51,13 +41,19 @@ angular
 //                    }
                     if (rejection.status === 401) {
 
-                        if(publicStates.indexOf($rootScope.$state.current.name) < 0  && undefined ==modalInstance){
-                            modalInstance =  $rootScope.$modal.open({
-                                templateUrl: 'views/auth.sessionTimeout.html',
-                                controller:sessionTimeoutCtrl
+                        if (publicStates.indexOf($rootScope.$state.current.name) < 0 && undefined == sessionTimeoutModal) {
+
+                            /*popup sessiontime warning modal*/
+                            sessionTimeoutModal = $rootScope.$modal({
+                                template: 'views/auth.sessionTimeout.html',
+                                show: true
                             });
-                        }else{
-                            $rootScope.currentUser =undefined;
+                            sessionTimeoutModal.$scope.goLogin = function () {
+                                $rootScope.$state.go('login');
+                            };
+
+                        } else {
+                            $rootScope.currentUser = undefined;
                             document.execCommand('ClearAuthenticationCache');
                             localStorage.removeItem('username');
                         }

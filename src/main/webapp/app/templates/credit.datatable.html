@@ -1,6 +1,6 @@
 <!--credit Criteria BEGINS
 ===========================================-->
-<form class="form-horizontal" name="form" novalidate ng-submit="submit()">
+<form class="form-horizontal" name="form" novalidate>
     <fieldset>
         <div class="col-sm-10 col-sm-offset-1">
 
@@ -87,13 +87,13 @@
             <!--搜索-->
             <div class="form-group">
                 <div class="col-sm-5 col-lg-offset-1">
-                    <button class="btn btn-info" type="submit" ng-click="action = 'SUBMIT'">
+                    <button class="btn btn-info" type="submit" ng-click="submit()">
                         <i class="ace-icon fa fa-check bigger-110"></i>
                         搜索
                     </button>
 
                     &nbsp; &nbsp; &nbsp;
-                    <button class="btn" type="submit" ng-click="action = 'RESET'">
+                    <button class="btn" type="submit" ng-click="rest()">
                         <i class="ace-icon fa fa-undo bigger-110"></i>
                         重置
                     </button>
@@ -145,9 +145,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="credit in data.content | filter:searchText | orderBy:'-creditId'   track by credit.creditId"
-            ng-class="{'animate-show':credit.editable != undefined}" ng-dblclick="edit(credit)"
-            ng-show="credit.editable == undefined || credit.editable " ng-if="!loading" >
+        <tr ng-repeat="credit in data.content | filter:searchText | orderBy:'-creditId'   track by credit.creditId" ng-dblclick="edit(credit)"
+            ng-if="!loading" >
             <td ng-if='undefined  == credit.editable' ng-bind="credit.creditId"></td>
             <td ng-if='undefined  == credit.editable' ng-bind="credit.client.clientNum"></td>
             <td ng-if='undefined  == credit.editable' ng-bind="credit.validDate | date:'yyyy-MM-dd'"></td>
@@ -200,11 +199,9 @@
 
             </td>
 
-            <td class="no-padding" colspan="10" ng-class="{'animate-show':credit.editable != undefined}"
-                ng-show="credit.editable ">
+            <td class="editable-row" colspan="10">
                 <ng-form name="detailForm">
-                    <div class="form-horizontal" ng-class="{'animate-show':credit.editable != undefined}"
-                         ng-show="credit.editable ">
+                    <div class="form-horizontal animate-if"  ng-if="credit.editable">
                         <hr>
                         <div class="col-sm-5 col-sm-offset-1">
                             <div class="form-group">

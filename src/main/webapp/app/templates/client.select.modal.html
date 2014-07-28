@@ -1,90 +1,96 @@
-<div class="modal-header">
-    <h3 class="modal-title">
-            <span class="text-info bigger-110 blue">
-                选择客户
-            </span>
-    </h3>
-</div>
-<div class="modal-body col-sm-12">
-        <form class="form-horizontal">
-            <div class="form-group">
-                <div class="col-sm-4">
-                    <div class="input-group">
-                        <input type="text" class="form-control search-query ng-pristine ng-valid ng-touched"
-                               placeholder="输入客户ID或者客户名称" ng-model="searchTerm" ng-change="searchTermChange(searchTerm)">
+<div class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a  class="close" ng-click="$hide()">&times;</a>
+                <h4 class="modal-title">
+                    <span class="text-info bigger-110 blue"> 选择客户 </span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control search-query ng-pristine ng-valid ng-touched"
+                                       placeholder="输入客户ID或者客户名称" ng-model="searchTerm" ng-change="searchTermChange(searchTerm)">
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-purple btn-sm" ng-click="search()">
                             搜索
                             <i class="ace-icon fa fa-search icon-on-right bigger-110"></i>
                         </button>
                     </span>
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="col-xs-11 label label-lg label-info arrowed-in arrowed-right">
+                                <b>已选</b>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-8">
-                    <div class="col-xs-11 label label-lg label-info arrowed-in arrowed-right">
-                        <b>已选</b>
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>客户编码</th>
+                                    <th>客户名称</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="client in searchData._embedded.clients">
+                                    <td class="align-middle">{{client.clientNum}}</td>
+                                    <td class="align-middle">{{client.clientName}}</td>
+                                    <td class="align-middle center">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-xs btn-success" ng-click="select(client)">
+                                                <i class="ace-icon fa fa-plus-circle bigger-120"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr ng-if="searchData == undefined || searchData.page.totalElements == 0">
+                                    <td colspan="3">无</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-8">
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>客户编码</th>
+                                    <th>客户名称</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="client in selected">
+                                    <td class="align-middle">{{client.clientNum}}</td>
+                                    <td class="align-middle">{{client.clientName}}</td>
+                                    <td class="align-middle center">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-xs btn-danger" ng-click="remove(client)">
+                                                <i class="ace-icon fa fa-trash-o bigger-120"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr ng-if="selected == undefined || selected.length < 1">
+                                    <td colspan="3">无</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
+                </form>
+
             </div>
-            <div class="form-group">
-                <div class="col-sm-4">
-                    <table class="table table-striped table-bordered table-hover">
-                        <thead>
-                        <tr>
-                            <th>客户编码</th>
-                            <th>客户名称</th>
-                            <th>操作</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="client in searchData._embedded.clients">
-                            <td class="align-middle">{{client.clientNum}}</td>
-                            <td class="align-middle">{{client.clientName}}</td>
-                            <td class="align-middle center">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-xs btn-success" ng-click="select(client)">
-                                        <i class="ace-icon fa fa-plus-circle bigger-120"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr ng-if="searchData == undefined || searchData.page.totalElements == 0">
-                            <td colspan="3">无</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-8">
-                    <table class="table table-striped table-bordered table-hover">
-                        <thead>
-                        <tr>
-                            <th>客户编码</th>
-                            <th>客户名称</th>
-                            <th>操作</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="client in selected">
-                            <td class="align-middle">{{client.clientNum}}</td>
-                            <td class="align-middle">{{client.clientName}}</td>
-                            <td class="align-middle center">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-xs btn-danger" ng-click="remove(client)">
-                                        <i class="ace-icon fa fa-trash-o bigger-120"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr ng-if="selected == undefined || selected.length < 1">
-                            <td colspan="3">无</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" ng-click="confirm();$hide();">确定</button>
+                <button class="btn btn-default" ng-click="$hide()">取消</button>
             </div>
-        </form>
-</div>
-<div class="modal-footer">
-    <button class="btn btn-primary" ng-click="confirm()">确定</button>
-    <button class="btn btn-warning" ng-click="cancel()">取消</button>
+        </div>
+    </div>
 </div>

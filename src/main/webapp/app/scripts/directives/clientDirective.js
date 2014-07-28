@@ -12,7 +12,7 @@ angular.module('newlpApp')
                     client: '=client',
                     clientId: '=?clientId'
                 },
-                controller: function ($scope, $modal, Client,currentUser) {
+                controller: function ($scope, $modal, Client, currentUser) {
 
 
 //                    Client.findByMemberId({memberId: currentUser.getUsername()}, {}, function (data) {
@@ -22,88 +22,46 @@ angular.module('newlpApp')
 //                            sessionStorage.setItem('incs',JSON.stringify(incs));
 //                    });
 
-                    $scope.$watch('client', function (val) {
-                        if(undefined != val){
-                            $scope.clients = [];
-                            $scope.clients.push($scope.client);
-                            $scope.client = $scope.clients[0]
-                        }
+                    $scope.searchTerm = '';
+                    $scope.selected = [];
+
+                    $scope.$watch('client', function (client) {
+                        client && client.clientId ? $scope.selected[0] = $scope.client : '';
                     });
 
+                    $scope.searchTermChange = function (searchTerm) {
+                        $scope.searchTerm = searchTerm;
+                    };
 
-                    $scope.open = function () {
-
-                        /*open modal*/
-                        var modalInstance = $modal.open({
-                            templateUrl: 'templates/client.select.modal.html',
-                            size: 'lg',
-                            controller: function ($scope, $modalInstance, Client, client) {
-
-                                $scope.searchTerm = '';
-                                $scope.selected = [];
-                                client && client.clientId ? $scope.selected.push(client) : '';
-
-                                $scope.searchTermChange = function (searchTerm) {
-                                    $scope.searchTerm = searchTerm;
-                                };
-
-                                $scope.search = function () {
-                                    Client.findByNameOrNumLike({searchTerm: $scope.searchTerm}, {}, function (data) {
-                                        $scope.searchData = data;
-                                    });
-                                };
-
-                                $scope.confirm = function () {
-                                    $modalInstance.close($scope.selected);
-                                };
-
-                                $scope.cancel = function () {
-                                    $modalInstance.dismiss('cancel');
-                                };
-
-                                $scope.add = function (client) {
-                                    $scope.selected.push(client);
-                                };
-
-                                $scope.select = function (client) {
-                                    $scope.selected[0] = client;
-                                };
-
-                                $scope.remove = function (client) {
-                                    $scope.selected = $scope.selected.filter(function (c) {
-                                        return c != client;
-                                    });
-                                }
-                            },
-                            resolve: {
-                                client: function () {
-                                    return $scope.client;
-                                }
-                            }
+                    $scope.search = function () {
+                        Client.findByNameOrNumLike({searchTerm: $scope.searchTerm}, {}, function (data) {
+                            $scope.searchData = data;
                         });
+                    };
 
-                        /*return selected result of modal*/
-                        modalInstance.result.then(function (selected) {
-                            $scope.clients = selected;
-                            $scope.client = selected[0];
-                            $scope.clientId = selected[0] ? selected[0].clientId : null;
+                    $scope.confirm = function () {
+                        $scope.clients = $scope.selected;
+                        $scope.client = $scope.selected[0];
+                        $scope.clientId = $scope.selected[0] ? $scope.selected[0].clientId : null;
+                    };
 
-                        }, function () {
-                            console.info('Modal dismissed at: ' + new Date());
+
+                    $scope.add = function (client) {
+                        $scope.selected.push(client);
+                    };
+
+                    $scope.select = function (client) {
+                        $scope.selected[0] = client;
+                    };
+
+                    $scope.remove = function (client) {
+                        $scope.selected = $scope.selected.filter(function (c) {
+                            return c != client;
                         });
                     };
 
                 },
-                link: function (scope, element, attrs, ctrl) {
-                    element[0].onclick = function ($event) {
-//                        $event.preventDefault();
-//                        $event.stopPropagation();
-                        scope.open();
-                    };
-
-                    if (element.attr('required')){
-                        scope.required = true;
-                    }
+                link: function (scope, element, attrs, ngModel) {
                 }
             };
         }
