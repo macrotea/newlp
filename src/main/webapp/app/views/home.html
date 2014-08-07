@@ -118,7 +118,7 @@
                         <span class="menu-text">
                           {{panel.name}}{{'active'| includedByState}}
                         </span>
-                        <span class="badge" ng-if="panel.count > 0">{{panel.count}} </span>
+                        <span class="badge" ng-if="!minimizeSidebar && panel.count > 0">{{panel.count}} </span>
                         <b class="arrow fa fa-angle-down"></b>
                         <!-- arrow down icon if there's a submenu -->
                     </a>
