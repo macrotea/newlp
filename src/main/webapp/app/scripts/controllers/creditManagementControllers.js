@@ -3,7 +3,7 @@
  */
 angular.module('newlpApp')
 
-    .controller('creditManagementBalanceController', function ($scope) {
+    .controller('creditManagementController', function ($scope) {
         $scope.searchForm = {
             options: {
                 criteria: {

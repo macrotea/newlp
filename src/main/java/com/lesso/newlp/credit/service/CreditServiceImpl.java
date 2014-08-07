@@ -83,9 +83,12 @@ public class CreditServiceImpl implements CreditService {
                 "i.amount,i.percent_,i.creditAmount,\n" +
                 "ROW_NUMBER () OVER (ORDER BY i.creditId DESC) AS rowNum from CRE_CREDIT i\n" +
                 "left join PM_CLIENT p on i.client_clientId = p.clientId\n" +
-                "left join PM_CLIENT_MEMBER_REL clim on clim.client_clientId = i.client_clientId where i.active =1 and clim.member_memberId = ?";
+                "left join PM_INC_MEMBER_REL incm on incm.inc_incId = i.inc_incId " +
+                "left join PM_CLIENT_MEMBER_REL clim on clim.client_clientId = i.client_clientId " +
+                "where i.active =1 and clim.member_memberId = ? and incm.member_memberId = ?";
         List<Object> objList=new ArrayList<Object>();
 
+        objList.add(memberId);
         objList.add(memberId);
 
         if(searchTerm.getClientId() !=null){

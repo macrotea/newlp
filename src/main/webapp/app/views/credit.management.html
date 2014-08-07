@@ -8,7 +8,7 @@
     </ul>
 </div>
 
-<div class="page-content" ng-controller="creditManagementBalanceController">
+<div class="page-content" ng-controller="creditManagementController">
 <!-- setting box goes here if needed -->
 
 <div class="page-header">
@@ -25,17 +25,13 @@
 <div class="col-xs-12">
 <!-- PAGE CONTENT BEGINS -->
 
-    <!--Invoice Search Form BEGINS
+
+    <!--Credit Management Form BEGINS
+    ===========================================-->
+    <div credit-management-form options="searchForm.options"></div>
+    <!--Credit Management Form ENDS
     ===========================================-->
 
-    <!--Invoice Search Form BEGINS
-    ===========================================-->
-    <credit-management-form options="searchForm.options"></credit-management-form>
-    <!--Invoice Search Form ENDS
-    ===========================================-->
-
-    <!--Invoice Search Form ENDS
-    ===========================================-->
 
 <!-- PAGE CONTENT ENDS -->
 </div>

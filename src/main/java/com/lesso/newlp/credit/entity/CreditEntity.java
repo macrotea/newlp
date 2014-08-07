@@ -2,8 +2,9 @@ package com.lesso.newlp.credit.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.core.entity.AuditableEntity;
 import com.lesso.newlp.pm.entity.ClientEntity;
+import com.lesso.newlp.pm.entity.IncEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,7 +18,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "CRE_CREDIT", schema = "DBO", catalog = "NEWLP")
-public class CreditEntity extends AbstractTimestampEntity implements Serializable {
+public class CreditEntity extends AuditableEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long creditId;
@@ -36,6 +37,8 @@ public class CreditEntity extends AbstractTimestampEntity implements Serializabl
     @ManyToOne()
     ClientEntity client;
 
+    @ManyToOne()
+    IncEntity inc;
 
     public Long getCreditId() {
         return creditId;
@@ -123,5 +126,13 @@ public class CreditEntity extends AbstractTimestampEntity implements Serializabl
 
     public void setClient(ClientEntity client) {
         this.client = client;
+    }
+
+    public IncEntity getInc() {
+        return inc;
+    }
+
+    public void setInc(IncEntity inc) {
+        this.inc = inc;
     }
 }

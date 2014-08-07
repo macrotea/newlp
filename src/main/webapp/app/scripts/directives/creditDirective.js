@@ -205,6 +205,8 @@ angular.module('newlpApp')
                     //criteria search
                     $scope.search = function () {
 
+                        tmpCreditIds=[];
+
                         Credit.search({
                                 page: $scope.page.number - 1,
                                 size: $scope.page.size
