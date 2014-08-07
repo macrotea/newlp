@@ -3,7 +3,7 @@ package com.lesso.newlp.invoice.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.core.entity.AuditableEntity;
 import com.lesso.newlp.material.entity.MaterialEntity;
 
 import javax.persistence.*;
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID",scope = InvoiceDetailEntity.class)
 @Entity
 @Table(name = "INV_INVOICE_DETAIL", schema = "DBO",catalog = "NEWLP")
-public class InvoiceDetailEntity extends AbstractTimestampEntity implements Serializable {
+public class InvoiceDetailEntity extends AuditableEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +37,7 @@ public class InvoiceDetailEntity extends AbstractTimestampEntity implements Seri
     Double conversionRateOne;//换算率1
     Double conversionRateTwo;//换算率2
     BigDecimal price;                             //单价
+    BigDecimal incPrice;                             //单价
     /*==========================================*/
 
     @JsonIgnore
@@ -156,5 +157,13 @@ public class InvoiceDetailEntity extends AbstractTimestampEntity implements Seri
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getIncPrice() {
+        return incPrice;
+    }
+
+    public void setIncPrice(BigDecimal incPrice) {
+        this.incPrice = incPrice;
     }
 }

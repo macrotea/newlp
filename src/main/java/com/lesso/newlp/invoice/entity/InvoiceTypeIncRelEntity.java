@@ -1,7 +1,7 @@
 package com.lesso.newlp.invoice.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.core.entity.AuditableEntity;
 import com.lesso.newlp.pm.entity.IncEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -16,7 +16,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "INV_INVOICETYPE_INC_REL", schema = "DBO",catalog = "NEWLP")
-public class InvoiceTypeIncRelEntity extends AbstractTimestampEntity implements Serializable  {
+public class InvoiceTypeIncRelEntity extends AuditableEntity implements Serializable  {
 
     @EmbeddedId
     private InvoiceTypeIncRelPk invoiceTypeIncRelPk;

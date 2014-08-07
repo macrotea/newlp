@@ -1,7 +1,7 @@
 package com.lesso.newlp.invoice.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.core.entity.AuditableEntity;
 import com.lesso.newlp.pm.entity.IncEntity;
 
 import javax.persistence.*;
@@ -14,7 +14,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "INV_INVOICE_TYPE", schema = "DBO",catalog = "NEWLP")
-public class InvoiceTypeEntity extends AbstractTimestampEntity implements Serializable {
+public class InvoiceTypeEntity extends AuditableEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

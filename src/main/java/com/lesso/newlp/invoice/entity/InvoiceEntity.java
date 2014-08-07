@@ -1,7 +1,7 @@
 package com.lesso.newlp.invoice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.core.entity.AuditableEntity;
 import com.lesso.newlp.log.entity.OperationLogEntity;
 import com.lesso.newlp.pm.entity.ClientEntity;
 import com.lesso.newlp.pm.entity.IncEntity;
@@ -19,7 +19,7 @@ import java.util.Set;
 //@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@UUID",scope = InvoiceEntity.class)
 @Entity
 @Table(name = "INV_INVOICE", schema = "DBO",catalog = "NEWLP")
-public class InvoiceEntity extends AbstractTimestampEntity implements Serializable {
+public class InvoiceEntity extends AuditableEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +30,7 @@ public class InvoiceEntity extends AbstractTimestampEntity implements Serializab
     Date createdDate;           //创建日期,客户下单-创建日期(保存未发送)
     Date submitDate;            //下单日期,客户下单-发送日期(保存并发送)
     Date deliveryDate;          //发货日期
+    String shift;
 
 
       //发货日期
@@ -48,6 +49,9 @@ public class InvoiceEntity extends AbstractTimestampEntity implements Serializab
     String remark;                   //备注
     @Column(columnDefinition = "bit NULL DEFAULT ((1))")
     Boolean active = true;                     //默认为1，0为删除
+
+    @Column(columnDefinition = "bit NULL DEFAULT ((1))")
+    Boolean isCreatedByDepot = false;                     //是否由仓库创建
 
     @ManyToOne
     IncEntity inc;
@@ -192,5 +196,22 @@ public class InvoiceEntity extends AbstractTimestampEntity implements Serializab
 
     public void setLogs(Set<OperationLogEntity> logs) {
         this.logs = logs;
+    }
+
+
+    public Boolean getIsCreatedByDepot() {
+        return isCreatedByDepot;
+    }
+
+    public void setIsCreatedByDepot(Boolean isCreatedByDepot) {
+        this.isCreatedByDepot = isCreatedByDepot;
+    }
+
+    public String getShift() {
+        return shift;
+    }
+
+    public void setShift(String shift) {
+        this.shift = shift;
     }
 }

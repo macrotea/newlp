@@ -9,6 +9,7 @@ angular.module('newlpApp')
             inc: null,
             client: null,
             carNum: '',
+            shift: '',
             clientAddress: '',
             receivedDate: moment().format('YYYY-MM-DD'),
             remark: '',
@@ -39,6 +40,9 @@ angular.module('newlpApp')
                 carNum:{
                     editable:true
                 },
+                shift:{
+                    editable:true
+                },
                 clientAddress:{
                     editable:true
                 },
@@ -51,14 +55,15 @@ angular.module('newlpApp')
             },
             actions:{
                 save:{
-                    auditStatus:70
+                    auditStatus:60
                 },
                 draft:{
                     auditStatus:50
                 }
             },
             activeStatus:0,
-            activeInvoiceTypes:[1,3]
+            activeInvoiceTypes:[1,3,5],
+            isCreatedByDepot:true
         };
     })
 
@@ -69,6 +74,7 @@ angular.module('newlpApp')
             inc: null,
             client: null,
             carNum: '',
+            shift: '',
             clientAddress: '',
             receivedDate: moment().format('YYYY-MM-DD'),
             remark: '',
@@ -99,6 +105,9 @@ angular.module('newlpApp')
                 carNum:{
                     editable:true
                 },
+                shift:{
+                    editable:true
+                },
                 clientAddress:{
                     editable:true
                 },
@@ -111,14 +120,15 @@ angular.module('newlpApp')
             },
             actions:{
                 save:{
-                    auditStatus:70
+                    auditStatus:60
                 },
                 draft:{
                     auditStatus:50
                 }
             },
             activeStatus:0,
-            activeInvoiceTypes:[2]
+            activeInvoiceTypes:[2,4],
+            isCreatedByDepot:true
         };
 
     })
@@ -152,6 +162,9 @@ angular.module('newlpApp')
                 carNum:{
                     editable:true
                 },
+                shift:{
+                    editable:true
+                },
                 clientAddress:{
                     editable:true
                 },
@@ -164,7 +177,7 @@ angular.module('newlpApp')
             },
             actions:{
                 update:{
-                    auditStatus:70
+                    auditStatus:60
                 },
                 draft:{
                     auditStatus:50
@@ -190,7 +203,7 @@ angular.module('newlpApp')
         $scope.options = {
             actions:{
                 receive:{
-                    auditStatus:60
+                    auditStatus:50
                 },
                 sendBack:{
                     auditStatus:30
@@ -222,7 +235,7 @@ angular.module('newlpApp')
                     auditStatus:30
                 }
             },
-            activeStatus:60,
+            activeStatus:50,
             readOnly:true
         };
     })
@@ -285,7 +298,7 @@ angular.module('newlpApp')
             Invoice.queryByAuditStatus({
                     page: $scope.page.number - 1,
                     size:$scope.page.size,
-                    auditStatus: '50,60'
+                    auditStatus: 50
                 },
                 function (data) {
                     $scope.data = data;
@@ -298,30 +311,14 @@ angular.module('newlpApp')
         //submit search
         $scope.search = function () {
             $scope.loading = true;
-            if (_.isDate($scope.searchTerm.endDateOfReceived)) {
-                $scope.searchTerm.endDateOfReceived = moment($scope.searchTerm.endDateOfReceived).add('hours', 23).add('minutes', 59).add('seconds', 59).format();
-            }
 
             $scope.searchTerm.auditStatus = 50;
             Invoice.search({
                 page: $scope.page.number - 1,
                 size:$scope.page.size
             }, $scope.searchTerm).$promise.then(function (data) {
-
-                $scope.searchTerm.auditStatus = 60;
-                Invoice.search({
-                        page: $scope.page.number - 1,
-                        size:$scope.page.size
-                    }, $scope.searchTerm,
-                    function (dataTmp) {
-
-                        data.content = data.content.concat(dataTmp.content);
-                        data.page.totalElements = data.page.totalElements + dataTmp.page.totalElements;
-                        data.page.totalPages = data.page.totalPages > dataTmp.page.totalPages ? data.page.totalPages : dataTmp.page.totalPages;
                         $scope.data = data;
                         $scope.loading = false;
-
-                    });
 
             }, function (data) {
                 $scope.loading = false;
@@ -354,10 +351,8 @@ angular.module('newlpApp')
             $scope.onPageChanged();
         };
 
-        $scope.edit = function (invoiceId, auditStatus) {
-            auditStatus == 50 ? $state.go('home.depot.edit', {invoiceId: invoiceId}) :
-                auditStatus == 60 ? $state.go('home.depot.adjust', {invoiceId: invoiceId}) :
-                    undefined;
+        $scope.edit = function (invoiceId, isCreatedByDepot) {
+            isCreatedByDepot ? $state.go('home.depot.edit', {invoiceId: invoiceId}) : $state.go('home.depot.adjust', {invoiceId: invoiceId});
         };
 
         $scope.sendBack = function (invoiceId) {
@@ -389,7 +384,7 @@ angular.module('newlpApp')
         $scope.searchForm = {
             options: {
                 criteria: {
-                    auditedStatus:70
+                    auditStatus:'60,70,80,90'
                 },
                 actions: {
                     view: function (invoiceId) {

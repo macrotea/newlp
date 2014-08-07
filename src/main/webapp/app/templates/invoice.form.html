@@ -24,7 +24,12 @@
 </ul>
 <hr>
 <form class="form-horizontal" name="form" novalidate>
-    <fieldset ng-disabled="success">
+    <div class="form-group" ng-if="loading">
+        <div class="col-sm-12 center blue">
+            <i class="fa fa-spinner fa-spin bigger-300"></i>
+        </div>
+    </div>
+    <fieldset ng-disabled="success" ng-if="!loading">
 
         <!--单号-->
         <div class="form-group" ng-if="!fields.invoiceNum.hidden">
@@ -92,10 +97,6 @@
                     <select class="form-control" name="invoiceType" required ng-model="invoice.invoiceType" ng-options="invoiceType.name for invoiceType in invoiceTypes track by invoiceType.invoiceTypeId">
                     </select>
                 </div>
-
-                <!--<span class="help-inline col-xs-12 col-sm-7" ng-if="form.invoiceType.$invalid">-->
-                    <!--<span class="middle red" ng-if="form.invoiceType.$error.required">必填！</span>-->
-                <!--</span>-->
             </div>
         </div>
 
@@ -138,9 +139,23 @@
             </div>
         </div>
 
+        <!--班次-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right"> 班次 </label>
+
+            <div class="col-sm-9">
+                <div class="input-group col-xs-10 col-sm-5" ng-if="!fields.shift.editable">
+                    <p class="form-control-static" ng-bind="invoice.shift"></p>
+                </div>
+                <div class="input-group col-xs-10 col-sm-5 pull-left" ng-if="fields.shift.editable">
+                    <input class="form-control" type="text" name="invoiceShift" ng-model="invoice.shift">
+                </div>
+            </div>
+        </div>
+
         <!--联系地址-->
         <div class="form-group">
-            <label class="col-sm-3 control-label no-padding-right"> 联系地址 </label>
+            <label class="col-sm-3 control-label no-padding-right"> 收货地址 </label>
 
             <div class="col-sm-9">
                 <div class="input-group col-xs-10 col-sm-5" ng-if="!fields.clientAddress.editable">
@@ -229,7 +244,7 @@
 
                 &nbsp; &nbsp; &nbsp;
                 <button class="btn" type="button" ng-click="draft()" ng-if="actions.draft" ng-disabled="form.$invalid">
-                    <i class="ace-icon fa fa-undo bigger-110"></i>
+                    <i class="ace-icon fa fa-floppy-o bigger-110"></i>
                     保存
                 </button>
 

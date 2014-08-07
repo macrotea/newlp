@@ -192,7 +192,7 @@ angular.module('newlpApp')
                     readOnly: '=?readOnly',
                     options: '=?options'
                 },
-                controller: function ($scope, Material) {
+                controller: function ($scope,$timeout,Material) {
 
 
                     $scope.options = $scope.options ? $scope.options : {};
@@ -241,6 +241,10 @@ angular.module('newlpApp')
                         });
 
                         if (notExist && 20 > $scope.invoiceDetails.length) {
+
+
+
+
                             var invoiceDetail = {};
                             invoiceDetail.orderCount = 1;
                             invoiceDetail.deliveryCount = invoiceDetail.orderCount;
@@ -252,6 +256,18 @@ angular.module('newlpApp')
                             invoiceDetail.conversionRateTwo = material.conversionRateTwo;
                             invoiceDetail.price = material.price;
                             invoiceDetail.material = material;
+
+                            /*bad code due to sudden requirement */
+                            Material.getCompanyMaterialByMaterialNum({
+                                materialNum:material.materialNum
+                            }).$promise.then(function (data) {
+                                    if(data._embedded && data._embedded.companyMaterials.length > 0){
+                                        invoiceDetail.incPrice = data._embedded.companyMaterials[0].price
+                                    }
+                                });
+                            /*bad code due to sudden requirement */
+
+
                             $scope.invoiceDetails.push(invoiceDetail);
                         }
 
@@ -273,8 +289,65 @@ angular.module('newlpApp')
                             });
                         }
                     };
+
+
+                    $scope.onMaterialNumHunting = function ($event) {
+                        $scope.materialNumHuntingSuccess = undefined;
+                        if(13 === $event.keyCode || 'click' == $event.type){
+                            Material.findByMaterialNum({
+                                page: $scope.currentPage - 1,
+                                size: 10,
+                                materialNum: $scope.materialNumHunting
+                            }, {}, function (data) {
+                                if(data._embedded && data._embedded.materials[0]){
+                                    var material =data._embedded.materials[0];
+                                    $scope.add(material);
+                                    $scope.materialNumHuntingSuccess = true;
+
+                                    $timeout(function () {
+                                        $scope.focusInputFiled(material.materialNum,'invoiceDetail.orderCount');
+                                    }, 0);
+                                }else{
+                                    $scope.materialNumHuntingSuccess = false;
+                                }
+                            });
+                        }
+
+                    };
+
                 },
                 link: function (scope, element, attrs, ctrl) {
+
+                    scope.focusInputFiled = function (materialNum,ngModelVal) {
+                        var materialElems = element.find("td[ng-bind='invoiceDetail.material.materialNum']");
+                        for (var i = 0; i < materialElems.length; i++) {
+                            var materialElem = materialElems.eq(i);
+                            if (materialElem.text() == materialNum) {
+                                materialElem.parent().find("input[ng-model='"+ngModelVal+"']").focus();
+                            }
+                        }
+                    };
+
+                    element.on('click','#materialNumHunting  button',function($event){
+                        scope.onMaterialNumHunting($event)
+                    });
+
+                    element.on('keypress','#materialNumHunting  input',function($event){
+                        scope.onMaterialNumHunting($event)
+                    });
+
+                    element.on('keypress','#materialDetails  input',function($event){
+                        if(13 === $event.keyCode){
+                            var $currentElem = $($event.currentTarget);
+                            var materialNum = $currentElem.parents('tr:eq(0)').find("td[ng-bind='invoiceDetail.material.materialNum']:eq(0)").text();
+                            if('invoiceDetail.orderCount'  == $($event.currentTarget).attr('ng-model')){
+                                scope.focusInputFiled(materialNum,'invoiceDetail.remark');
+                            }
+                            if('invoiceDetail.remark'  == $($event.currentTarget).attr('ng-model')){
+                                element.find('#materialNumHunting').find('input').focus();
+                            }
+                        }
+                    });
                 }
             };
         },
@@ -307,11 +380,19 @@ angular.module('newlpApp')
 //                    $scope.actions.submit = $scope.options.actions.submit?$scope.options.actions.submit:{};
 //                    $scope.actions.draft = $scope.options.actions.draft?$scope.options.actions.draft:{};
 
+                    $scope.loading = true;
+                    $scope.$watch('invoice', function (val) {
+                       if(undefined != val){
+                           $scope.loading = false;
+                       }
+                    });
 
                     $scope.invoiceTypes = [
-                        {"invoiceTypeId":1, "name":'销售'},
-                        { "invoiceTypeId":2, "name":'外购'},
-                        {"invoiceTypeId":3, "name":'自用'}
+                        {"invoiceTypeId": 1, "name": '销售'},
+                        {"invoiceTypeId": 2, "name": '外购'},
+                        {"invoiceTypeId": 3, "name": '自用'},
+                        {"invoiceTypeId": 4, "name": '正常（车间入）'},
+                        {"invoiceTypeId": 5, "name": '作废'}
                     ];
 
                     if($scope.options.activeInvoiceTypes){
@@ -331,9 +412,10 @@ angular.module('newlpApp')
 
 
                     $scope.save = function () {
+                        $scope.invoice.isCreatedByDepot = $scope.options.isCreatedByDepot?$scope.options.isCreatedByDepot:false;
+
                         $scope.invoice.auditStatus = $scope.actions.save.auditStatus;
                         Invoice.save({}, $scope.invoice).$promise.then(function (data) {
-                            console.log(data);
                             $scope.success = true;
                         }, function (data) {
                             $scope.error = true;
@@ -342,8 +424,8 @@ angular.module('newlpApp')
 
                     $scope.update = function () {
                         $scope.invoice.auditStatus = $scope.actions.update.auditStatus;
-                        Invoice.update({}, $scope.invoice).$promise.then(function (data) {
-                            console.log(data);
+                        Invoice.update({}, $scope.invoice).$promise
+                            .then(function (data) {
                             $scope.success = true;
                         }, function (data) {
                             $scope.error = true;
@@ -354,14 +436,14 @@ angular.module('newlpApp')
                         $scope.invoice.auditStatus = $scope.actions.draft.auditStatus;
                         if ($scope.invoice.invoiceId) {
                             Invoice.update({}, $scope.invoice).$promise.then(function (data) {
-                                console.log(data);
                                 $scope.success = true;
                             }, function (data) {
                                 $scope.error = true;
                             });
                         } else {
+                            $scope.invoice.isCreatedByDepot = $scope.options.isCreatedByDepot?$scope.options.isCreatedByDepot:false;
+
                             Invoice.save({}, $scope.invoice).$promise.then(function (data) {
-                                console.log(data);
                                 $scope.success = true;
                             }, function (data) {
                                 $scope.error = true;
@@ -375,7 +457,6 @@ angular.module('newlpApp')
                             invoiceId: $scope.invoice.invoiceId,
                             auditStatus: $scope.invoice.auditStatus
                         }).$promise.then(function (data) {
-                                console.log(data);
                                 $scope.success = true;
                             }, function (data) {
                                 $scope.error = true;
@@ -388,7 +469,6 @@ angular.module('newlpApp')
                             invoiceId: $scope.invoice.invoiceId,
                             auditStatus: $scope.invoice.auditStatus
                         }).$promise.then(function (data) {
-                                console.log(data);
                                 $scope.success = true;
                             }, function (data) {
                                 $scope.error = true;
@@ -402,7 +482,6 @@ angular.module('newlpApp')
                             invoiceDetails: $scope.invoice.invoiceDetails,
                             auditStatus: $scope.invoice.auditStatus
                         }).$promise.then(function (data) {
-                                console.log(data);
                                 $scope.success = true;
                             }, function (data) {
                                 $scope.error = true;
@@ -415,7 +494,6 @@ angular.module('newlpApp')
                             invoiceId: $scope.invoice.invoiceId,
                             auditStatus: $scope.invoice.auditStatus
                         }).$promise.then(function (data) {
-                                console.log(data);
                                 $scope.success = true;
                             }, function (data) {
                                 $scope.error = true;
@@ -449,15 +527,23 @@ angular.module('newlpApp')
             require: 'ngModel',
             link: function(scope, elm, attrs, ctrl) {
                 ctrl.$parsers.unshift(function(viewValue) {
-                    if (/^[\u4e00-\u9fa5]{1}[A-Z]{1}[A-Z_0-9]{5}$/.test(viewValue)) {
-                        // it is valid
+
+                    if(undefined != viewValue && 7 > viewValue.length && 0 < viewValue.length){
                         ctrl.$setValidity('carNum', true);
                         return viewValue;
-                    } else {
-                        // it is invalid, return undefined (no model update)
-                        ctrl.$setValidity('carNum', false);
-                        return undefined;
+                    }else{
+                        if (/[\u4e00-\u9fa5]{1}[A-Z]{1}[A-Z_0-9]{5}$/.test(viewValue)) {
+                            // it is valid
+                            ctrl.$setValidity('carNum', true);
+                            return viewValue;
+                        } else {
+                            // it is invalid, return undefined (no model update)
+                            ctrl.$setValidity('carNum', false);
+                            return undefined;
+                        }
                     }
+
+
                 });
             }
         };

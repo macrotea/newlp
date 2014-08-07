@@ -1,8 +1,9 @@
 package com.lesso.newlp.pm.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.core.entity.AuditableEntity;
 import com.lesso.newlp.home.entity.PanelEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -20,7 +21,7 @@ import java.util.Set;
 @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property="@UUID")
 @Entity
 @Table(name = "PM_GROUP", schema = "DBO",catalog = "NEWLP")
-public class GroupEntity extends AbstractTimestampEntity implements Serializable {
+public class GroupEntity extends AuditableEntity implements Serializable {
 
     @Id
     @Column(nullable = false)
@@ -30,15 +31,15 @@ public class GroupEntity extends AbstractTimestampEntity implements Serializable
 
 //    @JsonManagedReference("group-member")
 //    @JsonBackReference("group-member")
-    @ManyToMany()
+    @ManyToMany
     @JoinTable(name = "PM_GROUP_MEMBER_REL",
             joinColumns = {@JoinColumn(name = "group_groupId")},
             inverseJoinColumns = {@JoinColumn(name = "member_memberId")})
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<MemberEntity> members = new HashSet<MemberEntity>();
 
-
-    @ManyToMany()
+    @JsonIgnore
+    @ManyToMany
     @JoinTable(name = "PM_GROUP_PANEL_REL",
             joinColumns = {@JoinColumn(name = "group_groupId")},
             inverseJoinColumns = {@JoinColumn(name = "panel_panelId")})
@@ -67,5 +68,13 @@ public class GroupEntity extends AbstractTimestampEntity implements Serializable
 
     public void setMembers(Set<MemberEntity> members) {
         this.members = members;
+    }
+
+    public Set<PanelEntity> getPanels() {
+        return panels;
+    }
+
+    public void setPanels(Set<PanelEntity> panels) {
+        this.panels = panels;
     }
 }

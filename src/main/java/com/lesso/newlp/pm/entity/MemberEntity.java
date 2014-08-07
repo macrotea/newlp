@@ -1,10 +1,8 @@
 package com.lesso.newlp.pm.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.core.entity.AuditableEntity;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -21,7 +19,7 @@ import java.util.Set;
 @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property="@UUID")
 @Entity
 @Table(name = "PM_MEMBER", schema = "DBO",catalog = "NEWLP")
-public class MemberEntity extends AbstractTimestampEntity implements Serializable {
+public class MemberEntity extends AuditableEntity implements Serializable {
 
     @Id
     @Column(nullable = false)

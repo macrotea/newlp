@@ -1,6 +1,6 @@
 package com.lesso.newlp.log.entity;
 
-import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.core.entity.AuditableEntity;
 import com.lesso.newlp.invoice.entity.InvoiceEntity;
 import com.lesso.newlp.pm.entity.IncEntity;
 import com.lesso.newlp.pm.entity.MemberEntity;
@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "LOG_OPERATION", schema = "DBO",catalog = "NEWLP")
-public class OperationLogEntity extends AbstractTimestampEntity implements Serializable {
+public class OperationLogEntity extends AuditableEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long operationLogId;

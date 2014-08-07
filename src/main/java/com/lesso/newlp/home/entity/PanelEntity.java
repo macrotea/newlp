@@ -2,6 +2,7 @@ package com.lesso.newlp.home.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.lesso.newlp.pm.entity.GroupEntity;
 import org.hibernate.annotations.LazyCollection;
@@ -28,6 +29,7 @@ public class PanelEntity implements Serializable {
     String name;
     String state;
     String iconClass;
+    @Column(name = "count",updatable = false)
     Integer count;
     @Column(name = "order_")
     Integer order;
@@ -37,6 +39,7 @@ public class PanelEntity implements Serializable {
     @OrderBy("order ASC")
     Set<PaneEntity> panes = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy="panels")
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<GroupEntity> groups = new HashSet<GroupEntity>();

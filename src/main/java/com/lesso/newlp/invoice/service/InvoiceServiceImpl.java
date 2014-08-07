@@ -84,7 +84,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         final InvoiceEntity finalInvoice = invoice;
         invoice.getInvoiceDetails().forEach(invoiceDetail -> {
             invoiceDetail.setInvoice(finalInvoice);
-            invoiceDetail.setAmount(invoiceDetail.getPrice().multiply(new BigDecimal(Double.toString(invoiceDetail.getDeliveryCount()))));
+            invoiceDetail.setAmount(invoiceDetail.getIncPrice().multiply(new BigDecimal(Double.toString(invoiceDetail.getDeliveryCount()))));
         });
 
         InvoiceTypeEntity invoiceTypeEntity = invoiceTypeRepository.findOne(invoice.getInvoiceType().getInvoiceTypeId());
@@ -132,7 +132,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "\tj.active AS incDetailActive,\n" +
                 "\tm.name AS materName,\n" +
                 "\tm.unit AS materUnit,\n" +
-                "\tm.price AS materPrice\n" +
+                "\tm.price AS materPrice,\n" +
+                "\tj.incPrice AS incPrice\n" +
                 "FROM\n" +
                 "\tINV_INVOICE_DETAIL j\n" +
                 "LEFT JOIN INV_INVOICE i ON j.invoice_invoiceId = i.invoiceId\n" +
@@ -156,6 +157,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 invoiceDetailEntity.setConversionRateOne(rs.getDouble("conversionRateOne"));
                 invoiceDetailEntity.setConversionRateTwo(rs.getDouble("conversionRateTwo"));
                 invoiceDetailEntity.setPrice(rs.getBigDecimal("price"));
+                invoiceDetailEntity.setIncPrice(rs.getBigDecimal("incPrice"));
 
                 MaterialEntity materialEntity = new MaterialEntity();
                 materialEntity.setMaterialNum(rs.getString("material_materialNum"));
@@ -190,6 +192,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 invoice.setInvoiceId(rs.getLong("invoiceId"));
                 invoice.setInvoiceNum(rs.getString("invoiceNum"));
                 invoice.setCarNum(rs.getString("carNum"));
+                invoice.setShift(rs.getString("shift"));
                 invoice.setSubmitDate(rs.getDate("submitDate"));
                 invoice.setClientAddress(rs.getString("clientAddress"));
                 invoice.setCreatedDate(rs.getDate("createdDate"));
@@ -251,20 +254,20 @@ public class InvoiceServiceImpl implements InvoiceService {
             Iterator it=set.iterator();
             while(it.hasNext()){
                 InvoiceDetailEntity ide =(InvoiceDetailEntity) it.next();
-                ide.setAmount(ide.getPrice().multiply(new BigDecimal(Double.toString(ide.getDeliveryCount()))));
+                ide.setAmount(ide.getIncPrice().multiply(new BigDecimal(Double.toString(ide.getDeliveryCount()))));
                 if(invoiceDataDBID.contains(ide.getInvoiceDetailId())){
                     jdbcDaoSupport.getJdbcTemplate().update("update INV_INVOICE_DETAIL set active=?, amount=?,deliveryCount=?,orderCount=?,remark=?," +
-                                    "invoice_invoiceId=?,material_materialNum=?,auxiliaryUnitOne=?,auxiliaryUnitTwo=?,conversionRateOne=?,conversionRateTwo=?,price=?,unit=? WHERE invoiceDetailId=?",
+                                    "invoice_invoiceId=?,material_materialNum=?,auxiliaryUnitOne=?,auxiliaryUnitTwo=?,conversionRateOne=?,conversionRateTwo=?,price=?,incPrice=?,unit=? WHERE invoiceDetailId=?",
                             ide.getActive(),ide.getAmount(),ide.getDeliveryCount(),ide.getOrderCount(),ide.getRemark(),invoice.getInvoiceId(),ide.getMaterial().getMaterialNum(),ide.getAuxiliaryUnitOne()
-                            ,ide.getAuxiliaryUnitTwo(),ide.getConversionRateOne(),ide.getConversionRateTwo(),ide.getPrice(),ide.getUnit(),ide.getInvoiceDetailId());
+                            ,ide.getAuxiliaryUnitTwo(),ide.getConversionRateOne(),ide.getConversionRateTwo(),ide.getPrice(),ide.getIncPrice(),ide.getUnit(),ide.getInvoiceDetailId());
                     invoiceDataDBID.remove(ide.getInvoiceDetailId());
                 }else {
-                    jdbcDaoSupport.getJdbcTemplate().update("insert into INV_INVOICE_DETAIL(updated,amount,deliveryCount,orderCount,remark,invoice_invoiceId,material_materialNum,auxiliaryUnitOne,auxiliaryUnitTwo,conversionRateOne,conversionRateTwo,price,unit)" +
-                                    " values(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    jdbcDaoSupport.getJdbcTemplate().update("insert into INV_INVOICE_DETAIL(updated,amount,deliveryCount,orderCount,remark,invoice_invoiceId,material_materialNum,auxiliaryUnitOne,auxiliaryUnitTwo,conversionRateOne,conversionRateTwo,price,incPrice,unit)" +
+                                    " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                             new Date(),ide.getAmount(),ide.getDeliveryCount(),ide.getOrderCount(),ide.getRemark(),
                             invoice.getInvoiceId(),ide.getMaterial().getMaterialNum(),ide.getAuxiliaryUnitOne(),
                             ide.getAuxiliaryUnitTwo(),ide.getConversionRateOne(),
-                            ide.getConversionRateTwo(),ide.getPrice(),ide.getUnit());
+                            ide.getConversionRateTwo(),ide.getPrice(),ide.getIncPrice(),ide.getUnit());
                 }
             }
 
@@ -280,13 +283,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         jdbcDaoSupport.getJdbcTemplate().update("update INV_INVOICE  set invoiceNum=?,inc_incId=?," +
                         "carNum=?,client_clientId=?,clientAddress=?," +
-                        "receivedDate=?,auditStatus=?,remark=?,active=?,invoiceType_invoiceTypeId=?where invoiceId=?",
+                        "receivedDate=?,auditStatus=?,remark=?,active=?,invoiceType_invoiceTypeId=?,shift=? where invoiceId=?",
                 invoice.getInvoiceNum(),
                 invoice.getInc().getIncId(), invoice.getCarNum(),
                 invoice.getClient().getClientId(),invoice.getClientAddress(),
                 invoice.getReceivedDate(),
                 invoice.getAuditStatus(), invoice.getRemark(), invoice.getActive
-                (), invoice.getInvoiceType().getInvoiceTypeId(),
+                (), invoice.getInvoiceType().getInvoiceTypeId(),invoice.getShift(),
                 invoice.getInvoiceId());
         return invoice;
     }
@@ -307,7 +310,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                         a.setDeliveryCount(b.getDeliveryCount());
                     }
                     if (a.getInvoiceDetailId().equals(b.getInvoiceDetailId())) {
-                        a.setAmount(a.getPrice().multiply(new BigDecimal(Double.toString(a.getDeliveryCount()))));
+                        a.setAmount(a.getIncPrice().multiply(new BigDecimal(Double.toString(a.getDeliveryCount()))));
                     }
                 });
             });
@@ -581,6 +584,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 invoiceEntity.setInvoiceId(rs.getLong("invoiceId"));
                 invoiceEntity.setInvoiceNum(rs.getString("invoiceNum"));
                 invoiceEntity.setCarNum(rs.getString("carNum"));
+                invoiceEntity.setShift(rs.getString("shift"));
                 invoiceEntity.setSubmitDate(rs.getDate("submitDate"));
                 invoiceEntity.setClientAddress(rs.getString("clientAddress"));
                 invoiceEntity.setCreatedDate(rs.getDate("createdDate"));

@@ -65,6 +65,8 @@
                             <option value="1">销售</option>
                             <option value="2">外购</option>
                             <option value="3">自用</option>
+                            <option value="4">正常（车间入）</option>
+                            <option value="5">作废</option>
                         </select>
                     </div>
                 </div>
@@ -147,7 +149,7 @@
 
         <tbody>
         <tr ng-repeat="invoice in data.content | filter:searchText track by invoice.invoiceId"
-            ng-dblclick="edit(invoice.invoiceId,invoice.auditStatus)" ng-if="!loading">
+            ng-dblclick="edit(invoice.invoiceId,invoice.isCreatedByDepot)" ng-if="!loading">
             <td>
                 <span class="label label-sm label-success arrowed arrowed-righ" ng-if="invoice.invoiceType.type ==0"
                       ng-bind="invoice.invoiceType.name"></span>
@@ -166,12 +168,12 @@
                     </a>
 
                     <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)"
-                       ng-if="invoice.auditStatus==60">
+                       ng-if="!invoice.isCreatedByDepot">
                         <i class="ace-icon fa fa-reply bigger-130"></i>
                     </a>
 
                     <a class="red" href="javascript:;" title="删除" ng-click="remove(invoice.invoiceId)"
-                       ng-if="invoice.auditStatus==50">
+                       ng-if="invoice.isCreatedByDepot">
                         <i class="ace-icon fa fa-trash-o bigger-130"></i>
                     </a>
                 </div>
@@ -193,7 +195,7 @@
                                 </a>
                             </li>
 
-                            <li ng-if="invoice.auditStatus==60">
+                            <li ng-if="!invoice.isCreatedByDepot">
                                 <a class="tooltip-error" title="退回" href="javascript:;"
                                    ng-click="sendBack(invoice.invoiceId)">
 																			<span class="red">
@@ -202,7 +204,7 @@
                                 </a>
                             </li>
 
-                            <li ng-if="invoice.auditStatus==50">
+                            <li ng-if="invoice.isCreatedByDepot">
                                 <a class="tooltip-error" title="删除" href="javascript:;"
                                    ng-click="remove(invoice.invoiceId)">
 																			<span class="red">

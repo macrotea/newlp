@@ -72,7 +72,6 @@ public class HomeServiceImpl implements HomeService {
                         break;
                     case "DEPOT_AUDIT_UNAUDITED":
                         auditStatuses.add(50);
-                        auditStatuses.add(60);
                         count = invoiceService.queryCountByAuditStatus(auditStatuses,username);
                         pane.setCount(count);
                         panel.setCount(panel.getCount() + count);

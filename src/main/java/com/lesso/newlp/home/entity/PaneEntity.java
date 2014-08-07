@@ -22,6 +22,7 @@ public class PaneEntity implements Serializable {
     String paneId;
     String name;
     String state;
+    @Column(name = "count",updatable = false)
     Integer count;
     @Column(name = "order_")
     Integer order;

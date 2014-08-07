@@ -58,7 +58,7 @@
         </div>
         <div class="space space-6"></div>
         <div class="table-responsive">
-            <table class="table table-striped table-bordered table-hover">
+            <table id="materialDetails" class="table table-striped table-bordered table-hover">
                 <thead>
                 <tr>
                     <th>物料编码</th>
@@ -66,9 +66,9 @@
                     <th>订单数量</th>
                     <th>实发数量</th>
                     <th>主计量单位</th>
-                    <th>辅计量单位1</th>
                     <th>换算率1</th>
                     <th>单价</th>
+                    <th>公司售价</th>
                     <th>金额</th>
                     <th>备注</th>
                     <th ng-if="!readOnly">操作</th>
@@ -79,38 +79,44 @@
                     <td class="align-middle" ng-bind="invoiceDetail.material.materialNum"></td>
                     <td class="align-middle" ng-bind="invoiceDetail.material.name"></td>
                     <td class="align-middle">
-                        <span class="align-middle" ng-bind="invoiceDetail.orderCount" ng-if="!fields.orderCount.editable" ></span>
-                        <div class="ace-spinner touch-spinner" style="width: 80px;"  ng-if="fields.orderCount.editable" >
+                        <span class="align-middle" ng-bind="invoiceDetail.orderCount"
+                              ng-if="!fields.orderCount.editable"></span>
+
+                        <div class="ace-spinner touch-spinner" style="width: 80px;" ng-if="fields.orderCount.editable">
                             <div class="input-group">
                                 <input type="number" min="0" class="input-mini spinner-input form-control"
-                                       ng-model="invoiceDetail.orderCount" ng-change="invoiceDetail.deliveryCount=invoiceDetail.orderCount">
+                                       ng-model="invoiceDetail.orderCount"
+                                       ng-change="invoiceDetail.deliveryCount=invoiceDetail.orderCount">
                             </div>
                         </div>
                     </td>
                     <td class="align-middle">
-                        <span class="align-middle" ng-bind="invoiceDetail.deliveryCount" ng-if="!fields.deliveryCount.editable" ></span>
-                        <div class="ace-spinner touch-spinner" style="width: 120px;"  ng-if="fields.deliveryCount.editable" >
+                        <span class="align-middle" ng-bind="invoiceDetail.deliveryCount"
+                              ng-if="!fields.deliveryCount.editable"></span>
+
+                        <div class="ace-spinner touch-spinner" style="width: 120px;"
+                             ng-if="fields.deliveryCount.editable">
                             <div class="input-group">
                                 <input type="number" min="0" class="input-mini spinner-input form-control"
                                        ng-model="invoiceDetail.deliveryCount">
                             </div>
                         </div>
                     </td>
-                    <td class="align-middle" ng-bind="invoiceDetail.material.unit"></td>
-                    <td class="align-middle">{{(invoiceDetail.orderCount * invoiceDetail.material.conversionRateOne) |
-                        number:4}}
-                        {{invoiceDetail.material.auxiliaryUnitOne}}
+                    <td class="align-middle">{{(invoiceDetail.orderCount * invoiceDetail.conversionRateOne) | number:4}}  {{invoiceDetail.unit}}
                     </td>
                     <td class="align-middle" ng-bind="invoiceDetail.conversionRateOne">
                     </td>
-                    <td class="align-middle">{{invoiceDetail.material.price}}</td>
-                    <td class="align-middle">{{(invoiceDetail.deliveryCount*invoiceDetail.material.price) |number:2}}</td>
-                    <td class="align-middle">
-                        <span class="align-middle" ng-bind="invoiceDetail.remark"  ng-if="!fields.remark.editable"></span>
-                        <input class="input-sm" type="text" placeholder="备注"
-                               ng-model="invoiceDetail.remark"   ng-if="fields.remark.editable">
+                    <td class="align-middle">{{invoiceDetail.price}}</td>
+                    <td class="align-middle" ng-bind="invoiceDetail.incPrice | number:2"></td>
+                    <td class="align-middle">{{(invoiceDetail.deliveryCount*invoiceDetail.incPrice) |number:2}}
                     </td>
-                    <td class="align-middle"  ng-if="!readOnly">
+                    <td class="align-middle">
+                        <span class="align-middle" ng-bind="invoiceDetail.remark"
+                              ng-if="!fields.remark.editable"></span>
+                        <input class="input-sm" type="text" placeholder="备注"
+                               ng-model="invoiceDetail.remark" ng-if="fields.remark.editable">
+                    </td>
+                    <td class="align-middle" ng-if="!readOnly">
                         <div class="btn-group">
                             <button type="button" class="btn btn-xs btn-danger"
                                     ng-click="remove(invoiceDetail.material.materialNum)">
@@ -120,11 +126,29 @@
                     </td>
                 </tr>
                 <tr ng-if=" invoiceDetails == undefined ||  invoiceDetails.length == 0">
-                    <td colspan="11"  ng-if="!readOnly">无</td>
-                    <td colspan="10"  ng-if="readOnly">无</td>
+                    <td colspan="11" ng-if="!readOnly">无</td>
+                    <td colspan="10" ng-if="readOnly">无</td>
                 </tr>
                 </tbody>
             </table>
+        </div>
+
+
+        <div class="form-group" ng-show="!readOnly">
+            <div class="col-sm-12">
+                <div id="materialNumHunting" class="input-group col-xs-10 col-sm-5 pull-left">
+                    <input class="form-control" type="text" placeholder="输入物料编码" ng-model="materialNumHunting">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-success btn-sm">
+                            添加
+                            <i class="ace-icon fa fa-plus-circle bigger-120"></i>
+                        </button>
+                    </span>
+                </div>
+                <span class="help-inline col-xs-12 col-sm-7" ng-if=" undefined !=materialNumHuntingSuccess &&!materialNumHuntingSuccess">
+                    <span class="middle red">查无此物料！</span>
+                </span>
+            </div>
         </div>
     </div>
 </div>
