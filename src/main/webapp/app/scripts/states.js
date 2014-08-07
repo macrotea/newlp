@@ -261,6 +261,29 @@ angular
                 }
             })
 
+            // home > material //
+            .state('home.material', {
+                abstract: true,
+                url: '/material'
+            })
+            .state('home.material.management', {
+                url: '/management',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/material.management.html'
+                    }
+                }
+            })
+            .state('home.material.management.inc', {
+                url: '/inc',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/inc_material.management.html'
+                    }
+                }
+            })
+
+
             // home > setting //
             .state('home.setting', {
                 abstract: true,

@@ -115,16 +115,16 @@ angular.module('newlpApp')
     .controller('customerServiceConfirmSendBackConfirmCtrl', function ($scope, ngDialog, Invoice) {
 
         var invoiceIdToRemove = $scope.$parent.$parent.invoiceIdToRemove;
-        Invoice.getPreAuditStatusByInvoiceId({invoiceId: invoiceIdToRemove},function(data){
-            $scope.confirm = function () {
-                Invoice.patch({invoiceId: invoiceIdToRemove, auditStatus: data.auditStatus}, function (data) {
+//        Invoice.getPreAuditStatusByInvoiceId({invoiceId: invoiceIdToRemove},function(data){
+//            $scope.confirm = function () {
+                Invoice.patch({invoiceId: invoiceIdToRemove, auditStatus: 50}, function (data) {
                     $scope.$parent.data.content = $scope.$parent.data.content.filter(function (invoice) {
                         return invoice.invoiceId != $scope.$parent.invoiceIdToRemove;
                     });
                     $scope.$parent.invoiceIdToRemove = undefined;
                     $scope.closeThisDialog();
-                });
-            };
+//                });
+//            };
         });
 
 

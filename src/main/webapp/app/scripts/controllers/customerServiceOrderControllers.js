@@ -9,6 +9,7 @@ angular.module('newlpApp')
             inc: null,
             client: null,
             carNum: '',
+            shift: '',
             clientAddress: '',
             receivedDate: moment().format('YYYY-MM-DD'),
             remark: '',
@@ -37,6 +38,9 @@ angular.module('newlpApp')
                     editable:true
                 },
                 carNum:{
+                    editable:true
+                },
+                shift:{
                     editable:true
                 },
                 clientAddress:{
@@ -91,6 +95,9 @@ angular.module('newlpApp')
                 carNum:{
                     editable:true
                 },
+                shift:{
+                    editable:true
+                },
                 clientAddress:{
                     editable:true
                 },
@@ -132,6 +139,9 @@ angular.module('newlpApp')
                     editable:true
                 },
                 carNum:{
+                    editable:true
+                },
+                shift:{
                     editable:true
                 },
                 clientAddress:{

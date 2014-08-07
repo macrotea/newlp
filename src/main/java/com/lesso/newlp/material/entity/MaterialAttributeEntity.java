@@ -1,6 +1,6 @@
 package com.lesso.newlp.material.entity;
 
-import com.lesso.newlp.core.entity.AbstractTimestampEntity;
+import com.lesso.newlp.core.entity.AuditableEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "MAT_MATERIAL_ATTRIBUTE", schema = "DBO",catalog = "NEWLP")
-public class MaterialAttributeEntity extends AbstractTimestampEntity implements Serializable {
+public class MaterialAttributeEntity extends AuditableEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

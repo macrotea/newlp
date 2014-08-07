@@ -1,0 +1,187 @@
+<!--material Criteria BEGINS
+===========================================-->
+<form class="form-horizontal" name="form" novalidate>
+    <fieldset>
+        <div class="col-sm-10 col-sm-offset-1">
+
+
+            <div class="form-group">
+                <!--公司-->
+                <label class="col-sm-1 control-label no-padding-right"> 查询 </label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <input class="form-control" placeholder="输入物料编号或物料名称" ng-model="searchTerm.queryString">
+                    </div>
+                </div>
+
+                <!--客户-->
+                <label class="col-sm-1 control-label no-padding-right"> 类型 </label>
+
+                <div class="col-sm-5">
+                    <div class="input-group col-xs-12">
+                        <select class="form-control" ng-model="searchTerm.type">
+                            <option value="1">礼品</option>
+                            <option value="2">样品</option>
+                            <option value="3">送检验</option>
+                            <option value="4">广告成品</option>
+                            <option value="5">广告半成品</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-danger" ng-if="error">
+                <button type="button" class="close" data-dismiss="alert">
+                    <i class="ace-icon fa fa-times"></i>
+                </button>
+                <strong>
+                    <i class="ace-icon fa fa-check"></i>
+                    查询出错，请联系管理员!
+                </strong>
+                <br>
+            </div>
+
+            <!--搜索-->
+            <div class="form-group">
+                <div class="col-sm-11 col-lg-offset-1">
+                    <button class="btn btn-info" type="submit" ng-click="queryIncActiveMaterials()">
+                        <!--<i class="ace-icon fa fa-check bigger-110"></i>-->
+                        查询公司启用物料
+                    </button>
+
+                    &nbsp; &nbsp; &nbsp;
+                    <button class="btn btn-info" type="submit" ng-click="queryIncInactiveMaterials()">
+                        <!--<i class="ace-icon fa fa-check bigger-110"></i>-->
+                        查询公司禁用物料
+                    </button>
+
+                    &nbsp; &nbsp; &nbsp;
+                    <button class="btn" type="submit" ng-click="queryMaterials()">
+                        <!--<i class="ace-icon fa fa-undo bigger-110"></i>-->
+                        查询非本公司物料
+                    </button>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<!--material Criteria ENDS
+===========================================-->
+
+<!--material Datatable BEGINS
+===========================================-->
+<form name="form" novalidate>
+<div class="table-header">
+    公司物料列表
+</div>
+<div class="dataTables_wrapper">
+<div class="row">
+    <div class="col-xs-6">
+        <div id="sample-table-2_length" class="dataTables_length"><label>每页
+            <select ng-model="pageSize" ng-options="pageSize.name for pageSize in pageSizes"
+                    ng-change="onPageSizeChange()">
+            </select> 记录</label></div>
+    </div>
+    <div class="col-xs-6">
+        <div class="dataTables_filter">
+            <label>过滤: <input type="text" ng-model="searchText"></label>
+        </div>
+    </div>
+</div>
+
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover dataTable">
+        <thead>
+        <tr>
+            <th>编号</th>
+            <!--<th>录入时间</th>-->
+            <th>品名</th>
+            <th>长度</th>
+            <th>主单位</th>
+            <th>辅单位</th>
+            <th>换算率</th>
+            <th>产品类型1</th>
+            <th>产品类型2</th>
+            <th>标准售价</th>
+            <th ng-if="searchTerm.isRelated">公司售价</th>
+            <th ng-if="searchTerm.isRelated">上期结存</th>
+            <th  ng-if="!searchTerm.isRelated">添加至本公司</th>
+            <th ng-if="searchTerm.isRelated">启用</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="material in data.content | filter:searchText | orderBy:'materialNum'   track by material.materialNum"
+            ng-if="!loading" >
+            <td ng-bind="material.materialNum"></td>
+            <td ng-bind="material.name"></td>
+            <td ng-bind="material.length"></td>
+            <td ng-bind="material.unit"></td>
+            <td ng-bind="material.auxiliaryUnitOne"></td>
+            <td ng-bind="material.conversionRateOne"></td>
+            <td ng-bind="material.productTypeOne"></td>
+            <td ng-bind="material.productTypeTwo"></td>
+            <td ng-bind="material.price | number:2"></td>
+            <!--<td ng-bind="material.incPrice | number:2"></td>-->
+
+            <td ng-if="searchTerm.isRelated && !material.incPriceEditable"  width="100">
+                <a href="javascript:;" ng-bind="material.incPrice | number:2"  ng-click="onIncPriceEditable(material,$event)"></a>
+            </td>
+            <td  ng-if="material.incPriceEditable" width="100">
+                <input class="input-mini" ng-model="material.incPrice" ng-blur="onMaterialIncPriceBlur(material)" ng-keypress="onMaterialIncPriceKeypress(material,$event)">
+            </td>
+
+            <td ng-if="searchTerm.isRelated && !material.inventoryEditable"  width="100">
+                <a href="javascript:;" ng-bind="material.inventory"  ng-click="onInventoryEditable(material,$event)"></a>
+            </td>
+            <td  ng-if="material.inventoryEditable" width="100">
+                <input class="input-mini" ng-model="material.inventory" ng-blur="onMaterialInventoryBlur(material)" ng-keypress="onMaterialInventoryKeypress(material,$event)">
+            </td>
+            <td class="center"  ng-if="!searchTerm.isRelated">
+                <button type="button" class="btn btn-success btn-minier" ng-click="onAddIncMaterial(material)" ng-disabled="material.added">
+                    <i class="ace-icon fa fa-plus-circle bigger-120"  ng-if="!material.added"></i>
+                    <span  ng-if="!material.added">添加</span>
+
+                    <i class="ace-icon fa fa-check bigger-110"  ng-if="material.added"></i>
+                    <span  ng-if="material.added">已添加</span>
+                </button>
+            </td>
+            <td class="center"  ng-if="searchTerm.isRelated">
+                <label>
+                    <input class="ace ace-switch ace-switch-6" type="checkbox" ng-model="material.active" ng-checked="material.active" ng-change="onActiveChange(material)">
+                    <span class="lbl"></span>
+                </label>
+            </td>
+
+        </tr>
+        <tr class="center" ng-if="loading">
+            <td colspan="13">
+                <i class="fa fa-spinner fa-spin bigger-210"></i>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div class="row">
+    <div class="col-xs-6">
+        <div class="dataTables_info" id="sample-table-2_info">总共 <span
+                ng-bind="data.page.totalElements"></span> 条记录
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="dataTables_paginate paging_bootstrap">
+            <pagination ng-model="page.number" ng-change="onPageChanged()"
+                        total-items="data.page.totalElements" items-per-page="page.size" max-size="6"
+                        boundary-links="true"
+                        class="pagination pull-right" previous-text="&lsaquo;" next-text="&rsaquo;"
+                        first-text="&laquo;" last-text="&raquo;"></pagination>
+        </div>
+    </div>
+</div>
+</div>
+</form>
+<!--material Datatable ENDS
+===========================================-->
