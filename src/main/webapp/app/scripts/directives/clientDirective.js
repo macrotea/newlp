@@ -25,6 +25,10 @@ angular.module('newlpApp')
                     $scope.searchTerm = '';
                     $scope.selected = [];
 
+                    $scope.page = {};
+                    $scope.page.number = 1;
+                    $scope.page.size = $scope.pageSize.value;
+
                     $scope.$watch('client', function (client) {
                         client && client.clientId ? $scope.selected[0] = $scope.client : '';
                     });
@@ -34,7 +38,11 @@ angular.module('newlpApp')
                     };
 
                     $scope.search = function () {
-                        Client.findByNameOrNumLike({searchTerm: $scope.searchTerm}, {}, function (data) {
+                        Client.findByNameOrNumLike({
+                            page: $scope.page.number - 1,
+                            size: $scope.page.size,
+                            searchTerm: $scope.searchTerm
+                        }, {}, function (data) {
                             $scope.searchData = data;
                         });
                     };

@@ -129,11 +129,11 @@
                     <p class="form-control-static" ng-bind="invoice.carNum"></p>
                 </div>
                 <div class="input-group col-xs-10 col-sm-5 pull-left" ng-if="fields.carNum.editable">
-                    <input class="form-control" type="text" name="invoiceCarNum" ng-model="invoice.carNum" required carnum placeholder="示例：粤A12345">
+                    <input class="form-control" type="text" name="invoiceCarNum" ng-model="invoice.carNum" carnum placeholder="示例：粤A12345">
                 </div>
 
                 <span class="help-inline col-xs-12 col-sm-7" ng-if="form.invoiceCarNum.$invalid">
-                    <span class="middle red" ng-if="form.invoiceCarNum.$error.required">必填！</span>
+                    <!--<span class="middle red" ng-if="form.invoiceCarNum.$error.required">必填！</span>-->
                     <span class="middle red" ng-if="form.invoiceCarNum.$error.carNum">请输入正确的车号！</span>
                 </span>
             </div>
@@ -217,27 +217,27 @@
             <div class="col-md-offset-3 col-md-9">
                 <input type="submit" class="hide">
 
-                <button class="btn btn-info" type="submit" ng-click="submit()" ng-if="actions.submit" ng-disabled="form.$invalid">
+                <button class="btn btn-info" type="button" ng-click="submit()" ng-if="actions.submit" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     提交
                 </button>
 
-                <button class="btn btn-info" type="submit" ng-click="save()" ng-if="actions.save" ng-disabled="form.$invalid">
+                <button class="btn btn-info" type="button" ng-click="save()" ng-if="actions.save" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     提交
                 </button>
 
-                <button class="btn btn-info" type="submit" ng-click="update()" ng-if="actions.update" ng-disabled="form.$invalid">
+                <button class="btn btn-info" type="button" ng-click="update()" ng-if="actions.update" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     提交
                 </button>
 
-                <button class="btn btn-info" type="submit" ng-click="adjust()" ng-if="actions.adjust" ng-disabled="form.$invalid">
+                <button class="btn btn-info" type="button" ng-click="adjust()" ng-if="actions.adjust" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     提交
                 </button>
 
-                <button class="btn btn-info" type="submit" ng-click="receive()" ng-if="actions.receive" ng-disabled="form.$invalid">
+                <button class="btn btn-info" type="button" ng-click="receive()" ng-if="actions.receive" ng-disabled="form.$invalid">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     接收
                 </button>

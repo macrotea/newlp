@@ -16,7 +16,7 @@ angular.module('newlpApp')
             /*authenticate user*/
             authService.login($scope.user.username, $scope.user.password)
                 .success(function (data) {
-                    authService.setCredentials($scope.user.username);
+                    authService.setAuthentication(data);
                     $state.go('home');
                 }).error(function (data) {
                     $scope.form.$error.incorrect = true;
@@ -39,7 +39,7 @@ angular.module('newlpApp')
             /*authenticate user*/
             authService.login($scope.user.username, $scope.user.password)
                 .success(function (data) {
-                    authService.setCredentials($scope.user.username);
+                    authService.setAuthentication(data);
                     $state.go('home');
                 }).error(function (data) {
                     $scope.form.$error.incorrect = true;

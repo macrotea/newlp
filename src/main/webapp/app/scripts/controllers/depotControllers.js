@@ -49,7 +49,7 @@ angular.module('newlpApp')
                 remark:{
                     editable:true
                 },
-                orderCount:{
+                deliveryCount:{
                     editable:true
                 }
             },
@@ -240,7 +240,7 @@ angular.module('newlpApp')
         };
     })
 
-    .controller('depotReceivesController', function ($scope, $state) {
+    .controller('depotReceivesController', function ($scope, $state,$stateParams) {
         $scope.searchForm = {
             options: {
                 criteria: {
@@ -390,7 +390,8 @@ angular.module('newlpApp')
                     view: function (invoiceId) {
                         $state.go('home.depot.view', {invoiceId: invoiceId});
                     }
-                }
+                },
+                sendBackController:'depotAuditedSendBackConfirmCtrl'
             }
 
         };
@@ -399,17 +400,55 @@ angular.module('newlpApp')
     .controller('depotSendBackConfirmCtrl', function ($scope, ngDialog, Invoice) {
 
         $scope.confirm = function () {
-            Invoice.patch({invoiceId: this.invoiceIdToRemove, auditStatus: 30}, function (data) {
-                $scope.$parent.data.content = $scope.$parent.data.content.filter(function (invoice) {
-                    return invoice.invoiceId != $scope.$parent.invoiceIdToRemove;
-                });
-                $scope.$parent.invoiceIdToRemove = undefined;
-                $scope.closeThisDialog();
+            var invoiceId = this.invoiceIdToRemove;
+            Invoice.getSendBackAuditStatus({invoiceId: this.invoiceIdToRemove}, function (data) {
+
+                /*bad code, api should return correct auditStatus*/
+                if(20 == data.auditStatus){
+                    Invoice.patch({invoiceId: invoiceId, auditStatus: 20}, function (data) {
+                        $scope.$parent.data.content = $scope.$parent.data.content.filter(function (invoice) {
+                            return invoice.invoiceId != $scope.$parent.invoiceIdToRemove;
+                        });
+                        $scope.$parent.invoiceIdToRemove = undefined;
+                        $scope.closeThisDialog();
+                    });
+                }else{
+                    Invoice.patch({invoiceId: invoiceId, auditStatus: 30}, function (data) {
+                        $scope.$parent.data.content = $scope.$parent.data.content.filter(function (invoice) {
+                            return invoice.invoiceId != $scope.$parent.invoiceIdToRemove;
+                        });
+                        $scope.$parent.invoiceIdToRemove = undefined;
+                        $scope.closeThisDialog();
+                    });
+                }
             });
+
+
         };
 
         $scope.cancel = function () {
             ngDialog.close();
         };
     })
+
+    .controller('depotAuditedSendBackConfirmCtrl', function ($scope, ngDialog, Invoice) {
+
+        $scope.confirm = function () {
+            var invoiceId = this.invoiceIdToRemove;
+            Invoice.patch({invoiceId: invoiceId, auditStatus: 50}, function (data) {
+                $scope.$parent.data.content = $scope.$parent.data.content.filter(function (invoice) {
+                    return invoice.invoiceId != $scope.$parent.invoiceIdToRemove;
+                });
+                $scope.$parent.invoiceIdToRemove = undefined;
+                $scope.closeThisDialog();
+            });
+
+
+        };
+
+        $scope.cancel = function () {
+            ngDialog.close();
+        };
+    })
+
 ;

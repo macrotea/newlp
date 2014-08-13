@@ -10,25 +10,29 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
-import java.util.List;
-
 /**
  * Created by Sean on 6/18/2014.
  */
 @RepositoryRestResource(collectionResourceRel = "materials", path = "materials")
 public interface MaterialRepository extends JpaRepository<MaterialEntity, String> {
 
-    @Query("select m from MaterialEntity m left join m.companyMaterials cm left join cm.inc.members mem where (m.name like '%'||:searchTerm||'%' or m.materialNum like '%'||:searchTerm||'%' ) and m.active = true and mem.memberId= :memberId")
-    Page<MaterialEntity> findByNameOrNumLike(@Param("searchTerm") String searchTerm, @Param("memberId") String memberId,Pageable pageable);
+    @Query("select m from MaterialEntity m left join m.materialType left join m.companyMaterials cm left join cm.inc.members mem where (m.name like '%'||:q||'%' or m.materialNum like '%'||:q||'%' ) and m.active = true and mem.memberId= :memberId")
+    Page<MaterialEntity> findByNameOrNumLike(@Param("q") String q, @Param("memberId") String memberId,Pageable pageable);
+
+    @Query("select m from MaterialEntity m left join m.materialType left join m.companyMaterials cm left join cm.inc.members mem where (m.name like '%'||:q||'%' or m.materialNum like '%'||:q||'%' ) and m.materialType.materialTypeId = :materialTypeId and m.active = true and mem.memberId= :memberId")
+    Page<MaterialEntity> findByNameOrNumLikeAndMaterialTypeId(@Param("q") String q,@Param("materialTypeId") Long materialTypeId, @Param("memberId") String memberId,Pageable pageable);
 
     @Query("select m from MaterialEntity m where m.name = :name and m.active = true")
     Page<MaterialEntity> findByName(@Param("name") String name, Pageable pageable);
 
     @Query("select m from MaterialEntity m where TRIM(m.materialNum)  = :materialNum and m.active = true")
-    List<MaterialEntity> findByMaterialNum(@Param("materialNum") String materialNum);
+    MaterialEntity findByMaterialNum(@Param("materialNum") String materialNum);
+
+    @Query("select m from MaterialEntity m where TRIM(m.materialNum)  = :materialNum and m.active = true and m.materialType.materialTypeId = :materialTypeId")
+    Page<MaterialEntity> findByMaterialNumAndMaterialTypeId(@Param("materialNum") String materialNum,@Param("materialTypeId") Long materialTypeId,Pageable pageable);
 
     @Query("select m from MaterialEntity m where TRIM(m.name)  = :materialName and m.active = true")
-    List<MaterialEntity> findByMaterialName(@Param("materialName") String materialName);
+    Page<MaterialEntity> findByMaterialName(@Param("materialName") String materialName,Pageable pageable);
 
     @RestResource(exported = false)
     @Query("select m from MaterialEntity m where  m.active = true")

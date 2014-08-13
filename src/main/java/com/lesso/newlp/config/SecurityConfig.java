@@ -144,9 +144,67 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         jdbcUserDetailsManager.setEnableAuthorities(false);
 
 
-        jdbcUserDetailsManager.setRolePrefix("ROLE_");
+//        jdbcUserDetailsManager.setRolePrefix("ROLE_");
         jdbcUserDetailsManager.setUsersByUsernameQuery("SELECT M.MEMBERID,M.PASSWORD,M.ENABLED FROM PM_MEMBER M WHERE M.MEMBERID = ?");
-        jdbcUserDetailsManager.setGroupAuthoritiesByUsernameQuery("SELECT G.GROUPID ,G.NAME,G.GROUPID FROM PM_GROUP_MEMBER_REL GM LEFT JOIN PM_MEMBER M ON GM.member_memberId = M.MEMBERID LEFT JOIN PM_GROUP G ON G.GROUPID = GM.group_groupId WHERE M.MEMBERID = ?");
+
+
+        /**
+         *
+         SELECT DISTINCT
+         groupId,
+         name,
+         authority
+         FROM
+         (
+         SELECT
+         g.groupId,
+         g.name,
+         ga.authority,
+         gm.member_memberId
+         FROM
+         PM_GROUP_AUTHORITIES ga
+         LEFT JOIN PM_GROUP_MEMBER_REL gm ON gm.group_groupId = ga.group_groupId
+         LEFT JOIN PM_GROUP g ON ga.group_groupId = g.groupId
+         UNION
+         SELECT
+         g.groupId,
+         g.name,
+         g.groupId AS authority,
+         gm.member_memberId
+         FROM
+         PM_GROUP g
+         LEFT JOIN PM_GROUP_MEMBER_REL gm ON gm.group_groupId = g.groupId
+         ) a
+         WHERE
+         a.member_memberId = ?
+         */
+        jdbcUserDetailsManager.setGroupAuthoritiesByUsernameQuery("SELECT DISTINCT\n" +
+                "  groupId,\n" +
+                "  name,\n" +
+                "  authority\n" +
+                "FROM\n" +
+                "  (\n" +
+                "    SELECT\n" +
+                "      g.groupId,\n" +
+                "      g.name,\n" +
+                "      ga.authority,\n" +
+                "      gm.member_memberId\n" +
+                "    FROM\n" +
+                "      PM_GROUP_AUTHORITIES ga\n" +
+                "      LEFT JOIN PM_GROUP_MEMBER_REL gm ON gm.group_groupId = ga.group_groupId\n" +
+                "      LEFT JOIN PM_GROUP g ON ga.group_groupId = g.groupId\n" +
+                "    UNION\n" +
+                "    SELECT\n" +
+                "      g.groupId,\n" +
+                "      g.name,\n" +
+                "      g.groupId AS authority,\n" +
+                "      gm.member_memberId\n" +
+                "    FROM\n" +
+                "      PM_GROUP g\n" +
+                "      LEFT JOIN PM_GROUP_MEMBER_REL gm ON gm.group_groupId = g.groupId\n" +
+                "  ) a\n" +
+                "WHERE\n" +
+                "  a.member_memberId = ?");
 
         return jdbcUserDetailsManager;
     }

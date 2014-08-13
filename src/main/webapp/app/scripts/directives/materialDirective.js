@@ -80,7 +80,7 @@ angular.module('newlpApp')
                         var $trElem =$($event.currentTarget).parent().parent();
                         material.priceEditable = true;
                         $timeout(function () {
-                            $trElem.find("input[ng-model='material.price']").focus();
+                            $trElem.find("input[ng-model='material.price']").focus().select();
                         },0);
                     };
 
@@ -113,6 +113,30 @@ angular.module('newlpApp')
                                 });
                         }
                     };
+
+
+                    $scope.$watch(function ($scope) {
+                        if ($scope.data && $scope.data.content) {
+                            return $scope.data.content.
+                                map(function (material) {
+                                    return material.price
+                                });
+                        }
+                    }, function (newVal, oldVal) {
+                        if (undefined != newVal && undefined != oldVal) {
+                            for (var i = 0; i < newVal.length; i++) {
+                                var n = newVal[i];
+                                var o = oldVal[i];
+                                if (n !== o) {
+                                    if(['',undefined].indexOf(n) > -1){
+                                        $scope.data.content[i].price = 0;
+                                    }else if (!/^[0-9]\d*(.\d+)?$/.test(n) && !/^\d+.$/.test(n)) {
+                                        $scope.data.content[i].price = oldVal[i];
+                                    }
+                                }
+                            }
+                        }
+                    }, true);
 
                     $scope.daterangeOptions = {
                         locale: {
@@ -288,14 +312,16 @@ angular.module('newlpApp')
                                 }).$promise.then(function (data) {
                                      var usedMaterialNums =  _.intersection(materialNums,data);
                                         $scope.data.content.forEach(function (material) {
-                                            if(usedMaterialNums.indexOf(material.materialNum) > -1){
-                                                material.isRemoveUnable = true;
+                                            if(usedMaterialNums.indexOf(material.materialNum) < 0){
+                                                material.isRemoveAble = true;
+                                            }else{
+                                                material.isRemoveAble = false;
                                             }
                                         })
-                                }, function (data) {
+                                        $scope.loading = false;
+                                    }, function (data) {
                                 });
 
-                                $scope.loading = false;
                             }, function (data) {
                                 $scope.loading = false;
                                 $scope.error = true;
@@ -421,7 +447,7 @@ angular.module('newlpApp')
                         var $trElem =$($event.currentTarget).parent().parent();
                         material.inventoryEditable = true;
                         $timeout(function () {
-                            $trElem.find("input[ng-model='material.inventory']").focus();
+                            $trElem.find("input[ng-model='material.inventory']").focus().select();
                         },0);
                     };
 
@@ -460,7 +486,7 @@ angular.module('newlpApp')
                         var $trElem =$($event.currentTarget).parent().parent();
                         material.incPriceEditable = true;
                         $timeout(function () {
-                            $trElem.find("input[ng-model='material.incPrice']").focus();
+                            $trElem.find("input[ng-model='material.incPrice']").focus().select();
                         },0);
                     };
 

@@ -107,7 +107,8 @@ angular.module('newlpApp')
                     view:function (invoiceId) {
                         $state.go('home.customer_service.confirm.view', {invoiceId: invoiceId});
                     }
-                }
+                },
+                sendBackController: 'customerServiceConfirmAuditedSendBackConfirmCtrl'
             }
         };
     })
@@ -116,16 +117,37 @@ angular.module('newlpApp')
 
         var invoiceIdToRemove = $scope.$parent.$parent.invoiceIdToRemove;
 //        Invoice.getPreAuditStatusByInvoiceId({invoiceId: invoiceIdToRemove},function(data){
-//            $scope.confirm = function () {
-                Invoice.patch({invoiceId: invoiceIdToRemove, auditStatus: 50}, function (data) {
-                    $scope.$parent.data.content = $scope.$parent.data.content.filter(function (invoice) {
-                        return invoice.invoiceId != $scope.$parent.invoiceIdToRemove;
-                    });
-                    $scope.$parent.invoiceIdToRemove = undefined;
-                    $scope.closeThisDialog();
-//                });
-//            };
-        });
+        $scope.confirm = function () {
+            Invoice.patch({invoiceId: invoiceIdToRemove, auditStatus: 50}, function (data) {
+                $scope.$parent.data.content = $scope.$parent.data.content.filter(function (invoice) {
+                    return invoice.invoiceId != $scope.$parent.invoiceIdToRemove;
+                });
+                $scope.$parent.invoiceIdToRemove = undefined;
+                $scope.closeThisDialog();
+            });
+        };
+//        });
+
+
+        $scope.cancel = function () {
+            ngDialog.close();
+        };
+    })
+
+    .controller('customerServiceConfirmAuditedSendBackConfirmCtrl', function ($scope, ngDialog, Invoice) {
+
+        var invoiceIdToRemove = $scope.$parent.$parent.invoiceIdToRemove;
+//        Invoice.getPreAuditStatusByInvoiceId({invoiceId: invoiceIdToRemove},function(data){
+        $scope.confirm = function () {
+            Invoice.patch({invoiceId: invoiceIdToRemove, auditStatus: 80}, function (data) {
+                $scope.$parent.data.content = $scope.$parent.data.content.filter(function (invoice) {
+                    return invoice.invoiceId != $scope.$parent.invoiceIdToRemove;
+                });
+                $scope.$parent.invoiceIdToRemove = undefined;
+                $scope.closeThisDialog();
+            });
+        };
+//        });
 
 
         $scope.cancel = function () {

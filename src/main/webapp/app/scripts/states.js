@@ -54,6 +54,14 @@ angular
                     }
                 }
             })
+            .state('home.customer_service.order.add.success', {
+                url: '/success?type',
+                views: {
+                    '@home': {
+                        templateUrl: 'views/customer_service.order.add.success.html'
+                    }
+                }
+            })
             .state('home.customer_service.order.edit', {
                 url: '/{invoiceId:[0-9]{1,10}}/edit',
                 views: {
@@ -167,7 +175,7 @@ angular
                 url: '/depot'
             })
             .state('home.depot.receives', {
-                url: '/receives',
+                url: '/receives?success',
                 views: {
                     '@home': {
                         templateUrl: 'views/depot.receives.html'
@@ -299,7 +307,7 @@ angular
             })
         ;
     })
-    .run(function ($rootScope, $state, $stateParams,$modal,currentUser) {
+    .run(function ($rootScope, $state, $stateParams,$modal,currentUser,authService,$http) {
 
         $rootScope.$state = $state;
         $rootScope.$stateParams = $stateParams;
@@ -307,5 +315,9 @@ angular
 
         $rootScope.currentUser = {};
         $rootScope.currentUser.username = currentUser.getUsername();
+
+        $http.get("/api/v1/auth/authenticate").success(function(data){
+            authService.setAuthentication(data);
+        })
 
     });

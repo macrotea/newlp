@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * UserDTO: Sean
  * Date: 7/2/13
  * Time: 8:18 AM
  */

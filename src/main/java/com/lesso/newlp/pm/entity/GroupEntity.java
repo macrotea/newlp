@@ -46,6 +46,10 @@ public class GroupEntity extends AuditableEntity implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     Set<PanelEntity> panels = new HashSet<PanelEntity>();
 
+    @OneToMany(mappedBy = "group")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    Set<GroupAuthorityEntity> authorities = new HashSet<>();
+
     public String getGroupId() {
         return groupId;
     }
@@ -76,5 +80,13 @@ public class GroupEntity extends AuditableEntity implements Serializable {
 
     public void setPanels(Set<PanelEntity> panels) {
         this.panels = panels;
+    }
+
+    public Set<GroupAuthorityEntity> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<GroupAuthorityEntity> authorities) {
+        this.authorities = authorities;
     }
 }

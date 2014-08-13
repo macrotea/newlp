@@ -67,6 +67,17 @@ angular.module('newlpApp')
                 headers: {
                     'Content-Type': 'application/json'
                 }
+            },
+            getSendBackAuditStatus:{
+                url: '/api/v1/invoices/:invoiceId/auditStatus/getSendBackAuditStatus',
+                method: 'GET',
+                params: {
+                    invoiceId: '@invoiceId'
+                },
+                isArray: false,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }
         })
     })

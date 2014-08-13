@@ -69,13 +69,13 @@
             <!--搜索-->
             <div class="form-group">
                 <div class="col-sm-5 col-lg-offset-1">
-                    <button class="btn btn-info" type="submit" ng-click="submit()">
+                    <button class="btn btn-info" type="button" ng-click="submit()">
                         <i class="ace-icon fa fa-check bigger-110"></i>
                         搜索
                     </button>
 
                     &nbsp; &nbsp; &nbsp;
-                    <button class="btn" type="submit" ng-click="rest()">
+                    <button class="btn" type="button" ng-click="rest()">
                         <i class="ace-icon fa fa-undo bigger-110"></i>
                         重置
                     </button>
@@ -86,6 +86,19 @@
 </form>
 <!--Invoice Criteria ENDS
 ===========================================-->
+
+
+<div class="alert alert-success" ng-if="$location.search().success">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+    <strong>
+        <i class="ace-icon fa fa-check"></i>
+        <span>订单接收成功!</span>
+    </strong>
+    <br>
+</div>
+
 
 <!--Invoice Datatable BEGINS
 ===========================================-->
@@ -136,16 +149,30 @@
                         <td ng-bind="invoice.receivedDate | date:'yyyy-MM-dd'">/td>
                         <td ng-bind="invoice.carNum">/td>
                         <td>
-                            <div class="hidden-sm hidden-xs action-buttons">
+                            <!--<div class="hidden-sm hidden-xs action-buttons">-->
+                            <div class="action-buttons">
                                 <a class="green" title="修改" href="javascript:;"  ng-click="edit(invoice.invoiceId)" ng-if="edit">
                                     <i class="ace-icon fa fa-pencil bigger-130"></i>
                                 </a>
 
-                                <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)" ng-if="enableSendBack">
+                                <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)" ng-if="enableSendBack "
+                                   authorities="
+                                   home.customer_service.order.receives|sendBack,
+                                   home.customer_service.confirm.audit.audited|sendBack,
+                                   home.customer_service.confirm.audit.unaudited|sendBack,
+                                   home.customer_service.confirm.receives|sendBack,
+                                   home.depot.audit.unaudited|sendBack,
+                                   home.depot.receives|sendBack
+                                   ">
                                     <i class="ace-icon fa fa-reply bigger-130"></i>
                                 </a>
 
-                                <a class="red" href="javascript:;" title="删除" ng-click="remove(invoice.invoiceId)" ng-if="enableRemove">
+                                <a class="red" href="javascript:;" title="退回" ng-click="sendBack(invoice.invoiceId)" ng-if="$state.is('home.depot.audit.audited') && invoice.isCreatedByDepot "
+                                        authorities="home.depot.audit.audited|sendBack">
+                                    <i class="ace-icon fa fa-reply bigger-130"></i>
+                                </a>
+
+                                <a class="red" href="javascript:;" title="删除" ng-click="remove(invoice.invoiceId)" ng-if="enableRemove"  authorities="home.customer_service.order.drafts|del">
                                     <i class="ace-icon fa fa-trash-o bigger-130"></i>
                                 </a>
 
@@ -154,48 +181,54 @@
                                 </a>
                             </div>
 
-                            <div class="hidden-md hidden-lg">
-                                <div class="inline position-relative">
-                                    <button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown"
-                                            data-position="auto">
-                                        <i class="ace-icon fa fa-caret-down icon-only bigger-120"></i>
-                                    </button>
+                            <!--<div class="hidden-md hidden-lg">-->
+                                <!--<div class="inline position-relative">-->
+                                    <!--<button class="btn btn-minier btn-yellow dropdown-toggle" data-toggle="dropdown"-->
+                                            <!--data-position="auto">-->
+                                        <!--<i class="ace-icon fa fa-caret-down icon-only bigger-120"></i>-->
+                                    <!--</button>-->
 
-                                    <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
-                                        <li ng-if="edit">
-                                            <a  class="tooltip-success" title="修改"  href="javascript:;"  ng-click="edit(invoice.invoiceId)">
-																			<span class="green">
-																				<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>
-																			</span>
-                                            </a>
-                                        </li>
+                                    <!--<ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">-->
+                                        <!--<li ng-if="edit">-->
+                                            <!--<a  class="tooltip-success" title="修改"  href="javascript:;"  ng-click="edit(invoice.invoiceId)">-->
+																			<!--<span class="green">-->
+																				<!--<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>-->
+																			<!--</span>-->
+                                            <!--</a>-->
+                                        <!--</li>-->
 
-                                        <li ng-if="sendBack">
-                                            <a class="tooltip-error" title="退回" href="javascript:;" ng-click="sendBack(invoice.invoiceId)">
-																			<span class="red">
-																				<i class="ace-icon fa fa-reply bigger-120"></i>
-																			</span>
-                                            </a>
-                                        </li>
+                                        <!--<li ng-if="enableSendBack "-->
+                                            <!--authorities="-->
+                                           <!--home.customer_service.order.receives|sendBack,-->
+                                           <!--home.customer_service.confirm.audit.audited|sendBack,-->
+                                           <!--home.customer_service.confirm.audit.unaudited|sendBack,-->
+                                           <!--home.customer_service.confirm.receives|sendBack-->
+                                           <!--">-->
+                                            <!--<a class="tooltip-error" title="退回" href="javascript:;" ng-click="sendBack(invoice.invoiceId)">-->
+																			<!--<span class="red">-->
+																				<!--<i class="ace-icon fa fa-reply bigger-120"></i>-->
+																			<!--</span>-->
+                                            <!--</a>-->
+                                        <!--</li>-->
 
-                                        <li ng-if="remove">
-                                            <a class="tooltip-error" title="删除" href="javascript:;" ng-click="remove(invoice.invoiceId)">
-																			<span class="red">
-																				<i class="ace-icon fa fa-trash-o bigger-120"></i>
-																			</span>
-                                            </a>
-                                        </li>
+                                        <!--<li ng-if="enableRemove"  authorities="home.customer_service.order.drafts|del">-->
+                                            <!--<a class="tooltip-error" title="删除" href="javascript:;" ng-click="remove(invoice.invoiceId)">-->
+																			<!--<span class="red">-->
+																				<!--<i class="ace-icon fa fa-trash-o bigger-120"></i>-->
+																			<!--</span>-->
+                                            <!--</a>-->
+                                        <!--</li>-->
 
-                                        <li ng-if="remove">
-                                            <a class="tooltip-error" title="查看" href="javascript:;" ng-click="view(invoice.invoiceId)">
-																			<span class="blue">
-																				<i class="ace-icon fa fa-search-plus bigger-120"></i>
-																			</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                                        <!--<li ng-if="remove">-->
+                                            <!--<a class="tooltip-error" title="查看" href="javascript:;" ng-click="view(invoice.invoiceId)">-->
+																			<!--<span class="blue">-->
+																				<!--<i class="ace-icon fa fa-search-plus bigger-120"></i>-->
+																			<!--</span>-->
+                                            <!--</a>-->
+                                        <!--</li>-->
+                                    <!--</ul>-->
+                                <!--</div>-->
+                            <!--</div>-->
                         </td>
                     </tr>
                     <tr class="center" ng-if="loading">

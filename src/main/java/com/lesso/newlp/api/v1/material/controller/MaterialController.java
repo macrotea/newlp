@@ -65,13 +65,7 @@ public class MaterialController {
 
     @RequestMapping(value = "/{materialNum:.+}", method = RequestMethod.PUT)
     public ResponseEntity<MaterialEntity> update(@RequestBody MaterialEntity material, @PathVariable("materialNum") String materialNum) throws InvocationTargetException, IllegalAccessException {
-        List<MaterialEntity> materialEntityList = materialRepository.findByMaterialNum(materialNum);
-
-        MaterialEntity materialEntity = null;
-        if(0 < materialEntityList.size()){
-             materialEntity = materialEntityList.get(0);
-        }
-
+        MaterialEntity materialEntity = materialRepository.findByMaterialNum(materialNum);
         MaterialTypeEntity materialTypeEntity = materialTypeRepository.findOne(material.getMaterialType().getMaterialTypeId());
 
         materialEntity.setMaterialType(materialTypeEntity);
@@ -135,6 +129,32 @@ public class MaterialController {
             }
 
 
+
+        return new ResponseEntity<PagedResources<MaterialEntity>>(assembler.toResource(materialEntities), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{materialNum:.+}")
+    public ResponseEntity<MaterialEntity> findByMaterialNum(@PathVariable String materialNum){
+        MaterialEntity m = materialRepository.findByMaterialNum(materialNum);
+        return new ResponseEntity<MaterialEntity>(m, HttpStatus.OK);
+    }
+
+
+//    @RequestMapping(value = "/search/findByMaterialNumAndMaterialTypeId", method = RequestMethod.GET)
+//    @SuppressWarnings("unchecked")
+//    public ResponseEntity<PagedResources<MaterialEntity>> findByMaterialNumAndMaterialTypeId(Model model,@CurrentUser User user, Pageable pageable, PagedResourcesAssembler assembler, @RequestBody SearchTerm searchTerm, String materialNum,Long materialTypeId) {
+//
+//        Page<MaterialEntity> materialEntities = materialRepository.findByMaterialNumAndMaterialTypeId(materialNum,materialTypeId);
+//
+//        return new ResponseEntity<PagedResources<MaterialEntity>>(assembler.toResource(materialEntities), HttpStatus.OK);
+//    }
+
+    @RequestMapping(value = "/search/findByNameOrNumLikeAndMaterialTypeId", method = RequestMethod.GET)
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<PagedResources<MaterialEntity>> findByNameOrNumLikeAndMaterialTypeId(Model model,@CurrentUser User user, Pageable pageable, PagedResourcesAssembler assembler,  String q,Long materialTypeId) {
+
+
+        Page<MaterialEntity> materialEntities = materialRepository.findByNameOrNumLikeAndMaterialTypeId(q,materialTypeId, user.getUsername(), pageable);
 
         return new ResponseEntity<PagedResources<MaterialEntity>>(assembler.toResource(materialEntities), HttpStatus.OK);
     }

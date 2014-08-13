@@ -13,7 +13,7 @@ angular.module('newlpApp')
             $rootScope.collapseSidebar=!$rootScope.collapseSidebar;
         };
     })
-    .controller('mainCtrl', function ($scope, home) {
+    .controller('mainCtrl', function ($scope, home,$state) {
 
         /*init panels*/
             home.getPanels().$promise.then(function (data) {

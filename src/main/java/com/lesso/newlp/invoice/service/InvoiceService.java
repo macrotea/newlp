@@ -37,4 +37,5 @@ public interface InvoiceService {
 
     Page<InvoiceEntity> searchByOriginalAuditStatus(SearchTerm searchTerm, Integer auditedStatus, Pageable pageable, String username);
 
+    Integer getSendBackAuditStatus(Long invoiceId);
 }

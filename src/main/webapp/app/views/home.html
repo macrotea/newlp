@@ -31,7 +31,7 @@
                             <img class="nav-user-photo" src="./images/avatars/avatar.png" alt="Avatar">
 								<span class="user-info">
 									<small>你好,</small>
-									{{currentUser.username}}
+									{{authentication.username}}
 								</span>
                             <i class="ace-icon fa fa-caret-down"></i>
                         </a>
@@ -77,7 +77,7 @@
     <!-- /.navbar -->
 
     <div class="main-container" id="main-container" ng-controller="mainCtrl">
-        <div class="alert alert-block alert-danger center" ng-if="!currentUser.username">
+        <div class="alert alert-block alert-danger center" ng-if="!authentication">
 
             <p>
                 <strong>

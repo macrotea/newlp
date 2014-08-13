@@ -11,7 +11,6 @@ import com.lesso.newlp.invoice.repository.InvoiceRepository;
 import com.lesso.newlp.invoice.repository.InvoiceTypeRepository;
 import com.lesso.newlp.log.model.Modified;
 import com.lesso.newlp.log.repository.LogRepository;
-import com.lesso.newlp.material.entity.MaterialEntity;
 import com.lesso.newlp.material.repository.MaterialTypeRepository;
 import com.lesso.newlp.pm.entity.ClientEntity;
 import com.lesso.newlp.pm.entity.IncEntity;
@@ -125,113 +124,113 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceEntity findById(Long invoiceId) throws Exception {
 
-
-        List<InvoiceDetailEntity> list = jdbcDaoSupport.getJdbcTemplate().query("SELECT\n" +
-                "\tj.*,\n" +
-                "\tj.remark AS incDetailRemark,\n" +
-                "\tj.active AS incDetailActive,\n" +
-                "\tm.name AS materName,\n" +
-                "\tm.unit AS materUnit,\n" +
-                "\tm.price AS materPrice,\n" +
-                "\tj.incPrice AS incPrice\n" +
-                "FROM\n" +
-                "\tINV_INVOICE_DETAIL j\n" +
-                "LEFT JOIN INV_INVOICE i ON j.invoice_invoiceId = i.invoiceId\n" +
-                "LEFT JOIN MAT_MATERIAL m ON j.material_materialNum = m.materialNum\n" +
-                "WHERE\n" +
-                "\tj.invoice_invoiceId = ?\n" +
-                "AND j.active = 1 ", new Object[]{invoiceId}, new RowMapper<InvoiceDetailEntity>() {
-            @Override
-            public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-                InvoiceDetailEntity invoiceDetailEntity = new InvoiceDetailEntity();
-                invoiceDetailEntity.setInvoiceDetailId(rs.getLong("invoiceDetailId"));
-                invoiceDetailEntity.setOrderCount(rs.getDouble("orderCount"));
-                invoiceDetailEntity.setDeliveryCount(rs.getDouble("deliveryCount"));
-                invoiceDetailEntity.setAmount(rs.getBigDecimal("amount"));
-                invoiceDetailEntity.setRemark(rs.getString("incDetailRemark"));
-                invoiceDetailEntity.setActive(rs.getBoolean("incDetailActive"));
-                invoiceDetailEntity.setUnit(rs.getString("unit"));
-                invoiceDetailEntity.setAuxiliaryUnitOne(rs.getString("auxiliaryUnitOne"));
-                invoiceDetailEntity.setAuxiliaryUnitTwo(rs.getString("auxiliaryUnitTwo"));
-                invoiceDetailEntity.setConversionRateOne(rs.getDouble("conversionRateOne"));
-                invoiceDetailEntity.setConversionRateTwo(rs.getDouble("conversionRateTwo"));
-                invoiceDetailEntity.setPrice(rs.getBigDecimal("price"));
-                invoiceDetailEntity.setIncPrice(rs.getBigDecimal("incPrice"));
-
-                MaterialEntity materialEntity = new MaterialEntity();
-                materialEntity.setMaterialNum(rs.getString("material_materialNum"));
-                materialEntity.setName(rs.getString("materName"));
-                materialEntity.setUnit(rs.getString("materUnit"));
-                materialEntity.setAuxiliaryUnitOne(rs.getString("auxiliaryUnitOne"));
-                materialEntity.setAuxiliaryUnitTwo(rs.getString("auxiliaryUnitTwo"));
-                materialEntity.setConversionRateOne(rs.getDouble("conversionRateOne"));
-                materialEntity.setConversionRateTwo(rs.getDouble("conversionRateTwo"));
-                materialEntity.setPrice(rs.getBigDecimal("materPrice"));
-                invoiceDetailEntity.setMaterial(materialEntity);
-
-                return invoiceDetailEntity;
-            }
-        });
-        InvoiceEntity invoice = jdbcDaoSupport.getJdbcTemplate().queryForObject("SELECT\n" +
-                "\t*\n" +
-                "\n" +
-                "FROM\n" +
-                "\tINV_INVOICE i\n" +
-                "LEFT JOIN INV_INVOICE_TYPE t ON i.invoiceType_invoiceTypeId = t.invoiceTypeId\n" +
-                "LEFT JOIN PM_INC inc ON i.inc_incId = inc.incId\n" +
-                "LEFT JOIN PM_CLIENT incClient ON i.client_clientId = incClient.clientId\n" +
-                "WHERE\n" +
-                "  \n" +
-                "\ti.invoiceId = ?\n" +
-                " AND i.active =1 \n" +
-                "\n", new Object[]{invoiceId}, new RowMapper<InvoiceEntity>() {
-            @Override
-            public InvoiceEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
-                InvoiceEntity invoice = new InvoiceEntity();
-                invoice.setInvoiceId(rs.getLong("invoiceId"));
-                invoice.setInvoiceNum(rs.getString("invoiceNum"));
-                invoice.setCarNum(rs.getString("carNum"));
-                invoice.setShift(rs.getString("shift"));
-                invoice.setSubmitDate(rs.getDate("submitDate"));
-                invoice.setClientAddress(rs.getString("clientAddress"));
-                invoice.setCreatedDate(rs.getDate("createdDate"));
-                invoice.setDeliveryDate(rs.getDate("deliveryDate"));
-                invoice.setRemark(rs.getString("remark"));
-                invoice.setReceivedDate(rs.getDate("receivedDate"));
-                invoice.setAuditStatus(rs.getInt("auditStatus"));
-                invoice.setActive(rs.getBoolean("active"));
-
-                IncEntity incEntity = new IncEntity();
-                incEntity.setIncId(rs.getLong("incId"));
-                incEntity.setIncName(rs.getString("incName"));
-                incEntity.setIncShortName(rs.getString("incShortName"));
-                invoice.setInc(incEntity);
-
-                ClientEntity clientEntity = new ClientEntity();
-                clientEntity.setClientId(rs.getLong("clientId"));
-                clientEntity.setClientName(rs.getString("clientName"));
-                clientEntity.setClientNum(rs.getString("clientNum"));
-                invoice.setClient(clientEntity);
-
-                InvoiceTypeEntity invoiceTypeEntity = new InvoiceTypeEntity();
-                invoiceTypeEntity.setInvoiceTypeId(rs.getLong("invoiceTypeId"));
-                invoiceTypeEntity.setType(rs.getInt("type"));
-                invoiceTypeEntity.setName(rs.getString("name"));
-                invoiceTypeEntity.setActive(rs.getBoolean("active"));
-                invoice.setInvoiceType(invoiceTypeEntity);
-
-                return invoice;
-            }
-        });
-        if (null != list) {
-            Set<InvoiceDetailEntity> set = new HashSet<InvoiceDetailEntity>();
-            set.addAll(list);
-            invoice.setInvoiceDetails(set);
-        }
-
-        return invoice;
-//        return  invoiceRepository.findOne(invoiceId);
+//
+//        List<InvoiceDetailEntity> list = jdbcDaoSupport.getJdbcTemplate().query("SELECT\n" +
+//                "\tj.*,\n" +
+//                "\tj.remark AS incDetailRemark,\n" +
+//                "\tj.active AS incDetailActive,\n" +
+//                "\tm.name AS materName,\n" +
+//                "\tm.unit AS materUnit,\n" +
+//                "\tm.price AS materPrice,\n" +
+//                "\tj.incPrice AS incPrice\n" +
+//                "FROM\n" +
+//                "\tINV_INVOICE_DETAIL j\n" +
+//                "LEFT JOIN INV_INVOICE i ON j.invoice_invoiceId = i.invoiceId\n" +
+//                "LEFT JOIN MAT_MATERIAL m ON j.material_materialNum = m.materialNum\n" +
+//                "WHERE\n" +
+//                "\tj.invoice_invoiceId = ?\n" +
+//                "AND j.active = 1 ", new Object[]{invoiceId}, new RowMapper<InvoiceDetailEntity>() {
+//            @Override
+//            public InvoiceDetailEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+//
+//                InvoiceDetailEntity invoiceDetailEntity = new InvoiceDetailEntity();
+//                invoiceDetailEntity.setInvoiceDetailId(rs.getLong("invoiceDetailId"));
+//                invoiceDetailEntity.setOrderCount(rs.getDouble("orderCount"));
+//                invoiceDetailEntity.setDeliveryCount(rs.getDouble("deliveryCount"));
+//                invoiceDetailEntity.setAmount(rs.getBigDecimal("amount"));
+//                invoiceDetailEntity.setRemark(rs.getString("incDetailRemark"));
+//                invoiceDetailEntity.setActive(rs.getBoolean("incDetailActive"));
+//                invoiceDetailEntity.setUnit(rs.getString("unit"));
+//                invoiceDetailEntity.setAuxiliaryUnitOne(rs.getString("auxiliaryUnitOne"));
+//                invoiceDetailEntity.setAuxiliaryUnitTwo(rs.getString("auxiliaryUnitTwo"));
+//                invoiceDetailEntity.setConversionRateOne(rs.getDouble("conversionRateOne"));
+//                invoiceDetailEntity.setConversionRateTwo(rs.getDouble("conversionRateTwo"));
+//                invoiceDetailEntity.setPrice(rs.getBigDecimal("price"));
+//                invoiceDetailEntity.setIncPrice(rs.getBigDecimal("incPrice"));
+//
+//                MaterialEntity materialEntity = new MaterialEntity();
+//                materialEntity.setMaterialNum(rs.getString("material_materialNum"));
+//                materialEntity.setName(rs.getString("materName"));
+//                materialEntity.setUnit(rs.getString("materUnit"));
+//                materialEntity.setAuxiliaryUnitOne(rs.getString("auxiliaryUnitOne"));
+//                materialEntity.setAuxiliaryUnitTwo(rs.getString("auxiliaryUnitTwo"));
+//                materialEntity.setConversionRateOne(rs.getDouble("conversionRateOne"));
+//                materialEntity.setConversionRateTwo(rs.getDouble("conversionRateTwo"));
+//                materialEntity.setPrice(rs.getBigDecimal("materPrice"));
+//                invoiceDetailEntity.setMaterial(materialEntity);
+//
+//                return invoiceDetailEntity;
+//            }
+//        });
+//        InvoiceEntity invoice = jdbcDaoSupport.getJdbcTemplate().queryForObject("SELECT\n" +
+//                "\t*\n" +
+//                "\n" +
+//                "FROM\n" +
+//                "\tINV_INVOICE i\n" +
+//                "LEFT JOIN INV_INVOICE_TYPE t ON i.invoiceType_invoiceTypeId = t.invoiceTypeId\n" +
+//                "LEFT JOIN PM_INC inc ON i.inc_incId = inc.incId\n" +
+//                "LEFT JOIN PM_CLIENT incClient ON i.client_clientId = incClient.clientId\n" +
+//                "WHERE\n" +
+//                "  \n" +
+//                "\ti.invoiceId = ?\n" +
+//                " AND i.active =1 \n" +
+//                "\n", new Object[]{invoiceId}, new RowMapper<InvoiceEntity>() {
+//            @Override
+//            public InvoiceEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+//                InvoiceEntity invoice = new InvoiceEntity();
+//                invoice.setInvoiceId(rs.getLong("invoiceId"));
+//                invoice.setInvoiceNum(rs.getString("invoiceNum"));
+//                invoice.setCarNum(rs.getString("carNum"));
+//                invoice.setShift(rs.getString("shift"));
+//                invoice.setSubmitDate(rs.getDate("submitDate"));
+//                invoice.setClientAddress(rs.getString("clientAddress"));
+//                invoice.setCreatedDate(rs.getDate("createdDate"));
+//                invoice.setDeliveryDate(rs.getDate("deliveryDate"));
+//                invoice.setRemark(rs.getString("remark"));
+//                invoice.setReceivedDate(rs.getDate("receivedDate"));
+//                invoice.setAuditStatus(rs.getInt("auditStatus"));
+//                invoice.setActive(rs.getBoolean("active"));
+//
+//                IncEntity incEntity = new IncEntity();
+//                incEntity.setIncId(rs.getLong("incId"));
+//                incEntity.setIncName(rs.getString("incName"));
+//                incEntity.setIncShortName(rs.getString("incShortName"));
+//                invoice.setInc(incEntity);
+//
+//                ClientEntity clientEntity = new ClientEntity();
+//                clientEntity.setClientId(rs.getLong("clientId"));
+//                clientEntity.setClientName(rs.getString("clientName"));
+//                clientEntity.setClientNum(rs.getString("clientNum"));
+//                invoice.setClient(clientEntity);
+//
+//                InvoiceTypeEntity invoiceTypeEntity = new InvoiceTypeEntity();
+//                invoiceTypeEntity.setInvoiceTypeId(rs.getLong("invoiceTypeId"));
+//                invoiceTypeEntity.setType(rs.getInt("type"));
+//                invoiceTypeEntity.setName(rs.getString("name"));
+//                invoiceTypeEntity.setActive(rs.getBoolean("active"));
+//                invoice.setInvoiceType(invoiceTypeEntity);
+//
+//                return invoice;
+//            }
+//        });
+//        if (null != list) {
+//            Set<InvoiceDetailEntity> set = new HashSet<InvoiceDetailEntity>();
+//            set.addAll(list);
+//            invoice.setInvoiceDetails(set);
+//        }
+//
+//        return invoice;
+        return  invoiceRepository.findOne(invoiceId);
     }
 
     /**
@@ -349,10 +348,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         String sql = "select count(DISTINCT inv.invoiceId) from INV_INVOICE inv\n" +
                 "left join PM_INC_MEMBER_REL incm\n" +
                 "on incm.inc_incId = inv.inc_incId\n" +
-                "left join PM_CLIENT_MEMBER_REL clim\n" +
-                "on clim.client_clientId = inv.client_clientId\n" +
                 "left join LOG_OPERATION log on log.invoice_invoiceId = inv.invoiceId " +
-                "where incm.member_memberId = :memberId and clim.member_memberId = :memberId and inv.active = 1 and inv.auditStatus >= :auditedStatus and (\n" +
+                "where incm.member_memberId = :memberId and  inv.active = 1 and inv.auditStatus >= :auditedStatus and (\n" +
                 "log.description like '%\"modifiedVal\":\""+auditedStatus+"\",\"name\":\"auditStatus\",\"originalVal\":\"0\"%' or \n" +
                 "log.description like '%\"modifiedVal\":\""+auditedStatus+"\",\"name\":\"auditStatus\",\"originalVal\":\""+(auditedStatus - 10)+"\"%'\n" +
                 ") ";
@@ -450,12 +447,10 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "LEFT JOIN INV_INVOICE_TYPE t on i.invoiceType_invoiceTypeId=t.invoiceTypeId " +
                 "LEFT JOIN PM_INC p on i.inc_incId =p.incId " +
                 "left join PM_INC_MEMBER_REL incm on incm.inc_incId = i.inc_incId\n" +
-                "left join PM_CLIENT_MEMBER_REL clim on clim.client_clientId = i.client_clientId " +
                 "left join LOG_OPERATION log on log.invoice_invoiceId = i.invoiceId " +
-                "LEFT JOIN PM_CLIENT c on c.clientId=i.client_clientId where 1=1 and i.active =1 and incm.member_memberId = ? and clim.member_memberId = ? and i.auditStatus >= ? and "+logSql;
+                "LEFT JOIN PM_CLIENT c on c.clientId=i.client_clientId where 1=1 and i.active =1 and incm.member_memberId = ?  and i.auditStatus >= ? and "+logSql;
         List<Object> objList=new ArrayList<Object>();
 
-        objList.add(memberId);
         objList.add(memberId);
         objList.add(auditedStatus);
 
@@ -528,6 +523,40 @@ public class InvoiceServiceImpl implements InvoiceService {
         return new PageImpl<InvoiceEntity>(invoiceEntityList,pageable,dbCount);
     }
 
+    @Override
+    public Integer getSendBackAuditStatus(Long invoiceId) {
+
+        Integer auditStatus = 0;
+
+        String sql = "select count(*) as count from LOG_OPERATION log where log.entity = 'invoice' and log.type = 'CREATE' and log.invoice_invoiceId = :invoiceId";
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("invoiceId",invoiceId);
+
+        Integer count = namedParameterJdbcTemplate.queryForObject(sql,parameterSource,Integer.class);
+
+        if( 0 < count){
+
+//            sql = "select log.description from LOG_OPERATION log where log.entity = 'invoice' and log.type = 'CREATE' and log.invoice_invoiceId = :invoiceId";
+//
+//            parameterSource = new MapSqlParameterSource();
+//            parameterSource.addValue("invoiceId",invoiceId);
+//
+//            String description = namedParameterJdbcTemplate.queryForObject(sql,parameterSource,String.class);
+//
+//            List<Modified> modifieds = JSON.parseArray(description,Modified.class);
+//            for(Modified modified :modifieds){
+//                if("auditStatus".equals(modified.getName())){
+//                    auditStatus = Integer.parseInt(modified.getOriginalVal());
+//                }
+//            }
+
+        }else{
+            auditStatus = 20;
+        }
+
+
+        return auditStatus;
+    }
 
 
     @Override
@@ -538,11 +567,9 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "LEFT JOIN INV_INVOICE_TYPE t on i.invoiceType_invoiceTypeId=t.invoiceTypeId " +
                 "LEFT JOIN PM_INC p on i.inc_incId =p.incId " +
                 "left join PM_INC_MEMBER_REL incm on incm.inc_incId = i.inc_incId\n" +
-                "left join PM_CLIENT_MEMBER_REL clim on clim.client_clientId = i.client_clientId " +
-                "LEFT JOIN PM_CLIENT c on c.clientId=i.client_clientId where 1=1 and i.active =1 and incm.member_memberId = ? and clim.member_memberId = ?";
+                "LEFT JOIN PM_CLIENT c on c.clientId=i.client_clientId where 1=1 and i.active =1 and incm.member_memberId = ? ";
         List<Object> objList=new ArrayList<Object>();
 
-        objList.add(memberId);
         objList.add(memberId);
 
         if(searchTerm.getAuditStatus() !=null){
@@ -645,9 +672,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         String sql = "select count(inv.invoiceId) from INV_INVOICE inv\n" +
                 "left join PM_INC_MEMBER_REL incm\n" +
                 "on incm.inc_incId = inv.inc_incId\n" +
-                "left join PM_CLIENT_MEMBER_REL clim\n" +
-                "on clim.client_clientId = inv.client_clientId\n" +
-                "where incm.member_memberId = :memberId and clim.member_memberId = :memberId and inv.auditStatus in(:auditStatuses) and inv.active = 1";
+                "where incm.member_memberId = :memberId and inv.auditStatus in(:auditStatuses) and inv.active = 1";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("auditStatuses", auditStatuses);

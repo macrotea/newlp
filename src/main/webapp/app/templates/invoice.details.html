@@ -1,8 +1,22 @@
 <div class="form-group">
     <div class="clearfix" ng-class="{'col-md-4':!readOnly,'hide':readOnly}">
         <div class="input-group">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown"  ng-disabled="invoiceDetails.length > 0">
+                    {{ searchTerm.materialType.name|| '选择类别'}} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href='javascript:;' ng-click="choseSearchType('礼品',1)">礼品</a></li>
+                    <li><a href='javascript:;' ng-click="choseSearchType('样品',2)">样品</a></li>
+                    <li><a href='javascript:;' ng-click="choseSearchType('送检验',3)">送检验</a></li>
+                    <li><a href='javascript:;' ng-click="choseSearchType('广告成品',4)">广告成品</a></li>
+                    <li><a href='javascript:;' ng-click="choseSearchType('广告半成品',5)">广告半成品</a></li>
+                    <!--<li class="divider"></li>-->
+                    <!--<li><a href='javascript:;' ng-click="resetSearchType()">清除</a></li>-->
+                </ul>
+            </div><!-- /btn-group -->
             <input type="text" class="form-control search-query" placeholder="输入物料编码或者物料名称"
-                   ng-model="searchTerm">
+                   ng-model="searchTerm.q">
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-purple btn-sm" ng-click="search()">
                             搜索
@@ -20,12 +34,12 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="material in data._embedded.materials">
+            <tr ng-repeat="material in data.content">
                 <td class="align-middle">{{material.materialNum}}</td>
                 <td class="align-middle">{{material.name}}</td>
                 <td class="align-middle center">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-xs btn-success" ng-click="add(material)">
+                        <button type="button" class="btn btn-xs btn-success" ng-click="add(material)" ng-disabled="material.unselectable">
                             <i class="ace-icon fa fa-plus-circle bigger-120"></i>
                         </button>
                     </div>
@@ -49,7 +63,6 @@
                         first-text="&laquo;" last-text="&raquo;"></pagination>
         </div>
     </div>
-
     <div ng-class="{'col-md-8':!readOnly,'col-md-12':readOnly}">
         <div class="form-control-static">
             <div class="label label-lg label-info arrowed-in arrowed-right">
@@ -63,11 +76,11 @@
                 <tr>
                     <th>物料编码</th>
                     <th>物料名称</th>
-                    <th>订单数量</th>
-                    <th>实发数量</th>
-                    <th>主计量单位</th>
-                    <th>换算率1</th>
-                    <th>单价</th>
+                    <th ng-if="!$state.is('home.depot.add.delivery')">订单数量</th>
+                    <th ng-if="!$state.includes('home.customer_service.order')">实发数量</th>
+                    <!--<th>主单位</th>-->
+                    <th>辅数量</th>
+                    <!--<th>单价</th>-->
                     <th>公司售价</th>
                     <th>金额</th>
                     <th>备注</th>
@@ -78,35 +91,39 @@
                 <tr ng-repeat="invoiceDetail in invoiceDetails">
                     <td class="align-middle" ng-bind="invoiceDetail.material.materialNum"></td>
                     <td class="align-middle" ng-bind="invoiceDetail.material.name"></td>
-                    <td class="align-middle">
+                    <td class="align-middle" ng-if="!$state.is('home.depot.add.delivery')">
                         <span class="align-middle" ng-bind="invoiceDetail.orderCount"
                               ng-if="!fields.orderCount.editable"></span>
 
                         <div class="ace-spinner touch-spinner" style="width: 80px;" ng-if="fields.orderCount.editable">
                             <div class="input-group">
-                                <input type="number" min="0" class="input-mini spinner-input form-control"
+                                <input type="number" class="input-mini spinner-input form-control"
                                        ng-model="invoiceDetail.orderCount"
                                        ng-change="invoiceDetail.deliveryCount=invoiceDetail.orderCount">
                             </div>
                         </div>
+                           <span class="padding-6" ng-bind='invoiceDetail.unit'></span>
                     </td>
-                    <td class="align-middle">
+                    <td class="align-middle"  ng-if="!$state.includes('home.customer_service.order')">
                         <span class="align-middle" ng-bind="invoiceDetail.deliveryCount"
                               ng-if="!fields.deliveryCount.editable"></span>
 
                         <div class="ace-spinner touch-spinner" style="width: 120px;"
                              ng-if="fields.deliveryCount.editable">
                             <div class="input-group">
-                                <input type="number" min="0" class="input-mini spinner-input form-control"
+                                <input type="number" class="input-mini spinner-input form-control"
                                        ng-model="invoiceDetail.deliveryCount">
                             </div>
                         </div>
+                           <span class="padding-6" ng-bind='invoiceDetail.unit'></span>
                     </td>
-                    <td class="align-middle">{{(invoiceDetail.orderCount * invoiceDetail.conversionRateOne) | number:4}}  {{invoiceDetail.unit}}
+                    <!--<td class="align-middle">-->
+                        <!--{{invoiceDetail.unit}}-->
+                    <!--</td>-->
+                    <td class="align-middle">
+                        {{(invoiceDetail.deliveryCount * invoiceDetail.conversionRateOne) | number:4}} {{invoiceDetail.auxiliaryUnitOne}}
                     </td>
-                    <td class="align-middle" ng-bind="invoiceDetail.conversionRateOne">
-                    </td>
-                    <td class="align-middle">{{invoiceDetail.price}}</td>
+                    <!--<td class="align-middle">{{invoiceDetail.price}}</td>-->
                     <td class="align-middle" ng-bind="invoiceDetail.incPrice | number:2"></td>
                     <td class="align-middle">{{(invoiceDetail.deliveryCount*invoiceDetail.incPrice) |number:2}}
                     </td>
@@ -147,6 +164,9 @@
                 </div>
                 <span class="help-inline col-xs-12 col-sm-7" ng-if=" undefined !=materialNumHuntingSuccess &&!materialNumHuntingSuccess">
                     <span class="middle red">查无此物料！</span>
+                </span>
+                <span class="help-inline col-xs-12 col-sm-7" ng-if=" undefined !=materialTypeNotMatch &&materialTypeNotMatch">
+                    <span class="middle red">物料类别不一致！</span>
                 </span>
             </div>
         </div>

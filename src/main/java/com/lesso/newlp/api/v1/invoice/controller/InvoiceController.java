@@ -159,4 +159,12 @@ public class InvoiceController {
         model.addAttribute("auditStatus", auditStatus);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/{invoiceId}/auditStatus/getSendBackAuditStatus", method = RequestMethod.GET)
+    public ResponseEntity<Model> getSendBackAuditStatus(Model model, @PathVariable("invoiceId") Long invoiceId) throws Exception {
+        logger.debug("getting invoice:{}", invoiceId);
+        Integer auditStatus = invoiceService.getSendBackAuditStatus(invoiceId);
+        model.addAttribute("auditStatus", auditStatus);
+        return new ResponseEntity<>(model, HttpStatus.OK);
+    }
 }

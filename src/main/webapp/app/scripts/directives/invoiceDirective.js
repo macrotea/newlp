@@ -11,7 +11,10 @@ angular.module('newlpApp')
                 scope: {
                     options: '=options'
                 },
-                controller: function ($scope, $state, Invoice, ngDialog) {
+                controller: function ($scope, $location, $state, Invoice, ngDialog) {
+
+                    $scope.$location = $location;
+                    $scope.$state = $state;
 
                     /*init actions*/
                     $scope.edit = $scope.options.actions.edit;
@@ -192,8 +195,9 @@ angular.module('newlpApp')
                     readOnly: '=?readOnly',
                     options: '=?options'
                 },
-                controller: function ($scope,$timeout,Material) {
+                controller: function ($scope,$timeout,Material,$http,$state) {
 
+                    $scope.$state = $state;
 
                     $scope.options = $scope.options ? $scope.options : {};
                     $scope.options.fields = $scope.options.fields ? $scope.options.fields : {};
@@ -210,22 +214,56 @@ angular.module('newlpApp')
 
                     //init temp variables
                     $scope.data = undefined;
-                    $scope.searchTerm = '';
+                    $scope.searchTerm = {
+                        materialType:{
+                            name:'礼品',
+                            materialTypeId:1
+                        },
+                        q:''
+                    };
+
+                    if($scope.invoiceDetails && $scope.invoiceDetails.length > 0){
+                        Material.get({
+                            materialNum: $scope.invoiceDetails[0].material.materialNum
+                        },function (data) {
+                            $scope.searchTerm.materialType.name=data.materialType.name;
+                            $scope.searchTerm.materialType.materialTypeId=data.materialType.materialTypeId;
+                        })
+                    }
+
                     $scope.currentPage = 1;
 
+                    $scope.choseSearchType = function (name, materialTypeId) {
+                        $scope.searchTerm.materialType.name= name;
+                        $scope.searchTerm.materialType.materialTypeId= materialTypeId;
+                    };
 
                     //search materials
                     $scope.search = function () {
                         $scope.loading = true;
 
-                        Material.findByNameOrNumLike({
-                            page: $scope.currentPage - 1,
-                            size: 10,
-                            searchTerm: $scope.searchTerm
-                        }, {}, function (data) {
-                            $scope.loading = false;
-                            $scope.data = data;
-                        });
+                        if(undefined == $scope.searchTerm.materialType.materialTypeId){
+                            Material.findByNameOrNumLike({
+                                page: $scope.currentPage - 1,
+                                size: 10,
+                                q: $scope.searchTerm.q
+                            }, {}, function (data) {
+                                $scope.loading = false;
+                                $scope.data = data;
+                            });
+                        }else{
+                            Material.findByNameOrNumLikeAndMaterialTypeId({
+                                page: $scope.currentPage - 1,
+                                size: 10,
+                                materialTypeId:$scope.searchTerm.materialType.materialTypeId,
+                                q: $scope.searchTerm.q
+                            }, {}, function (data) {
+                                $scope.loading = false;
+                                $scope.data = data;
+                            });
+                        }
+
+
                     };
                     $scope.onPageChanged = $scope.search;
 
@@ -241,9 +279,6 @@ angular.module('newlpApp')
                         });
 
                         if (notExist && 20 > $scope.invoiceDetails.length) {
-
-
-
 
                             var invoiceDetail = {};
                             invoiceDetail.orderCount = 1;
@@ -267,8 +302,12 @@ angular.module('newlpApp')
                                 });
                             /*bad code due to sudden requirement */
 
+                            invoiceDetail.materialTypeId = material.materialType.materialTypeId;
+                            $scope.searchTerm.materialType.name = material.materialType.name;
+                            $scope.searchTerm.materialType.materialTypeId = material.materialType.materialTypeId;
 
                             $scope.invoiceDetails.push(invoiceDetail);
+                            $scope.disableDiffTypeMaterial();
                         }
 
                     };
@@ -293,26 +332,55 @@ angular.module('newlpApp')
 
                     $scope.onMaterialNumHunting = function ($event) {
                         $scope.materialNumHuntingSuccess = undefined;
-                        if(13 === $event.keyCode || 'click' == $event.type){
-                            Material.findByMaterialNum({
-                                page: $scope.currentPage - 1,
-                                size: 10,
+                        $scope.materialTypeNotMatch = undefined;
+
+                        if (13 === $event.keyCode || 'click' == $event.type) {
+                            Material.get({
                                 materialNum: $scope.materialNumHunting
                             }, {}, function (data) {
-                                if(data._embedded && data._embedded.materials[0]){
-                                    var material =data._embedded.materials[0];
-                                    $scope.add(material);
-                                    $scope.materialNumHuntingSuccess = true;
 
-                                    $timeout(function () {
-                                        $scope.focusInputFiled(material.materialNum,'invoiceDetail.orderCount');
-                                    }, 0);
-                                }else{
+                                /* not such material*/
+                                if (!data.materialNum) {
                                     $scope.materialNumHuntingSuccess = false;
+                                    return;
                                 }
+
+                                /* material type not match selected */
+                                if ($scope.invoiceDetails && $scope.invoiceDetails.length > 0) {
+                                    if (data.materialType.materialTypeId != $scope.invoiceDetails[0].material.materialType.materialTypeId) {
+                                        $scope.materialTypeNotMatch = true;
+                                        return;
+                                    }
+                                }
+
+                                /* add material */
+                                $scope.add(data);
+                                $scope.materialNumHuntingSuccess = true;
+
+                                $timeout(function () {
+                                    $scope.focusInputFiled(data.materialNum, 'invoiceDetail.orderCount');
+                                }, 0);
+
                             });
+
+
+                            $scope.disableDiffTypeMaterial();
+
                         }
 
+                    };
+
+                    $scope.disableDiffTypeMaterial = function () {
+                        if($scope.invoiceDetails.length > 0){
+                            var materialTypeId = $scope.invoiceDetails[0].material.materialType.materialTypeId;
+                            if($scope.data && $scope.data.content){
+                                $scope.data.content.forEach(function (material) {
+                                    if(materialTypeId != material.materialType.materialTypeId){
+                                        material.unselectable = true;
+                                    }
+                                })
+                            }
+                        }
                     };
 
                 },
@@ -361,7 +429,7 @@ angular.module('newlpApp')
                     readOnly: '=?readOnly',
                     options: '=?options'
                 },
-                controller: function ($scope, Invoice) {
+                controller: function ($scope,$state, Invoice) {
 
                     $scope.options = $scope.options ? $scope.options : {};
                     $scope.options.fields = $scope.options.fields ? $scope.options.fields : {};
@@ -417,6 +485,7 @@ angular.module('newlpApp')
                         $scope.invoice.auditStatus = $scope.actions.save.auditStatus;
                         Invoice.save({}, $scope.invoice).$promise.then(function (data) {
                             $scope.success = true;
+                            $state.go('home.customer_service.order.add.success',{type:'save'});
                         }, function (data) {
                             $scope.error = true;
                         });
@@ -445,6 +514,8 @@ angular.module('newlpApp')
 
                             Invoice.save({}, $scope.invoice).$promise.then(function (data) {
                                 $scope.success = true;
+
+                                $state.go('home.customer_service.order.add.success',{type:'draft'});
                             }, function (data) {
                                 $scope.error = true;
                             });
@@ -470,6 +541,7 @@ angular.module('newlpApp')
                             auditStatus: $scope.invoice.auditStatus
                         }).$promise.then(function (data) {
                                 $scope.success = true;
+                                $state.go('home.depot.receives',{success:true});
                             }, function (data) {
                                 $scope.error = true;
                             });
@@ -547,6 +619,6 @@ angular.module('newlpApp')
                 });
             }
         };
-    });
+    })
 ;
 

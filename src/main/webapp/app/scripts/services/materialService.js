@@ -41,8 +41,30 @@ angular.module('newlpApp')
                     'Content-Type': 'application/json;charset=UTF-8'
                 }
             },
+            findByNameOrNumLikeAndMaterialTypeId: {
+                url: '/api/v1/materials/search/findByNameOrNumLikeAndMaterialTypeId',
+                method: 'GET',
+                isArray: false,
+                params: {
+                    memberId:currentUser.getUsername()
+                },
+                headers: {
+                    'Content-Type': 'application/json;charset=UTF-8'
+                }
+            },
             findByMaterialNum: {
-                url: '/api/rest/materials/search/findByMaterialNum',
+                url: '/api/v1/materials/search/findByMaterialNum',
+                method: 'GET',
+                isArray: false,
+                params: {
+                    memberId:currentUser.getUsername()
+                },
+                headers: {
+                    'Content-Type': 'application/json;charset=UTF-8'
+                }
+            },
+            findByMaterialNumAndMaterialTypeId: {
+                url: '/api/rest/materials/search/findByMaterialNumAndMaterialTypeId',
                 method: 'GET',
                 isArray: false,
                 params: {
